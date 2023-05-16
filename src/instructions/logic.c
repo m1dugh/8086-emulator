@@ -4,7 +4,7 @@
 
 char *xor_rm_reg(binary_stream_t *data) {
     struct params_t params;
-    if(extract_mod_reg_rm(data, &params) != 0) {
+    if(extract_dw_mod_reg_rm(data, &params) != 0) {
         return NULL;
     }
     char *reg = get_reg(params.w, params.reg);

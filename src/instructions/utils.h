@@ -23,7 +23,17 @@ struct params_t {
     char data_low;
 };
 
+int extract_w(binary_stream_t *data, struct params_t *params);
+int extract_d(binary_stream_t *data, struct params_t *params);
+int extract_reg(binary_stream_t *data, struct params_t *params);
+int extract_rm(binary_stream_t *data, struct params_t *params);
+int extract_mod(binary_stream_t *data, struct params_t *params);
+
 int extract_mod_reg_rm(binary_stream_t *data, struct params_t *params);
+int extract_w_mod_reg_rm(binary_stream_t *data, struct params_t *params);
+int extract_dw_mod_reg_rm(binary_stream_t *data, struct params_t *params);
+
+short extract_data(binary_stream_t *data, struct params_t *params);
 
 char *get_reg(char w, char val);
 
@@ -31,5 +41,11 @@ char *get_short_reg(char val);
 char *get_word_reg(char val);
 
 char *get_rm(binary_stream_t *data, char mod, char w, char val);
+
+char *format_dw_rm_to_reg(char *val, binary_stream_t *data);
+
+char *format_w_rm_to_reg(char *val, binary_stream_t *data);
+
+char *format_rm_to_reg(char *val, binary_stream_t *data);
 
 #endif // !INSTRUCTIONS_UTILS_H

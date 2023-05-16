@@ -2,30 +2,56 @@
 #include "stdio.h"
 #include <malloc.h>
 
+int extract_w(binary_stream_t *data, struct params_t *params) {
+    return bs_next_reset(data, 1, &params->w);
+}
+
+int extract_d(binary_stream_t *data, struct params_t *params) {
+    return bs_next_reset(data, 1, &params->d);
+}
+
+int extract_reg(binary_stream_t *data, struct params_t *params) {
+    return bs_next_reset(data, 3, &params->reg);
+}
+
+int extract_mod(binary_stream_t *data, struct params_t *params) {
+    return bs_next_reset(data, 2, &params->mod); 
+}
+
+int extract_rm(binary_stream_t *data, struct params_t *params) {
+    return bs_next_reset(data, 3, &params->rm);
+}
+
 int extract_mod_reg_rm(binary_stream_t *data, struct params_t *params) {
-    struct params_t res;
-    if(bs_next_reset(data, 1, &res.d) != 0) {
+    if(extract_mod(data, params) != 0) {
         return -1;
     }
 
-    if(bs_next_reset(data, 1, &res.w) != 0) {
+    if(extract_reg(data, params) != 0) {
         return -1;
     }
 
-    if(bs_next_reset(data, 2, &res.mod) != 0) {
+    if(extract_rm(data, params) != 0) {
         return -1;
     }
 
-    if(bs_next_reset(data, 3, &res.reg) != 0) {
-        return -1;
-    }
-
-    if(bs_next_reset(data, 3, &res.rm) != 0) {
-        return -1;
-    }
-
-    *params = res;
     return 0;
+}
+
+int extract_w_mod_reg_rm(binary_stream_t *data, struct params_t *params) {
+    if(extract_w(data, params) != 0) {
+        return -1;
+    }
+
+    return extract_mod_reg_rm(data, params);
+}
+
+int extract_dw_mod_reg_rm(binary_stream_t *data, struct params_t *params) {
+    if(extract_d(data, params) != 0) {
+        return -1;
+    }
+
+    return extract_w_mod_reg_rm(data, params);
 }
 
 
@@ -85,7 +111,7 @@ char *get_rm(binary_stream_t *data, char w, char mod, char rm) {
         if (reg == NULL)
             return NULL;
         char *res = malloc(3);
-        snprintf(res, 2, "%s", reg);
+        snprintf(res, 3, "%s", reg);
         return res;
     }
 
@@ -109,34 +135,144 @@ char *get_rm(binary_stream_t *data, char w, char mod, char rm) {
     }
 
     char *effective_address = malloc(20);
+    char *format;
     switch(rm) {
         case 0b000:
-            snprintf(effective_address, 20, disp > 0 ? "[bx+si+%d]" : "[bx+si%d]", disp);
+            if (disp > 0)
+                format = "[bx+si+%d]";
+            else if (disp < 0)
+                format = "[bx+si%d]";
+            else
+                format = "[bx+si]";
             break;
         case 0b001:
-            snprintf(effective_address, 20, disp > 0 ? "[bx+di+%d]" : "[bx+di%d]", disp);
+            if (disp > 0)
+                format = "[bx+di+%d]";
+            else if (disp < 0)
+                format = "[bx+di%d]";
+            else
+                format = "[bx+di]";
             break;
         case 0b010:
-            snprintf(effective_address, 20, disp > 0 ? "[bp+si+%d]" : "[bp+si%d]", disp);
+            if (disp > 0)
+                format = "[bp+si+%d]";
+            else if (disp < 0)
+                format = "[bp+si%d]";
+            else
+                format = "[bp+si]";
             break;
         case 0b011:
-            snprintf(effective_address, 20, disp > 0 ? "[bp+di+%d]" : "[bp+di%d]", disp);
+            if (disp > 0)
+                format = "[bp+di+%d]";
+            else if (disp < 0)
+                format = "[bp+di%d]";
+            else
+                format = "[bp+di]";
             break;
         case 0b100:
-            snprintf(effective_address, 20, disp > 0 ? "[si+%d]" : "[si%d]", disp);
+            if (disp > 0)
+                format = "[si+%d]";
+            else if (disp < 0)
+                format = "[si%d]";
+            else
+                format = "[si]";
             break;
         case 0b101:
-            snprintf(effective_address, 20, disp > 0 ? "[di+%d]" : "[di%d]", disp);
+            if (disp > 0)
+                format = "[di+%d]";
+            else if (disp < 0)
+                format = "[di%d]";
+            else
+                format = "[di]";
             break;
         case 0b110:
-            snprintf(effective_address, 20, disp > 0 ? "[bp+%d]" : "[bp%d]", disp);
+            if (disp > 0)
+                format = "[bp+%d]";
+            else if (disp < 0)
+                format = "[bp%d]";
+            else
+                format = "[bp]";
             break;
         case 0b111:
-            snprintf(effective_address, 20, disp > 0 ? "[bx+%d]" : "[bx%d]", disp);
+            if (disp > 0)
+                format = "[bx+%d]";
+            else if (disp < 0)
+                format = "[bx%d]";
+            else
+                format = "[bx]";
             break;
         default:
             return NULL;
     }
+    if (disp != 0)
+        snprintf(effective_address, 20, format, disp);
+    else
+        snprintf(effective_address, 20, format);
 
     return effective_address;
 }
+
+char *format_dw_rm_to_reg(char *val, binary_stream_t *data) {
+    struct params_t params;
+    if(extract_dw_mod_reg_rm(data, &params) != 0) {
+        return NULL;
+    }
+    char *reg = get_reg(params.w, params.reg);
+
+    char *rm_value = get_rm(data, params.w, params.mod, params.rm);
+
+    char *instruction = malloc(50);
+    if (params.d) {
+        snprintf(instruction, 50, "%s %s, %s", val, reg, rm_value);
+    } else {
+        snprintf(instruction, 50, "%s %s, %s", val, rm_value, reg);
+    }
+    free(rm_value);
+    return instruction;
+}
+
+char *format_w_rm_to_reg(char *val, binary_stream_t *data) {
+    struct params_t params;
+    if(extract_w_mod_reg_rm(data, &params) != 0) {
+        return NULL;
+    }
+    char *reg = get_reg(params.w, params.reg);
+
+    char *rm_value = get_rm(data, params.w, params.mod, params.rm);
+
+    char *instruction = malloc(50);
+    snprintf(instruction, 50, "%s %s, %s", val, reg, rm_value);
+    return instruction;
+}
+
+char *format_rm_to_reg(char *val, binary_stream_t *data) {
+    struct params_t params;
+    if(extract_mod_reg_rm(data, &params) != 0) {
+        return NULL;
+    }
+
+    char *reg = get_reg(0b1, params.reg);
+
+    char *rm_value = get_rm(data, 0b1, params.mod, params.rm);
+
+    char *instruction = malloc(50);
+    snprintf(instruction, 50, "%s %s, %s", val, reg, rm_value);
+
+    free(rm_value);
+    return instruction;
+}
+
+char extract_byte(binary_stream_t *data) {
+    char res;
+    bs_next_reset(data, 8, &res);
+    return res;
+}
+
+short extract_data(binary_stream_t *data, struct params_t *params) {
+    short val = extract_byte(data);
+    if(params->w) {
+        val = (extract_byte(data) << 8) + val;
+    }
+    return val;
+}
+

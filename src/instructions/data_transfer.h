@@ -22,4 +22,7 @@ char *push_rm(binary_stream_t *stream);
 char *push_reg(binary_stream_t *stream);
 char *push_seg_reg(binary_stream_t *stream);
 
+// LEA
+char *lea(binary_stream_t *stream);
+
 #endif // !INSTRUCTIONS_DATA_TRANSFER_H

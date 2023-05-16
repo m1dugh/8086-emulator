@@ -4,6 +4,8 @@
 #include "utils/binary_stream.h"
 #include "instructions/logic.h"
 #include "instructions/data_transfer.h"
+#include "instructions/arithmetic.h"
+#include "utils/format.h"
 
 struct exec_header {
     unsigned char a_magic[2];   /* magic number */
@@ -32,21 +34,6 @@ long to_long(char *buffer) {
         res = (res << 8) + buffer[i];
 
     return res;
-}
-
-void print_byte(char c) {
-    char mask = 0x80;
-    for(int i = 0; i < 8; i++, mask >>= 1) {
-        if (mask & c) {
-            printf("1");
-        } else {
-            printf("0");
-        }
-    }
-}
-void print_hex(char c) {
-    printf("%x", (c & 0xf0) >> 4);
-    printf("%x", (c & 0xf));
 }
 
 short to_short(char *buffer) {
@@ -102,35 +89,52 @@ int read_header(FILE *stream, struct exec_header *header) {
     return 0;
 }
 
-char *find_4_len_instruction(char instruction, binary_stream_t *stream) {
+char *find_4_len_instruction(unsigned char instruction, binary_stream_t *stream) {
+    switch (instruction) {
+        case 0b1011:
+            return mov_immediate_to_reg(stream);
+
+    }
     return NULL;
 }
 
-char *find_5_len_instruction(char instruction, binary_stream_t *stream) {
+char *find_5_len_instruction(unsigned char instruction, binary_stream_t *stream) {
     return NULL;
 }
 
-char *find_6_len_instruction(char instruction, binary_stream_t *stream) {
+char *find_6_len_instruction(unsigned char instruction, binary_stream_t *stream) {
     switch (instruction) {
         case 0b001100:
             return xor_rm_reg(stream);
         case 0b100010:
             return mov_rm_to_reg(stream);
+        case 0b000000:
+            return add_rm_with_reg(stream);
     }
     return NULL;
 }
 
-char *find_7_len_instruction(char instruction, binary_stream_t *stream) {
+char *find_7_len_instruction(unsigned char instruction, binary_stream_t *stream) {
+    switch(instruction) {
+        case 0b1100011:
+            return mov_immediate_to_rm(stream);
+
+    }
     return NULL;
 }
 
-char *find_8_len_instruction(char instruction, binary_stream_t *stream) {
+char *find_8_len_instruction(unsigned char instruction, binary_stream_t *stream) {
+    switch(instruction) {
+        case 0b10001101:
+            return lea(stream);
+
+    }
     return NULL;
 }
 
 char *next_instruction(binary_stream_t *stream) {
     bs_flush_buffer(stream);
-    char instruction;
+    unsigned char instruction;
     char *res;
 
     if (bs_next_reset(stream, 4, &instruction) != 0)
@@ -177,14 +181,14 @@ int main(int argc, char **argv) {
 
     binary_stream_t *stream = bs_new(f, header.a_text);
 
-    char res;
-    for (int i = 0; i < 10; i++) {
+    unsigned short index = 0;
+    while(!bs_finished(stream)) {
         char *res = next_instruction(stream);
-        printf("found: %s\n", res);
-        for(size_t i = 0; i < stream->instruction_buffer_len; i++) {
-            print_hex(stream->instruction_buffer[i]);
+        if(printf_instruction(index, stream->instruction_buffer, stream->instruction_buffer_len, res)) {
+            fflush(stdout);
+            errx(-1, "Instruction not found");
         }
-        printf("\n");
+        index += stream->instruction_buffer_len;
     }
 
     fclose(f);
