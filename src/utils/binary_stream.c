@@ -50,9 +50,6 @@ binary_stream_t *bs_new(FILE *stream, long len) {
 }
 
 int bs_next(binary_stream_t *stream, int size, char *res) {
-    if(size > 8)
-        return -1;
-    *res = 0;
     for(int i = 0; i < size; i++) {
         char bit = 0;
         if (read_bit(stream, &bit) == 0) {
@@ -63,4 +60,14 @@ int bs_next(binary_stream_t *stream, int size, char *res) {
     }
 
     return 0;
+}
+
+int bs_next_reset(binary_stream_t *stream, int size, char *res) {
+    *res = 0;
+    return bs_next(stream, size, res);
+}
+
+void bs_free(binary_stream_t *stream) {
+    free(stream->instruction_buffer);
+    free(stream);
 }

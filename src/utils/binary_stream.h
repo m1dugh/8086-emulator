@@ -16,6 +16,9 @@ typedef struct {
 
 binary_stream_t *bs_new(FILE *stream, long len);
 int bs_next(binary_stream_t *, int size, char *res);
+int bs_next_reset(binary_stream_t *, int size, char *res);
+
+void bs_free(binary_stream_t *stream);
 
 
 
