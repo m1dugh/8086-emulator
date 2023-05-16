@@ -71,3 +71,11 @@ void bs_free(binary_stream_t *stream) {
     free(stream->instruction_buffer);
     free(stream);
 }
+
+void bs_flush_buffer(binary_stream_t *stream) {
+    stream->instruction_buffer_len = 0;
+}
+
+size_t bs_read_bytes(binary_stream_t *stream) {
+    return stream->_index;
+}

@@ -1,0 +1,35 @@
+#ifndef INSTRUCTIONS_UTILS_H
+#define INSTRUCTIONS_UTILS_H
+
+#include "../utils/binary_stream.h"
+
+#define GET_DATA(val, data, size)   if(bs_next_reset(data, size, &val) != 0) {\
+                                        return NULL; \
+                                    }
+ 
+
+#define GET_MOD(mod, data) GET_DATA(mod, data, 2)
+#define GET_RM_VALUE(reg, data) GET_DATA(mod, data, 3)
+
+#define GET_BIT(val, data) GET_DATA(val, data, 1)
+
+struct params_t {
+    char d;
+    char w;
+    char mod;
+    char reg;
+    char rm;
+    char data_high;
+    char data_low;
+};
+
+int extract_mod_reg_rm(binary_stream_t *data, struct params_t *params);
+
+char *get_reg(char w, char val);
+
+char *get_short_reg(char val);
+char *get_word_reg(char val);
+
+char *get_rm(binary_stream_t *data, char mod, char w, char val);
+
+#endif // !INSTRUCTIONS_UTILS_H

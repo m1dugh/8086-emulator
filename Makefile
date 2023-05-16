@@ -1,6 +1,6 @@
 CC=gcc
 CFLAGS=-Wall -Wextra -O3
-DFLAGS=-Wall -Wextra -Werror -O0 -g -fsanitize=address
+DFLAGS=-Wall -Wextra -O0 -g -fsanitize=address
 
 LD=gcc
 
@@ -14,8 +14,9 @@ DEBUG_TARGET_DIR=$(ROOT_TARGET)/Debug
 DEBUG_TARGET=$(DEBUG_TARGET_DIR)/$(BINARY).debug
 
 SRC_DIR=./src
-SRC=utils/binary_stream.c main.c
-HEADERS=utils/binary_stream.h
+SRC=utils/binary_stream.c main.c instructions/logic.c instructions/data_transfer.c instructions/utils.c
+HEADERS=utils/binary_stream.h instructions/logic.h instructions/data_transfer.h instructions/utils.h
+
 DEPS=$(addprefix $(SRC_DIR)/, $(HEADERS))
 
 OBJ_ROOT=./obj

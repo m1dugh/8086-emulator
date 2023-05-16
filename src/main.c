@@ -2,6 +2,8 @@
 #include <malloc.h>
 #include <err.h>
 #include "utils/binary_stream.h"
+#include "instructions/logic.h"
+#include "instructions/data_transfer.h"
 
 struct exec_header {
     unsigned char a_magic[2];   /* magic number */
@@ -100,6 +102,65 @@ int read_header(FILE *stream, struct exec_header *header) {
     return 0;
 }
 
+char *find_4_len_instruction(char instruction, binary_stream_t *stream) {
+    return NULL;
+}
+
+char *find_5_len_instruction(char instruction, binary_stream_t *stream) {
+    return NULL;
+}
+
+char *find_6_len_instruction(char instruction, binary_stream_t *stream) {
+    switch (instruction) {
+        case 0b001100:
+            return xor_rm_reg(stream);
+        case 0b100010:
+            return mov_rm_to_reg(stream);
+    }
+    return NULL;
+}
+
+char *find_7_len_instruction(char instruction, binary_stream_t *stream) {
+    return NULL;
+}
+
+char *find_8_len_instruction(char instruction, binary_stream_t *stream) {
+    return NULL;
+}
+
+char *next_instruction(binary_stream_t *stream) {
+    bs_flush_buffer(stream);
+    char instruction;
+    char *res;
+
+    if (bs_next_reset(stream, 4, &instruction) != 0)
+        return NULL;
+    if ((res = find_4_len_instruction(instruction, stream)) != NULL)
+        return res;
+
+    if (bs_next(stream, 1, &instruction) != 0)
+        return NULL;
+    if ((res = find_5_len_instruction(instruction, stream)) != NULL)
+        return res;
+
+    if (bs_next(stream, 1, &instruction) != 0)
+        return NULL;
+    if ((res = find_6_len_instruction(instruction, stream)) != NULL)
+        return res;
+
+    if (bs_next(stream, 1, &instruction) != 0)
+        return NULL;
+    if ((res = find_7_len_instruction(instruction, stream)) != NULL)
+        return res;
+
+    if (bs_next(stream, 1, &instruction) != 0)
+        return NULL;
+    if ((res = find_8_len_instruction(instruction, stream)) != NULL)
+        return res;
+
+    return NULL;
+}
+
 int main(int argc, char **argv) {
     if (argc != 2) {
         errx(-1, "Usage: %s <file>", argv[0]);
@@ -118,10 +179,11 @@ int main(int argc, char **argv) {
 
     char res;
     for (int i = 0; i < 10; i++) {
-        bs_next(stream, 8, &res);
-        print_byte(res);
-        printf(":");
-        print_hex(res);
+        char *res = next_instruction(stream);
+        printf("found: %s\n", res);
+        for(size_t i = 0; i < stream->instruction_buffer_len; i++) {
+            print_hex(stream->instruction_buffer[i]);
+        }
         printf("\n");
     }
 
