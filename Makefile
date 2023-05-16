@@ -14,8 +14,8 @@ DEBUG_TARGET_DIR=$(ROOT_TARGET)/Debug
 DEBUG_TARGET=$(DEBUG_TARGET_DIR)/$(BINARY).debug
 
 SRC_DIR=./src
-SRC=main.c
-HEADERS=
+SRC=utils/binary_stream.c main.c
+HEADERS=utils/binary_stream.h
 DEPS=$(addprefix $(SRC_DIR)/, $(HEADERS))
 
 OBJ_ROOT=./obj
