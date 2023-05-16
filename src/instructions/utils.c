@@ -276,3 +276,24 @@ short extract_data(binary_stream_t *data, struct params_t *params) {
     return val;
 }
 
+short extract_data_sw(binary_stream_t *data, struct params_t *params) {
+    short val = extract_byte(data);
+    if(params->w) {
+        if (params->d) {
+            if (val & 0x80) {
+                val |= 0xff00;
+            }
+        } else {
+            val = (extract_byte(data) << 8) + val;
+        }
+    }
+    return val;
+}
+
+char *format_displacement(char *val, binary_stream_t *data) {
+    char disp = extract_byte(data);
+    short effective_address = disp + data->current_address + data->instruction_buffer_len;
+    char *res = malloc(50);
+    snprintf(res, 50, "%s %04x", val, effective_address);
+    return res;
+}

@@ -12,6 +12,7 @@ typedef struct {
     char *instruction_buffer;
     size_t _instruction_buffer_cap;
     size_t instruction_buffer_len;
+    short current_address;
 } binary_stream_t;
 
 binary_stream_t *bs_new(FILE *stream, long len);

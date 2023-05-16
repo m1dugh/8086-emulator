@@ -46,6 +46,7 @@ binary_stream_t *bs_new(FILE *stream, long len) {
     res->instruction_buffer_len = 0;
     res->_index = 0;
     res->_buffer_index = 8;
+    res->current_address = 0;
     return res;
 }
 
@@ -73,6 +74,7 @@ void bs_free(binary_stream_t *stream) {
 }
 
 void bs_flush_buffer(binary_stream_t *stream) {
+    stream->current_address += stream->instruction_buffer_len;
     stream->instruction_buffer_len = 0;
 }
 

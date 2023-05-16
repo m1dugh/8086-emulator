@@ -110,6 +110,10 @@ char *find_6_len_instruction(unsigned char instruction, binary_stream_t *stream)
             return mov_rm_to_reg(stream);
         case 0b000000:
             return add_rm_with_reg(stream);
+        case 0b001110:
+            return cmp_rm_reg(stream);
+        case 0b100000:
+            return cmp_immediate_rm(stream);
     }
     return NULL;
 }
@@ -118,6 +122,8 @@ char *find_7_len_instruction(unsigned char instruction, binary_stream_t *stream)
     switch(instruction) {
         case 0b1100011:
             return mov_immediate_to_rm(stream);
+        case 0b1111011:
+            return test_immediate_rm(stream);
 
     }
     return NULL;
@@ -127,6 +133,10 @@ char *find_8_len_instruction(unsigned char instruction, binary_stream_t *stream)
     switch(instruction) {
         case 0b10001101:
             return lea(stream);
+        case 0b01110011:
+            return jnb(stream);
+        case 0b01110101:
+            return jne(stream);
 
     }
     return NULL;
@@ -181,14 +191,12 @@ int main(int argc, char **argv) {
 
     binary_stream_t *stream = bs_new(f, header.a_text);
 
-    unsigned short index = 0;
     while(!bs_finished(stream)) {
         char *res = next_instruction(stream);
-        if(printf_instruction(index, stream->instruction_buffer, stream->instruction_buffer_len, res)) {
+        if(printf_instruction(stream->current_address, stream->instruction_buffer, stream->instruction_buffer_len, res)) {
             fflush(stdout);
             errx(-1, "Instruction not found");
         }
-        index += stream->instruction_buffer_len;
     }
 
     fclose(f);
