@@ -17,20 +17,30 @@ char *cmp_immediate_rm(binary_stream_t *data) {
         return NULL;
     }
 
+    char *rm_value = get_rm(data, params.w, params.mod, params.rm);
     short val = extract_data_sw(data, &params);
     char *instruction;
     switch (params.reg) {
         case 0b000:
             instruction = "add";
             break;
+        case 0b001:
+            instruction = "or";
+            break;
         case 0b010:
             instruction = "adc";
+            break;
+        case 0b011:
+            instruction = "ssb";
+            break;
+        case 0b100:
+            instruction = "and";
             break;
         case 0b101:
             instruction = "sub";
             break;
-        case 0b011:
-            instruction = "ssb";
+        case 0b110:
+            instruction = "xor";
             break;
         case 0b111:
             instruction = "cmp";
@@ -40,8 +50,12 @@ char *cmp_immediate_rm(binary_stream_t *data) {
     }
 
     char *res = malloc(50);
-    char *rm_value = get_rm(data, params.w, params.mod, params.rm);
-    snprintf(res, 50, "%s %s, %04x", instruction, rm_value, val);
+    if (val == 0) {
+        snprintf(res, 50, "%s %s, %x", instruction, rm_value, val);
+    } else {
+        snprintf(res, 50, "%s %s, %04x", instruction, rm_value, val);
+    }
+    free(rm_value);
 
     return res;
 }
@@ -87,4 +101,8 @@ char *inc_rm(binary_stream_t *data) {
 
 char *dec_reg(binary_stream_t *data) {
     return format_reg("dec", data);
+}
+
+char *ssb_rm_with_reg(binary_stream_t *data) {
+    return format_dw_rm_to_reg("ssb", data);
 }

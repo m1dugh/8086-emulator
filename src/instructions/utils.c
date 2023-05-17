@@ -2,6 +2,14 @@
 #include "stdio.h"
 #include <malloc.h>
 
+
+char extract_byte(binary_stream_t *data) {
+    char res;
+    bs_next_reset(data, 8, &res);
+    return res;
+}
+
+
 int extract_w(binary_stream_t *data, struct params_t *params) {
     return bs_next_reset(data, 1, &params->w);
 }
@@ -115,7 +123,7 @@ char *get_rm(binary_stream_t *data, char w, char mod, char rm) {
         return res;
     }
 
-    short disp;
+    short disp = 0;
     if(mod == 0b00 && rm != 0b110) {
         disp = 0;
     }
@@ -127,11 +135,8 @@ char *get_rm(binary_stream_t *data, char w, char mod, char rm) {
             disp |= 0xff00;
         }
     } else { // mod == 0b10
-        char val;
-        GET_DATA(val, data, 8);
-        disp = val;
-        GET_DATA(val, data, 8);
-        disp |= (val << 8);
+        disp = extract_byte(data);
+        disp |= (extract_byte(data) << 8);
     }
 
     char *effective_address = malloc(20);
@@ -141,7 +146,7 @@ char *get_rm(binary_stream_t *data, char w, char mod, char rm) {
             if (disp > 0)
                 format = "[bx+si+%x]";
             else if (disp < 0)
-                format = "[bx+si%x]";
+                format = "[bx+si-%x]";
             else
                 format = "[bx+si]";
             break;
@@ -149,7 +154,7 @@ char *get_rm(binary_stream_t *data, char w, char mod, char rm) {
             if (disp > 0)
                 format = "[bx+di+%x]";
             else if (disp < 0)
-                format = "[bx+di%x]";
+                format = "[bx+di-%x]";
             else
                 format = "[bx+di]";
             break;
@@ -157,7 +162,7 @@ char *get_rm(binary_stream_t *data, char w, char mod, char rm) {
             if (disp > 0)
                 format = "[bp+si+%x]";
             else if (disp < 0)
-                format = "[bp+si%x]";
+                format = "[bp+si-%x]";
             else
                 format = "[bp+si]";
             break;
@@ -165,7 +170,7 @@ char *get_rm(binary_stream_t *data, char w, char mod, char rm) {
             if (disp > 0)
                 format = "[bp+di+%x]";
             else if (disp < 0)
-                format = "[bp+di%x]";
+                format = "[bp+di-%x]";
             else
                 format = "[bp+di]";
             break;
@@ -173,7 +178,7 @@ char *get_rm(binary_stream_t *data, char w, char mod, char rm) {
             if (disp > 0)
                 format = "[si+%x]";
             else if (disp < 0)
-                format = "[si%x]";
+                format = "[si-%x]";
             else
                 format = "[si]";
             break;
@@ -181,7 +186,7 @@ char *get_rm(binary_stream_t *data, char w, char mod, char rm) {
             if (disp > 0)
                 format = "[di+%x]";
             else if (disp < 0)
-                format = "[di%x]";
+                format = "[di-%x]";
             else
                 format = "[di]";
             break;
@@ -192,7 +197,7 @@ char *get_rm(binary_stream_t *data, char w, char mod, char rm) {
                 if (disp > 0)
                     format = "[bp+%x]";
                 else if (disp < 0)
-                    format = "[bp%x]";
+                    format = "[bp-%x]";
                 else
                     format = "[bp]";
             }
@@ -201,14 +206,17 @@ char *get_rm(binary_stream_t *data, char w, char mod, char rm) {
             if (disp > 0)
                 format = "[bx+%x]";
             else if (disp < 0)
-                format = "[bx%x]";
+                format = "[bx-%x]";
             else
                 format = "[bx]";
             break;
         default:
             return NULL;
     }
-    if (disp != 0)
+    if(disp < 0) {
+        disp = (disp ^ 0xffff) + 1;
+    }
+    if (disp != 0 || (mod == 0b00 && rm == 0b110))
         snprintf(effective_address, 20, format, disp);
     else
         snprintf(effective_address, 20, format);
@@ -246,6 +254,7 @@ char *format_w_rm_to_reg(char *val, binary_stream_t *data) {
 
     char *instruction = malloc(50);
     snprintf(instruction, 50, "%s %s, %s", val, reg, rm_value);
+    free(rm_value);
     return instruction;
 }
 
@@ -261,15 +270,8 @@ char *format_rm_to_reg(char *val, binary_stream_t *data) {
 
     char *instruction = malloc(50);
     snprintf(instruction, 50, "%s %s, %s", val, reg, rm_value);
-
     free(rm_value);
     return instruction;
-}
-
-char extract_byte(binary_stream_t *data) {
-    char res;
-    bs_next_reset(data, 8, &res);
-    return res;
 }
 
 short extract_data(binary_stream_t *data, struct params_t *params) {
@@ -296,7 +298,7 @@ short extract_data_sw(binary_stream_t *data, struct params_t *params) {
 
 char *format_byte_displacement(char *val, binary_stream_t *data) {
     char disp = extract_byte(data);
-    short effective_address = disp + data->current_address + data->instruction_buffer_len;
+    unsigned short effective_address = disp + data->current_address + data->instruction_buffer_len;
     char *res = malloc(50);
     snprintf(res, 50, "%s %04x", val, effective_address);
     return res;
@@ -304,9 +306,16 @@ char *format_byte_displacement(char *val, binary_stream_t *data) {
 
 char *format_word_displacement(char *val, binary_stream_t *data) {
     short disp = extract_byte(data);
-    disp += extract_byte(data) << 8;
-    
-    short effective_address = disp + data->current_address + data->instruction_buffer_len;
+    disp |= extract_byte(data) << 8;
+    short effective_address = data->current_address + data->instruction_buffer_len;
+
+    if(disp < 0) {
+        disp = (disp ^ 0xffff) + 1;
+        effective_address -= disp;
+    } else {
+        effective_address += disp;
+    }
+
     char *res = malloc(50);
     snprintf(res, 50, "%s %04x", val, effective_address);
     return res;

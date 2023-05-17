@@ -6,7 +6,6 @@
 typedef struct {
     FILE *_stream;  /* The stream to pull the bytes from */
     long len;       /* The max number of bytes to pull from the _stream */
-    long _index;    /* The current index in bytes in the stream */
     char _buffer;
     char _buffer_index;
     char *instruction_buffer;

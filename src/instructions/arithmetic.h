@@ -13,6 +13,9 @@ char *adc_rm_with_reg(binary_stream_t *data);
 char *adc_immediate_to_rm(binary_stream_t *data);
 char *adc_immediate_to_acc(binary_stream_t *data);
 
+// SSB
+char *ssb_rm_with_reg(binary_stream_t *data);
+
 // INC
 char *inc_rm(binary_stream_t *data);
 char *inc_reg(binary_stream_t *data);

@@ -14,12 +14,9 @@ int push_buffer(binary_stream_t *str, char c) {
 
 char read_bit(binary_stream_t *str, char *res) {
     if(str->_buffer_index > 7) {
-        if(str->_index >= str->len)
+        if(str->current_address >= str->len)
             return -1;
         str->_buffer = fgetc(str->_stream);
-        if (str->_buffer == -1) {
-            return -1;
-        }
         push_buffer(str, str->_buffer);
         str->_buffer_index = 1;
         *res = (0b10000000 & str->_buffer) >> 7;
@@ -44,7 +41,7 @@ binary_stream_t *bs_new(FILE *stream, long len) {
     res->_stream = stream;
     res->len = len;
     res->instruction_buffer_len = 0;
-    res->_index = 0;
+    res->current_address = 0;
     res->_buffer_index = 8;
     res->current_address = 0;
     return res;
@@ -79,9 +76,9 @@ void bs_flush_buffer(binary_stream_t *stream) {
 }
 
 size_t bs_read_bytes(binary_stream_t *stream) {
-    return stream->_index;
+    return stream->current_address;
 }
 
 int bs_finished(binary_stream_t *stream) {
-    return stream->_index >= stream->len;
+    return stream->current_address >= stream->len;
 }

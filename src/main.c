@@ -4,6 +4,7 @@
 #include "instructions/arithmetic.h"
 #include "instructions/control_transfer.h"
 #include "instructions/data_transfer.h"
+#include "instructions/logic.h"
 #include "instructions/processor_control.h"
 #include "utils/binary_stream.h"
 #include "instructions/instructions.h"
@@ -87,6 +88,7 @@ int read_header(FILE *stream, struct exec_header *header) {
     current_index += 4;
     // TODO: implement full header.
     
+    free(buffer);
     fseek(stream, header->a_hdrlen, SEEK_SET);
     return 0;
 }
@@ -114,6 +116,8 @@ char *find_5_len_instruction(unsigned char instruction, binary_stream_t *stream)
 
 char *find_6_len_instruction(unsigned char instruction, binary_stream_t *stream) {
     switch (instruction) {
+        case 0b000110:
+            return ssb_rm_with_reg(stream);
         case 0b001100:
             return xor_rm_reg(stream);
         case 0b100010:
@@ -124,6 +128,8 @@ char *find_6_len_instruction(unsigned char instruction, binary_stream_t *stream)
             return cmp_rm_reg(stream);
         case 0b100000:
             return cmp_immediate_rm(stream);
+        case 0b110100:
+            return shift_left(stream);
     }
     return NULL;
 }
@@ -132,6 +138,10 @@ char *find_7_len_instruction(unsigned char instruction, binary_stream_t *stream)
     switch(instruction) {
         case 0b1100011:
             return mov_immediate_to_rm(stream);
+        case 0b1110010:
+            return in_fixed_port(stream);
+        case 0b1110110:
+            return in_var_port(stream);
         case 0b1111011:
             return test_immediate_rm(stream);
         case 0b1111111:
@@ -145,6 +155,8 @@ char *find_8_len_instruction(unsigned char instruction, binary_stream_t *stream)
     switch(instruction) {
         case 0b01110011:
             return jnb(stream);
+        case 0b01110100:
+            return je(stream);
         case 0b01110101:
             return jne(stream);
         case 0b01111100:
@@ -157,6 +169,8 @@ char *find_8_len_instruction(unsigned char instruction, binary_stream_t *stream)
             return call_direct_seg(stream);
         case 0b11101001:
             return jmp_direct_seg(stream);
+        case 0b11101011:
+            return jmp_direct_seg_short(stream);
         case 0b11110100:
             return hlt();
     }
@@ -214,11 +228,14 @@ int main(int argc, char **argv) {
 
     while(!bs_finished(stream)) {
         char *res = next_instruction(stream);
-        if(printf_instruction(stream->current_address, stream->instruction_buffer, stream->instruction_buffer_len, res)) {
+        if(printf_instruction(stream->current_address, stream->instruction_buffer, stream->instruction_buffer_len, res) != 0) {
             fflush(stdout);
             errx(-1, "Instruction not found");
         }
+        free(res);
     }
+
+    bs_free(stream);
 
     fclose(f);
     return 0;

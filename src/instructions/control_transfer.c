@@ -10,6 +10,10 @@ char *jne(binary_stream_t *data) {
     return format_byte_displacement("jne", data);
 }
 
+char *je(binary_stream_t *data) {
+    return format_byte_displacement("je", data);
+}
+
 char *jl(binary_stream_t *data) {
     return format_byte_displacement("jl", data);
 }
@@ -20,4 +24,8 @@ char *call_direct_seg(binary_stream_t *data) {
 
 char *jmp_direct_seg(binary_stream_t *data) {
     return format_word_displacement("jmp", data);
+}
+
+char *jmp_direct_seg_short(binary_stream_t *data) {
+    return format_byte_displacement("jmp short", data);
 }

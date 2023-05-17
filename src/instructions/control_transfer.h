@@ -5,8 +5,10 @@
 
 // JUMP
 char *jmp_direct_seg(binary_stream_t *data);
+char *jmp_direct_seg_short(binary_stream_t *data);
 char *jnb(binary_stream_t *data);
 char *jne(binary_stream_t *data);
+char *je(binary_stream_t *data);
 char *jl(binary_stream_t *data);
 
 // CALL

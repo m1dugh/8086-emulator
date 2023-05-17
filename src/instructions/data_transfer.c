@@ -62,3 +62,36 @@ char *pop_rm(binary_stream_t *data) {
 char *pop_reg(binary_stream_t *data) {
     return format_reg("pop", data);
 }
+
+char *in_out_port(char *val, binary_stream_t *data, int fixed) {
+    struct params_t params;
+    if(extract_w(data, &params) != 0) {
+        return NULL;
+    }
+
+    char *reg = get_reg(params.w, 0b000);
+    char *res = malloc(16);
+    if(!fixed) {
+        snprintf(res, 16, "%s %s, %s", val, reg, get_reg(1, 0b010));
+    } else {
+        unsigned char port = extract_byte(data) & 0xff;
+        snprintf(res, 16, "%s %s, %x", val, reg, port);
+    }
+    return res;
+}
+
+char *in_fixed_port(binary_stream_t *data) {
+    return in_out_port("in", data, 1);
+}
+
+char *in_var_port(binary_stream_t *data) {
+    return in_out_port("in", data, 0);
+}
+
+char *out_fixed_port(binary_stream_t *data) {
+    return in_out_port("out", data, 1);
+}
+
+char *out_var_port(binary_stream_t *data) {
+    return in_out_port("out", data, 0);
+}

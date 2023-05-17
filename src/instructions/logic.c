@@ -58,7 +58,47 @@ char *test_immediate_rm(binary_stream_t *data) {
             return NULL;
     }
 
+    free(rm_value);
     return res;
 }
-char *test_immediate_acc(binary_stream_t *data) {
+
+char *shift_left(binary_stream_t *data) {
+    struct params_t params;
+    if(extract_dw_mod_reg_rm(data, &params) != 0) {
+        return NULL;
+    }
+
+    char *instruction;
+    char *rm_value = get_rm(data, params.w, params.mod, params.rm);
+    switch (params.reg) {
+        case 0b000:
+            instruction = "rol";
+            break;
+        case 0b001:
+            instruction = "ror";
+            break;
+        case 0b010:
+            instruction = "rcl";
+            break;
+        case 0b011:
+            instruction = "rcr";
+            break;
+        case 0b100:
+            instruction = "shl";
+            break;
+        case 0b101:
+            instruction = "shr";
+            break;
+        case 0b111:
+            instruction = "sar";
+            break;
+        default:
+            return NULL;
+    }
+    char *res = malloc(50);
+    snprintf(res, 50, "%s %s, 1", instruction, rm_value);
+    free(rm_value);
+
+    return res;
+
 }
