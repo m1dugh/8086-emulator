@@ -2,6 +2,7 @@
 #include <malloc.h>
 #include <err.h>
 #include "instructions/control_transfer.h"
+#include "instructions/data_transfer.h"
 #include "instructions/processor_control.h"
 #include "utils/binary_stream.h"
 #include "instructions/instructions.h"
@@ -102,6 +103,8 @@ char *find_5_len_instruction(unsigned char instruction, binary_stream_t *stream)
     switch (instruction) {
         case 0b01010:
             return push_reg(stream);
+        case 0b01011:
+            return pop_reg(stream);
     }
     return NULL;
 }
@@ -143,10 +146,12 @@ char *find_8_len_instruction(unsigned char instruction, binary_stream_t *stream)
             return jne(stream);
         case 0b11101000:
             return call_direct_seg(stream);
-        case 0b11111111:
-            return push_rm(stream);
         case 0b11110100:
             return hlt();
+        case 0b10001111:
+            return pop_rm(stream);
+        case 0b11111111:
+            return push_rm(stream);
     }
     return NULL;
 }

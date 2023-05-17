@@ -76,13 +76,24 @@ char *push_rm(binary_stream_t *data) {
 }
 
 char *push_reg(binary_stream_t *data) {
+    return format_reg("push", data);
+}
+
+char *pop_rm(binary_stream_t *data) {
     struct params_t params;
-    if(extract_reg(data, &params) != 0) {
+    if(extract_mod_reg_rm(data, &params) != 0) {
         return NULL;
     }
+    if(params.reg != 0b000)
+        return NULL;
 
-    char *reg_value = get_reg(0b1, params.reg);
-    char *res = malloc(10);
-    snprintf(res, 10, "push %s", reg_value);
+    char *rm_value = get_rm(data, params.w, params.mod, params.rm);
+    char *res = malloc(50);
+    snprintf(res, 50, "pop %s", rm_value);
+    free(rm_value);
     return res;
+}
+
+char *pop_reg(binary_stream_t *data) {
+    return format_reg("pop", data);
 }

@@ -51,5 +51,6 @@ char *format_rm_to_reg(char *val, binary_stream_t *data);
 
 char *format_byte_displacement(char *val, binary_stream_t *data);
 char *format_word_displacement(char *val, binary_stream_t *data);
+char *format_reg(char *val, binary_stream_t *data);
 
 #endif // !INSTRUCTIONS_UTILS_H

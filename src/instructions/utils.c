@@ -311,3 +311,15 @@ char *format_word_displacement(char *val, binary_stream_t *data) {
     snprintf(res, 50, "%s %04x", val, effective_address);
     return res;
 }
+
+char *format_reg(char *val, binary_stream_t *data) {
+    struct params_t params;
+    if(extract_reg(data, &params) != 0) {
+        return NULL;
+    }
+
+    char *reg_value = get_reg(0b1, params.reg);
+    char *res = malloc(10);
+    snprintf(res, 10, "%s %s", val, reg_value);
+    return res;
+}
