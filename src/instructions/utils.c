@@ -116,7 +116,7 @@ char *get_rm(binary_stream_t *data, char w, char mod, char rm) {
     }
 
     short disp;
-    if(mod == 0b00) {
+    if(mod == 0b00 && rm != 0b110) {
         disp = 0;
     }
     else if(mod == 0b01) {
@@ -139,65 +139,69 @@ char *get_rm(binary_stream_t *data, char w, char mod, char rm) {
     switch(rm) {
         case 0b000:
             if (disp > 0)
-                format = "[bx+si+%d]";
+                format = "[bx+si+%x]";
             else if (disp < 0)
-                format = "[bx+si%d]";
+                format = "[bx+si%x]";
             else
                 format = "[bx+si]";
             break;
         case 0b001:
             if (disp > 0)
-                format = "[bx+di+%d]";
+                format = "[bx+di+%x]";
             else if (disp < 0)
-                format = "[bx+di%d]";
+                format = "[bx+di%x]";
             else
                 format = "[bx+di]";
             break;
         case 0b010:
             if (disp > 0)
-                format = "[bp+si+%d]";
+                format = "[bp+si+%x]";
             else if (disp < 0)
-                format = "[bp+si%d]";
+                format = "[bp+si%x]";
             else
                 format = "[bp+si]";
             break;
         case 0b011:
             if (disp > 0)
-                format = "[bp+di+%d]";
+                format = "[bp+di+%x]";
             else if (disp < 0)
-                format = "[bp+di%d]";
+                format = "[bp+di%x]";
             else
                 format = "[bp+di]";
             break;
         case 0b100:
             if (disp > 0)
-                format = "[si+%d]";
+                format = "[si+%x]";
             else if (disp < 0)
-                format = "[si%d]";
+                format = "[si%x]";
             else
                 format = "[si]";
             break;
         case 0b101:
             if (disp > 0)
-                format = "[di+%d]";
+                format = "[di+%x]";
             else if (disp < 0)
-                format = "[di%d]";
+                format = "[di%x]";
             else
                 format = "[di]";
             break;
         case 0b110:
-            if (disp > 0)
-                format = "[bp+%d]";
-            else if (disp < 0)
-                format = "[bp%d]";
-            else
-                format = "[bp]";
+            if(mod == 0b00) {
+                format = "[%04x]";
+            } else {
+                if (disp > 0)
+                    format = "[bp+%x]";
+                else if (disp < 0)
+                    format = "[bp%x]";
+                else
+                    format = "[bp]";
+            }
             break;
         case 0b111:
             if (disp > 0)
-                format = "[bx+%d]";
+                format = "[bx+%x]";
             else if (disp < 0)
-                format = "[bx%d]";
+                format = "[bx%x]";
             else
                 format = "[bx]";
             break;
@@ -290,8 +294,18 @@ short extract_data_sw(binary_stream_t *data, struct params_t *params) {
     return val;
 }
 
-char *format_displacement(char *val, binary_stream_t *data) {
+char *format_byte_displacement(char *val, binary_stream_t *data) {
     char disp = extract_byte(data);
+    short effective_address = disp + data->current_address + data->instruction_buffer_len;
+    char *res = malloc(50);
+    snprintf(res, 50, "%s %04x", val, effective_address);
+    return res;
+}
+
+char *format_word_displacement(char *val, binary_stream_t *data) {
+    short disp = extract_byte(data);
+    disp += extract_byte(data) << 8;
+    
     short effective_address = disp + data->current_address + data->instruction_buffer_len;
     char *res = malloc(50);
     snprintf(res, 50, "%s %04x", val, effective_address);

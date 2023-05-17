@@ -21,14 +21,6 @@ char *xor_rm_reg(binary_stream_t *data) {
     return instruction;
 }
 
-char *jnb(binary_stream_t *data) {
-    return format_displacement("jnb", data);
-}
-
-char *jne(binary_stream_t *data) {
-    return format_displacement("jne", data);
-}
-
 char *test_rm_reg(binary_stream_t *data) {
     return format_w_rm_to_reg("test", data);
 }

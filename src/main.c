@@ -1,10 +1,9 @@
 #include <stdio.h>
 #include <malloc.h>
 #include <err.h>
+#include "instructions/control_transfer.h"
 #include "utils/binary_stream.h"
-#include "instructions/logic.h"
-#include "instructions/data_transfer.h"
-#include "instructions/arithmetic.h"
+#include "instructions/instructions.h"
 #include "utils/format.h"
 
 struct exec_header {
@@ -99,6 +98,10 @@ char *find_4_len_instruction(unsigned char instruction, binary_stream_t *stream)
 }
 
 char *find_5_len_instruction(unsigned char instruction, binary_stream_t *stream) {
+    switch (instruction) {
+        case 0b01010:
+            return push_reg(stream);
+    }
     return NULL;
 }
 
@@ -137,6 +140,10 @@ char *find_8_len_instruction(unsigned char instruction, binary_stream_t *stream)
             return jnb(stream);
         case 0b01110101:
             return jne(stream);
+        case 0b11101000:
+            return call_direct_seg(stream);
+        case 0b11111111:
+            return push_rm(stream);
 
     }
     return NULL;

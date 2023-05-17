@@ -41,7 +41,7 @@ char *get_reg(char w, char val);
 char *get_short_reg(char val);
 char *get_word_reg(char val);
 
-char *get_rm(binary_stream_t *data, char mod, char w, char val);
+char *get_rm(binary_stream_t *data, char w, char mod, char val);
 
 char *format_dw_rm_to_reg(char *val, binary_stream_t *data);
 
@@ -49,6 +49,7 @@ char *format_w_rm_to_reg(char *val, binary_stream_t *data);
 
 char *format_rm_to_reg(char *val, binary_stream_t *data);
 
-char *format_displacement(char *val, binary_stream_t *data);
+char *format_byte_displacement(char *val, binary_stream_t *data);
+char *format_word_displacement(char *val, binary_stream_t *data);
 
 #endif // !INSTRUCTIONS_UTILS_H
