@@ -2,6 +2,7 @@
 #include <malloc.h>
 #include <err.h>
 #include "instructions/control_transfer.h"
+#include "instructions/processor_control.h"
 #include "utils/binary_stream.h"
 #include "instructions/instructions.h"
 #include "utils/format.h"
@@ -144,7 +145,8 @@ char *find_8_len_instruction(unsigned char instruction, binary_stream_t *stream)
             return call_direct_seg(stream);
         case 0b11111111:
             return push_rm(stream);
-
+        case 0b11110100:
+            return hlt();
     }
     return NULL;
 }
