@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <malloc.h>
 #include <err.h>
+#include "instructions/arithmetic.h"
 #include "instructions/control_transfer.h"
 #include "instructions/data_transfer.h"
 #include "instructions/processor_control.h"
@@ -101,6 +102,8 @@ char *find_4_len_instruction(unsigned char instruction, binary_stream_t *stream)
 
 char *find_5_len_instruction(unsigned char instruction, binary_stream_t *stream) {
     switch (instruction) {
+        case 0b01001:
+            return dec_reg(stream);
         case 0b01010:
             return push_reg(stream);
         case 0b01011:
@@ -131,6 +134,8 @@ char *find_7_len_instruction(unsigned char instruction, binary_stream_t *stream)
             return mov_immediate_to_rm(stream);
         case 0b1111011:
             return test_immediate_rm(stream);
+        case 0b1111111:
+            return inc_rm(stream);
 
     }
     return NULL;
@@ -138,20 +143,22 @@ char *find_7_len_instruction(unsigned char instruction, binary_stream_t *stream)
 
 char *find_8_len_instruction(unsigned char instruction, binary_stream_t *stream) {
     switch(instruction) {
-        case 0b10001101:
-            return lea(stream);
         case 0b01110011:
             return jnb(stream);
         case 0b01110101:
             return jne(stream);
-        case 0b11101000:
-            return call_direct_seg(stream);
-        case 0b11110100:
-            return hlt();
+        case 0b01111100:
+            return jl(stream);
+        case 0b10001101:
+            return lea(stream);
         case 0b10001111:
             return pop_rm(stream);
-        case 0b11111111:
-            return push_rm(stream);
+        case 0b11101000:
+            return call_direct_seg(stream);
+        case 0b11101001:
+            return jmp_direct_seg(stream);
+        case 0b11110100:
+            return hlt();
     }
     return NULL;
 }

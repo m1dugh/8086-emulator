@@ -40,41 +40,6 @@ char *lea(binary_stream_t *data) {
     return format_rm_to_reg("lea", data);
 }
 
-char *push_rm(binary_stream_t *data) {
-    struct params_t params;
-    if(extract_mod_reg_rm(data, &params) != 0) {
-        return NULL;
-    }
-    char *instruction;
-    switch(params.reg) {
-        case 0b010:
-            instruction = "call";
-            break;
-        case 0b011:
-            // TODO: indirect intersegment
-            instruction = "call";
-            break;
-        case 0b100:
-            instruction = "jmp";
-            break;
-        case 0b101:
-            // TODO: indirect intersegment
-            instruction = "jmp";
-            break;
-        case 0b110:
-            instruction = "push";
-            break;
-        default:
-            return NULL;
-    };
-
-    char *rm_value = get_rm(data, params.w, params.mod, params.rm);
-    char *res = malloc(50);
-    snprintf(res, 50, "%s %s", instruction, rm_value);
-    free(rm_value);
-    return res;
-}
-
 char *push_reg(binary_stream_t *data) {
     return format_reg("push", data);
 }
