@@ -13,6 +13,9 @@ char *adc_rm_with_reg(binary_stream_t *data);
 char *adc_immediate_to_rm(binary_stream_t *data);
 char *adc_immediate_to_acc(binary_stream_t *data);
 
+// SUB
+char *sub_immediate_to_acc(binary_stream_t *data);
+
 // SSB
 char *ssb_rm_with_reg(binary_stream_t *data);
 
@@ -31,5 +34,8 @@ char *neg(binary_stream_t *data);
 char *cmp_rm_reg(binary_stream_t *data);
 char *cmp_immediate_rm(binary_stream_t *data);
 char *cmp_immeditate_acc(binary_stream_t *data);
+
+char *cbw();
+char *cwd();
 
 #endif // !INSTRUCTIONS_ARITHMETIC_H

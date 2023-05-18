@@ -34,7 +34,10 @@ char *test_immediate_rm(binary_stream_t *data) {
     char *rm_value = get_rm(data, params.w, params.mod, params.rm);
     switch (params.reg) {
         case 0b000:
-            snprintf(res, 50, "test %s, %x", rm_value, extract_data(data, &params));
+            if(params.w || params.mod == 0b11)
+                snprintf(res, 50, "test %s, %x", rm_value, extract_data(data, &params));
+            else
+                snprintf(res, 50, "test byte %s, %x", rm_value, extract_data(data, &params));
             break;
         case 0b010:
             snprintf(res, 50, "not %s", rm_value);
@@ -101,4 +104,20 @@ char *shift_left(binary_stream_t *data) {
 
     return res;
 
+}
+
+char *and_immediate_acc(binary_stream_t *data) {
+    return format_immediate_from_acc("and", data);
+}
+
+char *and_rm_reg(binary_stream_t *data) {
+    return format_dw_rm_to_reg("and", data);
+}
+
+char *or_immediate_acc(binary_stream_t *data) {
+    return format_immediate_from_acc("or", data);
+}
+
+char *or_rm_reg(binary_stream_t *data) {
+    return format_dw_rm_to_reg("or", data);
 }

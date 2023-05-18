@@ -16,6 +16,11 @@ char *and_rm_reg(binary_stream_t *data);
 char *and_immediate_rm(binary_stream_t *data);
 char *and_immediate_acc(binary_stream_t *data);
 
+// OR
+char *or_rm_reg(binary_stream_t *data);
+char *or_immediate_rm(binary_stream_t *data);
+char *or_immediate_acc(binary_stream_t *data);
+
 // XOR
 char *xor_rm_reg(binary_stream_t *data);
 char *xor_immediate_rm(binary_stream_t *data);

@@ -128,10 +128,9 @@ char *get_rm(binary_stream_t *data, char w, char mod, char rm) {
         disp = 0;
     }
     else if(mod == 0b01) {
-        char val;
-        GET_DATA(val, data, 8);
+        unsigned char val = extract_byte(data);
         disp = val;
-        if(val & 0x8) {
+        if(val & 0x80) {
             disp |= 0xff00;
         }
     } else { // mod == 0b10
@@ -243,6 +242,31 @@ char *format_dw_rm_to_reg(char *val, binary_stream_t *data) {
     return instruction;
 }
 
+char *format_sized_dw_rm_to_reg(char *val, binary_stream_t *data) {
+    struct params_t params;
+    if(extract_dw_mod_reg_rm(data, &params) != 0) {
+        return NULL;
+    }
+    char *reg = get_reg(params.w, params.reg);
+
+    char *rm_value = get_rm(data, params.w, params.mod, params.rm);
+
+    char *instruction = malloc(50);
+    char *format;
+    if(params.w) {
+        format =  "%s %s, %s";
+    } else {
+        format =  "%s byte %s, %s";
+    }
+    if (params.d) {
+        snprintf(instruction, 50, format, val, reg, rm_value);
+    } else {
+        snprintf(instruction, 50, format, val, rm_value, reg);
+    }
+    free(rm_value);
+    return instruction;
+}
+
 char *format_w_rm_to_reg(char *val, binary_stream_t *data) {
     struct params_t params;
     if(extract_w_mod_reg_rm(data, &params) != 0) {
@@ -275,7 +299,8 @@ char *format_rm_to_reg(char *val, binary_stream_t *data) {
 }
 
 short extract_data(binary_stream_t *data, struct params_t *params) {
-    short val = extract_byte(data);
+    unsigned char low = extract_byte(data);
+    short val = low;
     if(params->w) {
         val = (extract_byte(data) << 8) + val;
     }
@@ -298,15 +323,22 @@ short extract_data_sw(binary_stream_t *data, struct params_t *params) {
 
 char *format_byte_displacement(char *val, binary_stream_t *data) {
     char disp = extract_byte(data);
-    unsigned short effective_address = disp + data->current_address + data->instruction_buffer_len;
+    unsigned short effective_address = data->current_address + data->instruction_buffer_len;
+    if (disp < 0) {
+        disp = (disp ^ 0xff) + 1;
+        effective_address -= disp;
+    } else {
+        effective_address += disp;
+    }
     char *res = malloc(50);
     snprintf(res, 50, "%s %04x", val, effective_address);
     return res;
 }
 
 char *format_word_displacement(char *val, binary_stream_t *data) {
-    short disp = extract_byte(data);
-    disp |= extract_byte(data) << 8;
+    unsigned char disp_low = extract_byte(data);
+
+    short disp = (extract_byte(data) << 8) | disp_low;
     short effective_address = data->current_address + data->instruction_buffer_len;
 
     if(disp < 0) {
@@ -330,5 +362,38 @@ char *format_reg(char *val, binary_stream_t *data) {
     char *reg_value = get_reg(0b1, params.reg);
     char *res = malloc(10);
     snprintf(res, 10, "%s %s", val, reg_value);
+    return res;
+}
+
+char *format_immediate_from_acc(char *val, binary_stream_t *data) {
+    struct params_t params;
+    if(extract_w(data, &params) != 0) {
+        return NULL;
+    }
+    char *res = malloc(50);
+    short extracted = extract_data(data, &params);
+    char *reg = get_reg(params.w, 0b000);
+
+    snprintf(res, 50, "%s %s, %04x", val, reg, extracted);
+    return res;
+}
+
+char *format_w_immediate_to_rm(char *val, binary_stream_t *data) {
+    struct params_t params;
+    if(extract_w_mod_reg_rm(data, &params) != 0) {
+        return NULL;
+    }
+    char *rm_value = get_rm(data, params.mod, params.w, params.rm);
+    short extracted = extract_data(data, &params);
+
+    char *format;
+    if(params.w) {
+        format = "%s %s, %04x";
+    } else {
+        format =  "%s byte %s, %04x";
+    }
+
+    char *res = malloc(50);
+    snprintf(res, 50, format, val, rm_value, extracted);
     return res;
 }

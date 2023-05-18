@@ -8,17 +8,7 @@ char *mov_rm_to_reg(binary_stream_t *data) {
 }
 
 char *mov_immediate_to_rm(binary_stream_t *data) {
-    struct params_t params;
-    if(extract_w_mod_reg_rm(data, &params) != 0) {
-        return NULL;
-    }
-    short val = extract_data(data, &params);
-
-    char *rm_value = get_rm(data, params.mod, params.w, params.rm);
-
-    char *res = malloc(50);
-    snprintf(res, 50, "mov %s, %04x", rm_value, val);
-    return res;
+    return format_w_immediate_to_rm("mov", data);
 }
 
 char *mov_immediate_to_reg(binary_stream_t *data) {

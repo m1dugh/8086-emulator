@@ -104,6 +104,8 @@ char *find_4_len_instruction(unsigned char instruction, binary_stream_t *stream)
 
 char *find_5_len_instruction(unsigned char instruction, binary_stream_t *stream) {
     switch (instruction) {
+        case 0b01000:
+            return inc_reg(stream);
         case 0b01001:
             return dec_reg(stream);
         case 0b01010:
@@ -116,36 +118,28 @@ char *find_5_len_instruction(unsigned char instruction, binary_stream_t *stream)
 
 char *find_6_len_instruction(unsigned char instruction, binary_stream_t *stream) {
     switch (instruction) {
-        case 0b000110:
-            return ssb_rm_with_reg(stream);
-        case 0b001100:
-            return xor_rm_reg(stream);
-        case 0b100010:
-            return mov_rm_to_reg(stream);
-        case 0b000000:
-            return add_rm_with_reg(stream);
-        case 0b001110:
-            return cmp_rm_reg(stream);
-        case 0b100000:
-            return cmp_immediate_rm(stream);
-        case 0b110100:
-            return shift_left(stream);
+        case 0b000000: return add_rm_with_reg(stream);
+        case 0b000010: return or_rm_reg(stream);
+        case 0b000110: return ssb_rm_with_reg(stream);
+        case 0b001000: return and_rm_reg(stream);
+        case 0b001100: return xor_rm_reg(stream);
+        case 0b001110: return cmp_rm_reg(stream);
+        case 0b100000: return cmp_immediate_rm(stream);
+        case 0b100010: return mov_rm_to_reg(stream);
+        case 0b110100: return shift_left(stream);
     }
     return NULL;
 }
 
 char *find_7_len_instruction(unsigned char instruction, binary_stream_t *stream) {
     switch(instruction) {
-        case 0b1100011:
-            return mov_immediate_to_rm(stream);
-        case 0b1110010:
-            return in_fixed_port(stream);
-        case 0b1110110:
-            return in_var_port(stream);
-        case 0b1111011:
-            return test_immediate_rm(stream);
-        case 0b1111111:
-            return inc_rm(stream);
+        case 0b0000110: return or_immediate_acc(stream);
+        case 0b0010110: return sub_immediate_to_acc(stream);
+        case 0b1100011: return mov_immediate_to_rm(stream);
+        case 0b1110010: return in_fixed_port(stream);
+        case 0b1110110: return in_var_port(stream);
+        case 0b1111011: return test_immediate_rm(stream);
+        case 0b1111111: return inc_rm(stream);
 
     }
     return NULL;
@@ -153,26 +147,20 @@ char *find_7_len_instruction(unsigned char instruction, binary_stream_t *stream)
 
 char *find_8_len_instruction(unsigned char instruction, binary_stream_t *stream) {
     switch(instruction) {
-        case 0b01110011:
-            return jnb(stream);
-        case 0b01110100:
-            return je(stream);
-        case 0b01110101:
-            return jne(stream);
-        case 0b01111100:
-            return jl(stream);
-        case 0b10001101:
-            return lea(stream);
-        case 0b10001111:
-            return pop_rm(stream);
-        case 0b11101000:
-            return call_direct_seg(stream);
-        case 0b11101001:
-            return jmp_direct_seg(stream);
-        case 0b11101011:
-            return jmp_direct_seg_short(stream);
-        case 0b11110100:
-            return hlt();
+        case 0b01110011: return jnb(stream);
+        case 0b01110100: return je(stream);
+        case 0b01110101: return jne(stream);
+        case 0b01111100: return jl(stream);
+        case 0b01111101: return jnl(stream);
+        case 0b01111111: return jnle(stream);
+        case 0b10001101: return lea(stream);
+        case 0b10001111: return pop_rm(stream);
+        case 0b10011000: return cbw();
+        case 0b10011001: return cwd();
+        case 0b11101000: return call_direct_seg(stream);
+        case 0b11101001: return jmp_direct_seg(stream);
+        case 0b11101011: return jmp_direct_seg_short(stream);
+        case 0b11110100: return hlt();
     }
     return NULL;
 }

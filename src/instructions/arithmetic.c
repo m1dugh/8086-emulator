@@ -8,7 +8,7 @@ char *add_rm_with_reg(binary_stream_t *data) {
 }
 
 char *cmp_rm_reg(binary_stream_t *data) {
-    return format_dw_rm_to_reg("cmp", data);
+    return format_sized_dw_rm_to_reg("cmp", data);
 }
 
 char *cmp_immediate_rm(binary_stream_t *data) {
@@ -43,18 +43,18 @@ char *cmp_immediate_rm(binary_stream_t *data) {
             instruction = "xor";
             break;
         case 0b111:
-            instruction = "cmp";
+            if (params.w) {
+                instruction = "cmp";
+            } else {
+                instruction = "cmp byte";
+            }
             break;
         default:
             return NULL;
     }
 
     char *res = malloc(50);
-    if (val == 0) {
-        snprintf(res, 50, "%s %s, %x", instruction, rm_value, val);
-    } else {
-        snprintf(res, 50, "%s %s, %04x", instruction, rm_value, val);
-    }
+    snprintf(res, 50, "%s %s, %x", instruction, rm_value, val);
     free(rm_value);
 
     return res;
@@ -99,10 +99,30 @@ char *inc_rm(binary_stream_t *data) {
     return res;
 }
 
+char *inc_reg(binary_stream_t *data) {
+    return format_reg("inc", data);
+}
+
 char *dec_reg(binary_stream_t *data) {
     return format_reg("dec", data);
 }
 
 char *ssb_rm_with_reg(binary_stream_t *data) {
     return format_dw_rm_to_reg("ssb", data);
+}
+
+char *cbw() {
+    char *res = malloc(4);
+    snprintf(res, 4, "cbw");
+    return res;
+}
+
+char *cwd() {
+    char *res = malloc(4);
+    snprintf(res, 4, "cwd");
+    return res;
+}
+
+char *sub_immediate_to_acc(binary_stream_t *data) {
+    return format_immediate_from_acc("sub", data);
 }

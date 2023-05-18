@@ -10,6 +10,14 @@ char *jne(binary_stream_t *data) {
     return format_byte_displacement("jne", data);
 }
 
+char *jnl(binary_stream_t *data) {
+    return format_byte_displacement("jnl", data);
+}
+
+char *jnle(binary_stream_t *data) {
+    return format_byte_displacement("jnle", data);
+}
+
 char *je(binary_stream_t *data) {
     return format_byte_displacement("je", data);
 }
