@@ -18,14 +18,16 @@ char *cmp_immediate_rm(binary_stream_t *data) {
     }
 
     char *rm_value = get_rm(data, params.w, params.mod, params.rm);
-    short val = extract_data_sw(data, &params);
+    unsigned short extracted = extract_data_sw(data, &params);
     char *instruction;
+    int signed_val = 1;
     switch (params.reg) {
         case 0b000:
             instruction = "add";
             break;
         case 0b001:
             instruction = "or";
+            signed_val = 0;
             break;
         case 0b010:
             instruction = "adc";
@@ -35,12 +37,14 @@ char *cmp_immediate_rm(binary_stream_t *data) {
             break;
         case 0b100:
             instruction = "and";
+            signed_val = 0;
             break;
         case 0b101:
             instruction = "sub";
             break;
         case 0b110:
             instruction = "xor";
+            signed_val = 0;
             break;
         case 0b111:
             if (params.w) {
@@ -54,7 +58,12 @@ char *cmp_immediate_rm(binary_stream_t *data) {
     }
 
     char *res = malloc(50);
-    snprintf(res, 50, "%s %s, %x", instruction, rm_value, val);
+    if(signed_val && extracted & 0x8000) {
+        short val = (extracted ^ 0xffff) + 1;
+        snprintf(res, 50, "%s %s, -%x", instruction, rm_value, val);
+    } else {
+        snprintf(res, 50, "%s %s, %04x", instruction, rm_value, extracted);
+    }
     free(rm_value);
 
     return res;
@@ -111,6 +120,10 @@ char *ssb_rm_with_reg(binary_stream_t *data) {
     return format_dw_rm_to_reg("ssb", data);
 }
 
+char *sub_rm_with_reg(binary_stream_t *data) {
+    return format_dw_rm_to_reg("sub", data);
+}
+
 char *cbw() {
     char *res = malloc(4);
     snprintf(res, 4, "cbw");
@@ -125,4 +138,8 @@ char *cwd() {
 
 char *sub_immediate_to_acc(binary_stream_t *data) {
     return format_immediate_from_acc("sub", data);
+}
+
+char *cmp_immediate_acc(binary_stream_t *data) {
+    return format_immediate_from_acc("cmp", data);
 }

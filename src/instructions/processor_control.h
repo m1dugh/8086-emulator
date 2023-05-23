@@ -2,5 +2,6 @@
 #define INSTRUCTIONS_PROCESSOR_CONTROL_H
 
 char *hlt();
+char *cld();
 
 #endif // !INSTRUCTIONS_PROCESSOR_CONTROL_H

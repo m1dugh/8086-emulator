@@ -18,11 +18,10 @@ char *mov_immediate_to_reg(binary_stream_t *data) {
     if(extract_reg(data, &params) != 0)
         return NULL;
     short val = extract_data(data, &params);
-
     char *reg_value = get_reg(params.w, params.reg);
-
     char *res = malloc(50);
-    snprintf(res, 50, "mov %s, %04x", reg_value, val);
+
+    snprintf(res, 50, "mov %s, %04x", reg_value, val & 0xffff);
     return res;
 }
 

@@ -129,13 +129,14 @@ char *get_rm(binary_stream_t *data, char w, char mod, char rm) {
     }
     else if(mod == 0b01) {
         unsigned char val = extract_byte(data);
-        disp = val;
         if(val & 0x80) {
-            disp |= 0xff00;
+            disp = val | 0xff00;
+        } else {
+            disp = val;
         }
     } else { // mod == 0b10
-        disp = extract_byte(data);
-        disp |= (extract_byte(data) << 8);
+        unsigned char low = extract_byte(data);
+        disp = (extract_byte(data) << 8) + low;
     }
 
     char *effective_address = malloc(20);
@@ -300,7 +301,7 @@ char *format_rm_to_reg(char *val, binary_stream_t *data) {
 
 short extract_data(binary_stream_t *data, struct params_t *params) {
     unsigned char low = extract_byte(data);
-    short val = low;
+    unsigned short val = low;
     if(params->w) {
         val = (extract_byte(data) << 8) + val;
     }
@@ -308,15 +309,21 @@ short extract_data(binary_stream_t *data, struct params_t *params) {
 }
 
 short extract_data_sw(binary_stream_t *data, struct params_t *params) {
-    short val = extract_byte(data);
+    unsigned char low = extract_byte(data);
+    unsigned short val;
     if(params->w) {
         if (params->d) {
-            if (val & 0x80) {
-                val |= 0xff00;
+            if (low & 0x80) {
+                val = low | 0xff00;
+            } else {
+                val = low;
             }
         } else {
-            val = (extract_byte(data) << 8) + val;
+            unsigned char high = extract_byte(data);
+            val = (high << 8) + low;
         }
+    } else {
+        val = low;
     }
     return val;
 }
@@ -371,7 +378,7 @@ char *format_immediate_from_acc(char *val, binary_stream_t *data) {
         return NULL;
     }
     char *res = malloc(50);
-    short extracted = extract_data(data, &params);
+    unsigned short extracted = extract_data(data, &params);
     char *reg = get_reg(params.w, 0b000);
 
     snprintf(res, 50, "%s %s, %04x", val, reg, extracted);
@@ -383,8 +390,8 @@ char *format_w_immediate_to_rm(char *val, binary_stream_t *data) {
     if(extract_w_mod_reg_rm(data, &params) != 0) {
         return NULL;
     }
-    char *rm_value = get_rm(data, params.mod, params.w, params.rm);
-    short extracted = extract_data(data, &params);
+    char *rm_value = get_rm(data, params.w, params.mod, params.rm);
+    unsigned short extracted = extract_data(data, &params);
 
     char *format;
     if(params.w) {
