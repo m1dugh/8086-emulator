@@ -28,6 +28,10 @@ char *mov_immediate_to_reg(binary_stream_t *data)
     return res;
 }
 
+char *mov_mem_to_acc(binary_stream_t *data) {
+    return format_w_mem_to_acc("mov", data);
+}
+
 char *lea(binary_stream_t *data)
 {
     return format_rm_to_reg("lea", data);
@@ -104,7 +108,7 @@ char *out_var_port(binary_stream_t *data)
 
 char *xchg_rm_with_reg(binary_stream_t *data)
 {
-    return format_w_rm_to_reg("xchg", data);
+    return format_w_rm_to_reg_d("xchg", data, 0);
 }
 char *xchg_reg(binary_stream_t *data)
 {

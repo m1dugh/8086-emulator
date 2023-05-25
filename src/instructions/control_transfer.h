@@ -16,6 +16,7 @@ char *je(binary_stream_t *data);
 char *jl(binary_stream_t *data);
 char *jle(binary_stream_t *data);
 char *jb(binary_stream_t *data);
+char *js(binary_stream_t *data);
 
 // LOOP
 char *loop(binary_stream_t *data);

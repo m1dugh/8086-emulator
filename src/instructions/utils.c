@@ -257,25 +257,9 @@ char *get_rm(binary_stream_t *data, char w, char mod, char rm)
 char *format_dw_rm_to_reg(char *val, binary_stream_t *data)
 {
     struct params_t params;
-    if (extract_dw_mod_reg_rm(data, &params) != 0)
-    {
+    if(extract_d(data, &params) != 0)
         return NULL;
-    }
-    char *reg = get_reg(params.w, params.reg);
-
-    char *rm_value = get_rm(data, params.w, params.mod, params.rm);
-
-    char *instruction = malloc(50);
-    if (params.d)
-    {
-        snprintf(instruction, 50, "%s %s, %s", val, reg, rm_value);
-    }
-    else
-    {
-        snprintf(instruction, 50, "%s %s, %s", val, rm_value, reg);
-    }
-    free(rm_value);
-    return instruction;
+    return format_w_rm_to_reg_d(val, data, params.d);
 }
 
 char *format_sized_dw_rm_to_reg(char *val, binary_stream_t *data)
@@ -324,6 +308,30 @@ char *format_w_rm_to_reg(char *val, binary_stream_t *data)
 
     char *instruction = malloc(50);
     snprintf(instruction, 50, "%s %s, %s", val, reg, rm_value);
+    free(rm_value);
+    return instruction;
+}
+
+char *format_w_rm_to_reg_d(char *val, binary_stream_t *data, int direction) {
+
+    struct params_t params;
+    if (extract_w_mod_reg_rm(data, &params) != 0)
+    {
+        return NULL;
+    }
+    char *reg = get_reg(params.w, params.reg);
+
+    char *rm_value = get_rm(data, params.w, params.mod, params.rm);
+
+    char *instruction = malloc(50);
+    if (direction)
+    {
+        snprintf(instruction, 50, "%s %s, %s", val, reg, rm_value);
+    }
+    else
+    {
+        snprintf(instruction, 50, "%s %s, %s", val, rm_value, reg);
+    }
     free(rm_value);
     return instruction;
 }
@@ -494,5 +502,20 @@ char *format_w_immediate_to_rm(char *val, binary_stream_t *data)
 
     char *res = malloc(50);
     snprintf(res, 50, format, val, rm_value, extracted);
+    return res;
+}
+
+char *format_w_mem_to_acc(char *val, binary_stream_t *data) {
+    struct params_t params;
+    if(extract_w(data, &params) != 0) {
+        return NULL;
+    }
+
+    unsigned char low = extract_byte(data);
+    unsigned char high = extract_byte(data);
+    unsigned short addr = (high << 8) + low;
+
+    char *res = malloc(20);
+    snprintf(res, 20, "%s ax, [%04x]", val, addr);
     return res;
 }

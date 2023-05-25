@@ -7,9 +7,6 @@ char *get_string_instruction(char instruction, binary_stream_t *data)
 {
 
     char *format;
-    struct params_t params;
-    if (extract_w(data, &params) != 0)
-        return NULL;
 
     switch (instruction)
     {
@@ -31,6 +28,10 @@ char *get_string_instruction(char instruction, binary_stream_t *data)
         default:
             return NULL;
     };
+
+    struct params_t params;
+    if (extract_w(data, &params) != 0)
+        return NULL;
 
     char *res = malloc(6);
     snprintf(res, 6, format, params.w ? 'w' : 'b');

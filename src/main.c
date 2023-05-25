@@ -170,6 +170,8 @@ char *find_7_len_instruction(
 {
     switch (instruction)
     {
+        case 0b0000010:
+            return add_immediate_to_acc(stream);
         case 0b0000110:
             return or_immediate_acc(stream);
         case 0b0010110:
@@ -180,6 +182,8 @@ char *find_7_len_instruction(
             return test_rm_reg(stream);
         case 0b1000011:
             return xchg_rm_with_reg(stream);
+        case 0b1010000:
+            return mov_mem_to_acc(stream);
         case 0b1010100:
             return test_immediate_acc(stream);
         case 0b1100011:
@@ -195,8 +199,7 @@ char *find_7_len_instruction(
         case 0b1111111:
             return inc_rm(stream);
     }
-    // return get_string_instruction(instruction, stream);
-    return NULL;
+    return get_string_instruction(instruction, stream);
 }
 
 char *find_8_len_instruction(
@@ -206,6 +209,8 @@ char *find_8_len_instruction(
     {
         case 0b01110010:
             return jb(stream);
+        case 0b01111000:
+            return js(stream);
         case 0b01110011:
             return jnb(stream);
         case 0b01110100:
@@ -316,6 +321,8 @@ int main(int argc, char **argv)
         errx(-1, "Could not read header.");
     }
 
+    printf("text length: %04lx\ntext start address: %04x\ntext end address: %04lx\n", header.a_text, header.a_hdrlen, ((long)header.a_hdrlen) + header.a_text);
+
     binary_stream_t *stream = bs_new(f, header.a_text);
 
     while (!bs_finished(stream))
@@ -324,7 +331,7 @@ int main(int argc, char **argv)
         if (printf_instruction(stream->current_address,
                 stream->instruction_buffer, stream->instruction_buffer_len,
                 res)
-            != 0)
+            != 0 && !bs_finished(stream))
         {
             fflush(stdout);
             errx(-1, "Instruction not found");

@@ -20,7 +20,7 @@ char read_bit(binary_stream_t *str, char *res)
 {
     if (str->_buffer_index > 7)
     {
-        if (str->current_address >= str->len)
+        if (bs_finished(str))
             return -1;
         str->_buffer = fgetc(str->_stream);
         push_buffer(str, str->_buffer);

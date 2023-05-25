@@ -7,6 +7,10 @@ char *jnb(binary_stream_t *data)
 {
     return format_byte_displacement("jnb", data);
 }
+char *js(binary_stream_t *data)
+{
+    return format_byte_displacement("js", data);
+}
 
 char *jb(binary_stream_t *data)
 {
