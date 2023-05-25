@@ -257,7 +257,7 @@ char *get_rm(binary_stream_t *data, char w, char mod, char rm)
 char *format_dw_rm_to_reg(char *val, binary_stream_t *data)
 {
     struct params_t params;
-    if(extract_d(data, &params) != 0)
+    if (extract_d(data, &params) != 0)
         return NULL;
     return format_w_rm_to_reg_d(val, data, params.d);
 }
@@ -312,7 +312,8 @@ char *format_w_rm_to_reg(char *val, binary_stream_t *data)
     return instruction;
 }
 
-char *format_w_rm_to_reg_d(char *val, binary_stream_t *data, int direction) {
+char *format_w_rm_to_reg_d(char *val, binary_stream_t *data, int direction)
+{
 
     struct params_t params;
     if (extract_w_mod_reg_rm(data, &params) != 0)
@@ -505,9 +506,11 @@ char *format_w_immediate_to_rm(char *val, binary_stream_t *data)
     return res;
 }
 
-char *format_w_mem_to_acc(char *val, binary_stream_t *data) {
+char *format_w_mem_to_acc(char *val, binary_stream_t *data)
+{
     struct params_t params;
-    if(extract_w(data, &params) != 0) {
+    if (extract_w(data, &params) != 0)
+    {
         return NULL;
     }
 

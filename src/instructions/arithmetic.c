@@ -8,7 +8,8 @@ char *add_rm_with_reg(binary_stream_t *data)
     return format_dw_rm_to_reg("add", data);
 }
 
-char *add_immediate_to_acc(binary_stream_t *data) {
+char *add_immediate_to_acc(binary_stream_t *data)
+{
     return format_immediate_from_acc("add", data);
 }
 

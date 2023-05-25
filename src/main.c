@@ -321,7 +321,10 @@ int main(int argc, char **argv)
         errx(-1, "Could not read header.");
     }
 
-    printf("text length: %04lx\ntext start address: %04x\ntext end address: %04lx\n", header.a_text, header.a_hdrlen, ((long)header.a_hdrlen) + header.a_text);
+    printf("text length: %04lx\ntext start address: %04x\ntext end address: "
+           "%04lx\n",
+        header.a_text, header.a_hdrlen,
+        ((long)header.a_hdrlen) + header.a_text);
 
     binary_stream_t *stream = bs_new(f, header.a_text);
 
@@ -331,7 +334,8 @@ int main(int argc, char **argv)
         if (printf_instruction(stream->current_address,
                 stream->instruction_buffer, stream->instruction_buffer_len,
                 res)
-            != 0 && !bs_finished(stream))
+                != 0
+            && !bs_finished(stream))
         {
             fflush(stdout);
             errx(-1, "Instruction not found");

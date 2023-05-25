@@ -28,7 +28,8 @@ char *mov_immediate_to_reg(binary_stream_t *data)
     return res;
 }
 
-char *mov_mem_to_acc(binary_stream_t *data) {
+char *mov_mem_to_acc(binary_stream_t *data)
+{
     return format_w_mem_to_acc("mov", data);
 }
 

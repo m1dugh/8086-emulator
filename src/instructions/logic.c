@@ -114,9 +114,12 @@ char *shift_left(binary_stream_t *data)
             return NULL;
     }
     char *res = malloc(50);
-    if(params.d == 0) {
+    if (params.d == 0)
+    {
         snprintf(res, 50, "%s %s, 1", instruction, rm_value);
-    } else {
+    }
+    else
+    {
         snprintf(res, 50, "%s %s, cl", instruction, rm_value);
     }
     free(rm_value);
