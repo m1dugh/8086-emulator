@@ -3,17 +3,19 @@
 
 #include "../utils/binary_stream.h"
 
-#define GET_DATA(val, data, size)   if(bs_next_reset(data, size, &val) != 0) {\
-                                        return NULL; \
-                                    }
- 
+#define GET_DATA(val, data, size)             \
+    if (bs_next_reset(data, size, &val) != 0) \
+    {                                         \
+        return NULL;                          \
+    }
 
 #define GET_MOD(mod, data) GET_DATA(mod, data, 2)
 #define GET_RM_VALUE(reg, data) GET_DATA(mod, data, 3)
 
 #define GET_BIT(val, data) GET_DATA(val, data, 1)
 
-struct params_t {
+struct params_t
+{
     char d;
     char w;
     char mod;

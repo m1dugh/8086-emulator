@@ -25,7 +25,6 @@ char *loopnz(binary_stream_t *data);
 // CALL
 char *call_direct_seg(binary_stream_t *data);
 
-
 // INT
 char *interrupt();
 char *interrupt_with_code(binary_stream_t *data);

@@ -1,11 +1,14 @@
-#include "binary_stream.h"
 #include <malloc.h>
 #include <stdio.h>
+#include "binary_stream.h"
 
-int push_buffer(binary_stream_t *str, char c) {
-    if (str->instruction_buffer_len == str->_instruction_buffer_cap) {
+int push_buffer(binary_stream_t *str, char c)
+{
+    if (str->instruction_buffer_len == str->_instruction_buffer_cap)
+    {
         str->_instruction_buffer_cap *= 2;
-        str->instruction_buffer = realloc(str->instruction_buffer, str->_instruction_buffer_cap);
+        str->instruction_buffer
+            = realloc(str->instruction_buffer, str->_instruction_buffer_cap);
         if (str->instruction_buffer == NULL)
             return -1;
     }
@@ -13,15 +16,19 @@ int push_buffer(binary_stream_t *str, char c) {
     return 0;
 }
 
-char read_bit(binary_stream_t *str, char *res) {
-    if(str->_buffer_index > 7) {
-        if(str->current_address >= str->len)
+char read_bit(binary_stream_t *str, char *res)
+{
+    if (str->_buffer_index > 7)
+    {
+        if (str->current_address >= str->len)
             return -1;
         str->_buffer = fgetc(str->_stream);
         push_buffer(str, str->_buffer);
         str->_buffer_index = 1;
         *res = (0b10000000 & str->_buffer) >> 7;
-    } else {
+    }
+    else
+    {
         char mask = 0b10000000 >> str->_buffer_index;
         *res = (mask & str->_buffer) >> (7 - str->_buffer_index);
         str->_buffer_index++;
@@ -29,13 +36,16 @@ char read_bit(binary_stream_t *str, char *res) {
     return 0;
 }
 
-binary_stream_t *bs_new(FILE *stream, long len) {
+binary_stream_t *bs_new(FILE *stream, long len)
+{
     binary_stream_t *res = malloc(sizeof(binary_stream_t));
-    if(res == NULL)
+    if (res == NULL)
         return NULL;
     res->_instruction_buffer_cap = 2;
-    res->instruction_buffer = malloc(sizeof(char) * res->_instruction_buffer_cap);
-    if(res->instruction_buffer == NULL) {
+    res->instruction_buffer
+        = malloc(sizeof(char) * res->_instruction_buffer_cap);
+    if (res->instruction_buffer == NULL)
+    {
         free(res);
         return NULL;
     }
@@ -49,12 +59,17 @@ binary_stream_t *bs_new(FILE *stream, long len) {
     return res;
 }
 
-int bs_next(binary_stream_t *stream, int size, char *res) {
-    for(int i = 0; i < size; i++) {
+int bs_next(binary_stream_t *stream, int size, char *res)
+{
+    for (int i = 0; i < size; i++)
+    {
         char bit = 0;
-        if (read_bit(stream, &bit) == 0) {
+        if (read_bit(stream, &bit) == 0)
+        {
             *res = (*res << 1) | bit;
-        } else {
+        }
+        else
+        {
             return -1;
         }
     }
@@ -62,41 +77,49 @@ int bs_next(binary_stream_t *stream, int size, char *res) {
     return 0;
 }
 
-int bs_next_reset(binary_stream_t *stream, int size, char *res) {
+int bs_next_reset(binary_stream_t *stream, int size, char *res)
+{
     *res = 0;
     return bs_next(stream, size, res);
 }
 
-void bs_free(binary_stream_t *stream) {
+void bs_free(binary_stream_t *stream)
+{
     free(stream->instruction_buffer);
     free(stream);
 }
 
-void bs_flush_buffer(binary_stream_t *stream) {
+void bs_flush_buffer(binary_stream_t *stream)
+{
     stream->current_address += stream->instruction_buffer_len;
     stream->instruction_buffer_len = 0;
 }
 
-size_t bs_read_bytes(binary_stream_t *stream) {
+size_t bs_read_bytes(binary_stream_t *stream)
+{
     return stream->current_address;
 }
 
-int bs_finished(binary_stream_t *stream) {
+int bs_finished(binary_stream_t *stream)
+{
     return stream->current_address + 1 >= stream->len;
 }
 
-
-struct stack *stack_push(struct stack* stack, size_t cursor, char byte_position) {
+struct stack *stack_push(
+    struct stack *stack, size_t cursor, char byte_position)
+{
     struct stack *res = malloc(sizeof(struct stack));
-    if(res == NULL)
+    if (res == NULL)
         return NULL;
     res->byte_position = byte_position;
     res->cursor_pos = cursor;
     res->last = stack;
     return res;
 }
-struct stack *stack_pop(struct stack* stack, size_t *cursor, char *byte_position) {
-    if(stack == NULL)
+struct stack *stack_pop(
+    struct stack *stack, size_t *cursor, char *byte_position)
+{
+    if (stack == NULL)
         return NULL;
 
     *cursor = stack->cursor_pos;
@@ -107,17 +130,19 @@ struct stack *stack_pop(struct stack* stack, size_t *cursor, char *byte_position
     return res;
 }
 
-
-void bs_save(binary_stream_t *stream) {
+void bs_save(binary_stream_t *stream)
+{
     size_t cursor = ftell(stream->_stream);
     stream->_stack = stack_push(stream->_stack, cursor, stream->_buffer_index);
 }
-int bs_rollback(binary_stream_t *stream) {
-    if(stream->_stack == NULL)
+int bs_rollback(binary_stream_t *stream)
+{
+    if (stream->_stack == NULL)
         return -1;
 
     size_t cursor;
-    stream->_stack = stack_pop(stream->_stack, &cursor, &stream->_buffer_index);
+    stream->_stack
+        = stack_pop(stream->_stack, &cursor, &stream->_buffer_index);
 
     fseek(stream->_stream, cursor, SEEK_SET);
     stream->instruction_buffer_len = 0;
@@ -125,11 +150,13 @@ int bs_rollback(binary_stream_t *stream) {
     return 0;
 }
 
-int bs_unsave(binary_stream_t *stream) {
-    if(stream->_stack == NULL)
+int bs_unsave(binary_stream_t *stream)
+{
+    if (stream->_stack == NULL)
         return -1;
     size_t cursor;
-    stream->_stack = stack_pop(stream->_stack, &cursor, &stream->_buffer_index);
+    stream->_stack
+        = stack_pop(stream->_stack, &cursor, &stream->_buffer_index);
 
     return 0;
 }

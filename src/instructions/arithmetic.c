@@ -1,19 +1,23 @@
-#include "arithmetic.h"
-#include "utils.h"
 #include <malloc.h>
 #include <stdio.h>
+#include "arithmetic.h"
+#include "utils.h"
 
-char *add_rm_with_reg(binary_stream_t *data) {
+char *add_rm_with_reg(binary_stream_t *data)
+{
     return format_dw_rm_to_reg("add", data);
 }
 
-char *cmp_rm_reg(binary_stream_t *data) {
+char *cmp_rm_reg(binary_stream_t *data)
+{
     return format_sized_dw_rm_to_reg("cmp", data);
 }
 
-char *cmp_immediate_rm(binary_stream_t *data) {
+char *cmp_immediate_rm(binary_stream_t *data)
+{
     struct params_t params;
-    if(extract_dw_mod_reg_rm(data, &params) != 0) {
+    if (extract_dw_mod_reg_rm(data, &params) != 0)
+    {
         return NULL;
     }
 
@@ -21,7 +25,8 @@ char *cmp_immediate_rm(binary_stream_t *data) {
     unsigned short extracted = extract_data_sw(data, &params);
     char *instruction;
     int signed_val = 1;
-    switch (params.reg) {
+    switch (params.reg)
+    {
         case 0b000:
             instruction = "add";
             break;
@@ -47,9 +52,12 @@ char *cmp_immediate_rm(binary_stream_t *data) {
             signed_val = 0;
             break;
         case 0b111:
-            if (params.w) {
+            if (params.w)
+            {
                 instruction = "cmp";
-            } else {
+            }
+            else
+            {
                 instruction = "cmp byte";
             }
             break;
@@ -58,10 +66,13 @@ char *cmp_immediate_rm(binary_stream_t *data) {
     }
 
     char *res = malloc(50);
-    if(signed_val && extracted & 0x8000) {
+    if (signed_val && extracted & 0x8000)
+    {
         short val = (extracted ^ 0xffff) + 1;
         snprintf(res, 50, "%s %s, -%x", instruction, rm_value, val);
-    } else {
+    }
+    else
+    {
         snprintf(res, 50, "%s %s, %04x", instruction, rm_value, extracted);
     }
     free(rm_value);
@@ -69,14 +80,17 @@ char *cmp_immediate_rm(binary_stream_t *data) {
     return res;
 }
 
-char *inc_rm(binary_stream_t *data) {
+char *inc_rm(binary_stream_t *data)
+{
     struct params_t params;
-    if(extract_w_mod_reg_rm(data, &params) != 0) {
+    if (extract_w_mod_reg_rm(data, &params) != 0)
+    {
         return NULL;
     }
     char *rm_value = get_rm(data, params.w, params.mod, params.rm);
     char *res = malloc(50);
-    switch(params.reg) {
+    switch (params.reg)
+    {
         case 0b000:
             snprintf(res, 50, "inc %s", rm_value);
             break;
@@ -108,42 +122,51 @@ char *inc_rm(binary_stream_t *data) {
     return res;
 }
 
-char *inc_reg(binary_stream_t *data) {
+char *inc_reg(binary_stream_t *data)
+{
     return format_reg("inc", data);
 }
 
-char *dec_reg(binary_stream_t *data) {
+char *dec_reg(binary_stream_t *data)
+{
     return format_reg("dec", data);
 }
 
-char *ssb_rm_with_reg(binary_stream_t *data) {
+char *ssb_rm_with_reg(binary_stream_t *data)
+{
     return format_dw_rm_to_reg("ssb", data);
 }
 
-char *sub_rm_with_reg(binary_stream_t *data) {
+char *sub_rm_with_reg(binary_stream_t *data)
+{
     return format_dw_rm_to_reg("sub", data);
 }
 
-char *cbw() {
+char *cbw()
+{
     char *res = malloc(4);
     snprintf(res, 4, "cbw");
     return res;
 }
 
-char *cwd() {
+char *cwd()
+{
     char *res = malloc(4);
     snprintf(res, 4, "cwd");
     return res;
 }
 
-char *sub_immediate_to_acc(binary_stream_t *data) {
+char *sub_immediate_to_acc(binary_stream_t *data)
+{
     return format_immediate_from_acc("sub", data);
 }
 
-char *cmp_immediate_acc(binary_stream_t *data) {
+char *cmp_immediate_acc(binary_stream_t *data)
+{
     return format_immediate_from_acc("cmp", data);
 }
 
-char *adc_rm_with_reg(binary_stream_t *data) {
+char *adc_rm_with_reg(binary_stream_t *data)
+{
     return format_dw_rm_to_reg("adc", data);
 }
