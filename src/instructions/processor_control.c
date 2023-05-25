@@ -16,3 +16,9 @@ char *cld() {
     snprintf(res, 4, "cld");
     return res;
 }
+
+char *std_instruction() {
+    char *res = malloc(4);
+    snprintf(res, 4, "std");
+    return res;
+}

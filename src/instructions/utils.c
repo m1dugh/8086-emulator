@@ -372,6 +372,18 @@ char *format_reg(char *val, binary_stream_t *data) {
     return res;
 }
 
+char *format_reg_to_acc(char *val, binary_stream_t *data) {
+    struct params_t params;
+    if(extract_reg(data, &params) != 0) {
+        return NULL;
+    }
+
+    char *reg_value = get_reg(0b1, params.reg);
+    char *res = malloc(20);
+    snprintf(res, 20, "%s %s, ax", val, reg_value);
+    return res;
+}
+
 char *format_immediate_from_acc(char *val, binary_stream_t *data) {
     struct params_t params;
     if(extract_w(data, &params) != 0) {

@@ -6,6 +6,7 @@
 #include "arithmetic.h"
 #include "control_transfer.h"
 #include "processor_control.h"
+#include "string_manipulation.h"
 
 #endif // !INSTRUCTIONS_H
 

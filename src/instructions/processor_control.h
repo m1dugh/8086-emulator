@@ -3,5 +3,6 @@
 
 char *hlt();
 char *cld();
+char *std_instruction();
 
 #endif // !INSTRUCTIONS_PROCESSOR_CONTROL_H

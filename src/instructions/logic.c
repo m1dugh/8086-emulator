@@ -24,6 +24,7 @@ char *xor_rm_reg(binary_stream_t *data) {
 char *test_rm_reg(binary_stream_t *data) {
     return format_w_rm_to_reg("test", data);
 }
+
 char *test_immediate_rm(binary_stream_t *data) {
     struct params_t params;
     if(extract_w_mod_reg_rm(data, &params) != 0) {

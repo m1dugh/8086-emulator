@@ -84,3 +84,10 @@ char *out_fixed_port(binary_stream_t *data) {
 char *out_var_port(binary_stream_t *data) {
     return in_out_port("out", data, 0);
 }
+
+char *xchg_rm_with_reg(binary_stream_t *data) {
+    return format_w_rm_to_reg("xchg", data);
+}
+char *xchg_reg(binary_stream_t *data) {
+    return format_reg_to_acc("xchg", data);
+}

@@ -83,3 +83,13 @@ char *ret() {
     snprintf(res, 4, "ret");
     return res;
 }
+
+char *loop(binary_stream_t *data) {
+    return format_byte_displacement("loop", data);
+}
+char *loopz(binary_stream_t *data) {
+    return format_byte_displacement("loopz", data);
+}
+char *loopnz(binary_stream_t *data) {
+    return format_byte_displacement("loopnz", data);
+}

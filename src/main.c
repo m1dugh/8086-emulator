@@ -2,10 +2,10 @@
 #include <malloc.h>
 #include <err.h>
 #include "instructions/arithmetic.h"
-#include "instructions/control_transfer.h"
 #include "instructions/data_transfer.h"
 #include "instructions/logic.h"
 #include "instructions/processor_control.h"
+#include "instructions/string_manipulation.h"
 #include "utils/binary_stream.h"
 #include "instructions/instructions.h"
 #include "utils/format.h"
@@ -104,14 +104,11 @@ char *find_4_len_instruction(unsigned char instruction, binary_stream_t *stream)
 
 char *find_5_len_instruction(unsigned char instruction, binary_stream_t *stream) {
     switch (instruction) {
-        case 0b01000:
-            return inc_reg(stream);
-        case 0b01001:
-            return dec_reg(stream);
-        case 0b01010:
-            return push_reg(stream);
-        case 0b01011:
-            return pop_reg(stream);
+        case 0b01000: return inc_reg(stream);
+        case 0b01001: return dec_reg(stream);
+        case 0b01010: return push_reg(stream);
+        case 0b01011: return pop_reg(stream);
+        case 0b10010: return xchg_reg(stream);
     }
     return NULL;
 }
@@ -120,6 +117,7 @@ char *find_6_len_instruction(unsigned char instruction, binary_stream_t *stream)
     switch (instruction) {
         case 0b000000: return add_rm_with_reg(stream);
         case 0b000010: return or_rm_reg(stream);
+        case 0b000100: return adc_rm_with_reg(stream);
         case 0b000110: return ssb_rm_with_reg(stream);
         case 0b001000: return and_rm_reg(stream);
         case 0b001010: return sub_rm_with_reg(stream);
@@ -137,14 +135,18 @@ char *find_7_len_instruction(unsigned char instruction, binary_stream_t *stream)
         case 0b0000110: return or_immediate_acc(stream);
         case 0b0010110: return sub_immediate_to_acc(stream);
         case 0b0011110: return cmp_immediate_acc(stream);
+        case 0b1000010: return test_rm_reg(stream);
+        case 0b1000011: return xchg_rm_with_reg(stream);
         case 0b1010100: return test_immediate_acc(stream);
         case 0b1100011: return mov_immediate_to_rm(stream);
         case 0b1110010: return in_fixed_port(stream);
         case 0b1110110: return in_var_port(stream);
+        case 0b1111001: return rep_string(stream);
         case 0b1111011: return test_immediate_rm(stream);
         case 0b1111111: return inc_rm(stream);
 
     }
+    // return get_string_instruction(instruction, stream);
     return NULL;
 }
 
@@ -166,6 +168,9 @@ char *find_8_len_instruction(unsigned char instruction, binary_stream_t *stream)
         case 0b10011001: return cwd();
         case 0b11001100: return interrupt();
         case 0b11001101: return interrupt_with_code(stream);
+        case 0b11100000: return loopnz(stream);
+        case 0b11100001: return loopz(stream);
+        case 0b11100010: return loop(stream);
         case 0b11101000: return call_direct_seg(stream);
         case 0b11101001: return jmp_direct_seg(stream);
         case 0b11101011: return jmp_direct_seg_short(stream);
@@ -175,6 +180,7 @@ char *find_8_len_instruction(unsigned char instruction, binary_stream_t *stream)
         case 0b11001011:
         case 0b11000011: return ret();
         case 0b11111100: return cld();
+        case 0b11111101: return std_instruction();
     }
     return NULL;
 }
@@ -236,6 +242,8 @@ int main(int argc, char **argv) {
         }
         free(res);
     }
+
+    printf("===== END OF .TEXT SECTION =====\n");
 
     bs_free(stream);
 

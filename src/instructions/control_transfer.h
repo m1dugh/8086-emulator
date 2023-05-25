@@ -17,6 +17,11 @@ char *jl(binary_stream_t *data);
 char *jle(binary_stream_t *data);
 char *jb(binary_stream_t *data);
 
+// LOOP
+char *loop(binary_stream_t *data);
+char *loopz(binary_stream_t *data);
+char *loopnz(binary_stream_t *data);
+
 // CALL
 char *call_direct_seg(binary_stream_t *data);
 
