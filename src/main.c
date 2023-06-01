@@ -272,7 +272,7 @@ char *find_8_len_instruction(
 char *next_instruction(binary_stream_t *stream)
 {
     bs_flush_buffer(stream);
-    unsigned char instruction;
+    char instruction;
     char *res;
 
     if (bs_next_reset(stream, 4, &instruction) != 0)
