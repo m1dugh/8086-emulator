@@ -8,7 +8,7 @@ char *jmp_direct_seg(binary_stream_t *data);
 char *jmp_direct_seg_short(binary_stream_t *data);
 char *jnb(binary_stream_t *data);
 char *jbe(binary_stream_t *data);
-char *jnl(binary_stream_t *data);
+char *jnl_instruction(binary_stream_t *data);
 char *jne(binary_stream_t *data);
 char *jnle(binary_stream_t *data);
 char *jnbe(binary_stream_t *data);

@@ -22,7 +22,7 @@ char *jne(binary_stream_t *data)
     return format_byte_displacement("jne", data);
 }
 
-char *jnl(binary_stream_t *data)
+char *jnl_instruction(binary_stream_t *data)
 {
     return format_byte_displacement("jnl", data);
 }

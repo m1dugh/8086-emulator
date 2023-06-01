@@ -224,7 +224,7 @@ char *find_8_len_instruction(
         case 0b01111100:
             return jl(stream);
         case 0b01111101:
-            return jnl(stream);
+            return jnl_instruction(stream);
         case 0b01111110:
             return jle(stream);
         case 0b01111111:
