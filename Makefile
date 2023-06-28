@@ -18,11 +18,13 @@ SRC_DIR=./src
 SRC=utils/binary_stream.c main.c instructions/arithmetic.c instructions/logic.c \
 	instructions/data_transfer.c instructions/utils.c utils/format.c \
 	instructions/control_transfer.c instructions/processor_control.c \
-	instructions/string_manipulation.c
+	instructions/string_manipulation.c \
+	models.c
 HEADERS=utils/binary_stream.h instructions/arithmetic.h instructions/logic.h \
 		instructions/data_transfer.h instructions/utils.h utils/format.h \
 		instructions/instructions.h instructions/control_transfer.h \
-		instructions/processor_control.h instructions/string_manipulation.h
+		instructions/processor_control.h instructions/string_manipulation.h \
+		models.h
 
 DEPS=$(addprefix $(SRC_DIR)/, $(HEADERS))
 
