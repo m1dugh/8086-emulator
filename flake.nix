@@ -18,6 +18,23 @@
     });
   in {
 
+    devShells = forAllSystems(system:
+    let pkgs = nixpkgsFor.${system};
+    in {
+        default = pkgs.mkShell {
+            nativeBuildInputs = with pkgs; [
+                gcc
+                gnumake
+                clang-tools
+                pre-commit
+            ];
+
+            shellHook = ''
+                pre-commit install;
+            '';
+        };
+    });
+
     packages = forAllSystems(system: 
     let pkgs = nixpkgsFor.${system};
     inherit (pkgs) stdenv;

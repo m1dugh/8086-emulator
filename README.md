@@ -1,27 +1,23 @@
-# Intel 8086 Disassembler
+#Intel 8086 Disassembler
 
-## How to use ?
+##How to use ?
 
-### Building
+             ## #Building
 
-- Prod build
-```bash
-$ make
+                 - Prod build
+```bash $ make
 ```
 
-- Debug build
-```bash
-$ make debug
+                 - Debug build
+```bash $ make debug
 ```
 
-### Running
+                 ## #Running
 
-- Running prod binary
-```bash
-$ ./bin/Release/mmvm <file_to_disassemble>
+                 - Running prod binary
+```bash $./ bin / Release / mmvm<file_to_disassemble>
 ```
 
-- Running debug binary
-```bash
-$ ./bin/Debug/mmvm.debug <file_to_disassemble>
+                 - Running debug binary
+```bash $./ bin / Debug / mmvm.debug<file_to_disassemble>
 ```
