@@ -1,6 +1,7 @@
 CC=gcc
-CFLAGS=-Wall -Wextra -O3
-DFLAGS=-Wall -Wextra -O0 -g -fsanitize=address
+COMMON_FLAGS=-Wall -Wextra -Wno-format-security
+CFLAGS=$(COMMON_FLAGS) -O3
+DFLAGS=$(COMMON_FLAGS) -O0 -g -fsanitize=address
 
 LD=gcc
 
