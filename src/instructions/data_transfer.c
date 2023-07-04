@@ -5,12 +5,14 @@
 
 char *mov_rm_to_reg(binary_stream_t *data)
 {
-    return format_dw_rm_to_reg("mov", data);
+    params_t params;
+    return format_dw_rm_to_reg("mov", data, &params);
 }
 
 char *mov_immediate_to_rm(binary_stream_t *data)
 {
-    return format_w_immediate_to_rm("mov", data);
+    params_t params;
+    return format_w_immediate_to_rm("mov", data, &params);
 }
 
 char *mov_immediate_to_reg(binary_stream_t *data)
@@ -30,17 +32,20 @@ char *mov_immediate_to_reg(binary_stream_t *data)
 
 char *mov_mem_to_acc(binary_stream_t *data)
 {
-    return format_w_mem_to_acc("mov", data);
+    params_t params;
+    return format_w_mem_to_acc("mov", data, &params);
 }
 
 char *lea(binary_stream_t *data)
 {
-    return format_rm_to_reg("lea", data);
+    params_t params;
+    return format_rm_to_reg("lea", data, &params);
 }
 
 char *push_reg(binary_stream_t *data)
 {
-    return format_reg("push", data);
+    params_t params;
+    return format_reg("push", data, &params);
 }
 
 char *pop_rm(binary_stream_t *data)
@@ -53,7 +58,7 @@ char *pop_rm(binary_stream_t *data)
     if (params.reg != 0b000)
         return NULL;
 
-    char *rm_value = get_rm(data, params.w, params.mod, params.rm);
+    char *rm_value = get_rm(data, &params);
     char *res = malloc(50);
     snprintf(res, 50, "pop %s", rm_value);
     free(rm_value);
@@ -62,7 +67,8 @@ char *pop_rm(binary_stream_t *data)
 
 char *pop_reg(binary_stream_t *data)
 {
-    return format_reg("pop", data);
+    params_t params;
+    return format_reg("pop", data, &params);
 }
 
 char *in_out_port(char *val, binary_stream_t *data, int fixed)
@@ -113,5 +119,6 @@ char *xchg_rm_with_reg(binary_stream_t *data)
 }
 char *xchg_reg(binary_stream_t *data)
 {
-    return format_reg_to_acc("xchg", data);
+    params_t params;
+    return format_reg_to_acc("xchg", data, &params);
 }

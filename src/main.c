@@ -12,6 +12,7 @@
 #include "utils/binary_stream.h"
 #include "utils/format.h"
 #include "utils/trie.h"
+#include "utils/vector.h"
 
 struct exec_header
 {
@@ -309,9 +310,10 @@ instruction_t *next_instruction(binary_stream_t *stream)
     return NULL;
 }
 
-void display_instructions(
+void execute_instructions(
     instruction_t *data, unsigned long address, emulator_t *emulator)
 {
+    data->callback(emulator, data->params);
     char *proc_display = processor_display(emulator->processor);
     printf("%s ", proc_display);
     free(proc_display);
@@ -319,9 +321,49 @@ void display_instructions(
         address, data->instruction, data->instruction_len, data->display);
 }
 
+extern char **environ;
+
 /// returns a list of pointers to the env variables
 vector_t *load_environment(emulator_t *emulator)
 {
+    vector_t *res = vector_new();
+    for (char **env = environ; *env; env++)
+    {
+        char *s = *env;
+        if (*s)
+        {
+            unsigned short addr = emulator_push_environment(emulator, *s++);
+            vector_append(res, TO_VOID_PTR(addr));
+            for (; *s; s++)
+            {
+                emulator_push_environment(emulator, *s);
+            }
+            emulator_push_environment(emulator, 0);
+        }
+    }
+
+    return res;
+}
+
+vector_t *load_args(emulator_t *emulator, int argc, char **argv)
+{
+    vector_t *res = vector_new();
+    for (int i = 0; i < argc; i++)
+    {
+        char *s = argv[i];
+        if (*s)
+        {
+            unsigned short addr = emulator_push_args(emulator, *s++);
+            vector_append(res, TO_VOID_PTR(addr));
+            for (; *s; s++)
+            {
+                emulator_push_args(emulator, *s);
+            }
+            emulator_push_args(emulator, 0);
+        }
+    }
+
+    return res;
 }
 
 void load_text(struct exec_header header, FILE *f, emulator_t *emulator)
@@ -372,17 +414,20 @@ int main(int argc, char **argv)
     }
 
     emulator_t *emulator = emulator_new(MEM_SIZE);
+    vector_t *env = load_environment(emulator);
+    vector_t *args = load_args(emulator, argc, argv);
+
     load_text(header, f, emulator);
     load_data(header, f, emulator);
 
-    emulator_prepare(emulator);
-
-    mem_seg_display(emulator->data);
+    emulator_prepare(emulator, env, args);
+    vector_free(env);
+    vector_free(args);
 
     printf("%s IP \n", PROCESSOR_HEADER);
 
     trie_for_each(
-        emulator->text, (trie_function_t)display_instructions, emulator);
+        emulator->text, (trie_function_t)execute_instructions, emulator);
 
     printf("===== END OF .TEXT SECTION =====\n");
 

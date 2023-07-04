@@ -152,6 +152,15 @@ typedef struct
     char rm;
     char data_high;
     char data_low;
+    union
+    {
+        struct
+        {
+            char low_disp;
+            unsigned char : 8;
+        };
+        short disp;
+    };
 } params_t;
 
 #define DIRECTION_DOWN (unsigned char)1
@@ -170,17 +179,25 @@ memory_segment_t *mem_seg_new(
 void mem_seg_free(memory_segment_t *mem);
 unsigned short mem_seg_high_addr(memory_segment_t *mem);
 unsigned short mem_seg_low_addr(memory_segment_t *mem);
+
 unsigned char mem_seg_get_abs(memory_segment_t *mem, unsigned short address);
 unsigned char mem_seg_get(memory_segment_t *mem, unsigned short address);
+
+void mem_seg_set_abs(
+    memory_segment_t *mem, unsigned short address, unsigned char value);
+void mem_seg_set(
+    memory_segment_t *mem, unsigned short address, unsigned char value);
 unsigned short mem_seg_push(memory_segment_t *mem, unsigned char data);
 
 void mem_seg_display(memory_segment_t *mem);
+int mem_seg_empty(memory_segment_t *mem);
 
 typedef struct
 {
     processor_t *processor;
     unsigned short top_address;
     memory_segment_t *environment;
+    memory_segment_t *args;
     memory_segment_t *stack;
     trie_t *heap;
     memory_segment_t *bss;
@@ -192,13 +209,14 @@ typedef struct
 emulator_t *emulator_new(size_t memory_size);
 void emulator_free(emulator_t *);
 
-void emulator_prepare(emulator_t *);
+void emulator_prepare(emulator_t *, vector_t *environment, vector_t *args);
 
 unsigned short emulator_push_data(emulator_t *, unsigned char);
 
 unsigned short emulator_push_bss(emulator_t *, unsigned char);
 
 unsigned short emulator_push_environment(emulator_t *, unsigned char);
+unsigned short emulator_push_args(emulator_t *, unsigned char);
 
 void emulator_stack_push(emulator_t *, unsigned short value);
 unsigned short emulator_stack_pop(emulator_t *);
@@ -208,6 +226,11 @@ void emulator_set_reg_byte(emulator_t *, char reg, unsigned char);
 
 unsigned short emulator_get_reg(emulator_t *, char reg);
 void emulator_set_reg(emulator_t *, char reg, unsigned short);
+
+unsigned char emulator_get_mem_byte(
+    emulator_t *emulator, unsigned short address);
+void emulator_set_mem_byte(
+    emulator_t *emulator, unsigned short address, unsigned char value);
 
 unsigned char emulator_get_rm_byte(emulator_t *, params_t params);
 void emulator_set_rm_byte(emulator_t *, params_t params, unsigned char);

@@ -3,8 +3,40 @@
 #include "logic.h"
 #include "utils.h"
 
-void xor_rm_reg_exec(emulator_t *emulator, params_t *params)
+void xor_rm_reg_exec(emulator_t *emulator, params_t params)
 {
+    if (params.w)
+    {
+        unsigned short rm = emulator_get_rm(emulator, params);
+        unsigned short reg = emulator_get_reg(emulator, params.reg);
+        unsigned short res = rm ^ reg;
+        if (res == 0)
+            emulator->processor->flags.z = 1;
+        if (params.d)
+        {
+            emulator_set_reg(emulator, params.reg, res);
+        }
+        else
+        {
+            emulator_set_rm(emulator, params, res);
+        }
+    }
+    else
+    {
+        unsigned char rm = emulator_get_rm_byte(emulator, params);
+        unsigned char reg = emulator_get_reg_byte(emulator, params.reg);
+        unsigned char res = rm ^ reg;
+        if (res == 0)
+            emulator->processor->flags.z = 1;
+        if (params.d)
+        {
+            emulator_set_reg_byte(emulator, params.reg, res);
+        }
+        else
+        {
+            emulator_set_rm_byte(emulator, params, res);
+        }
+    }
 }
 
 instruction_t *xor_rm_reg(binary_stream_t *data)
@@ -16,7 +48,7 @@ instruction_t *xor_rm_reg(binary_stream_t *data)
     }
     char *reg = get_reg(params.w, params.reg);
 
-    char *rm_value = get_rm(data, params.w, params.mod, params.rm);
+    char *rm_value = get_rm(data, &params);
 
     char *instruction = malloc(50);
     if (params.d)
@@ -33,13 +65,14 @@ instruction_t *xor_rm_reg(binary_stream_t *data)
     memcpy(instruction_buffer_copy, data->instruction_buffer,
         data->instruction_buffer_len);
     instruction_t *res = instruction_new(instruction, instruction_buffer_copy,
-        data->instruction_buffer_len, params, NULL);
+        data->instruction_buffer_len, params, xor_rm_reg_exec);
     return res;
 }
 
 char *test_rm_reg(binary_stream_t *data)
 {
-    return format_w_rm_to_reg("test", data);
+    params_t params;
+    return format_w_rm_to_reg("test", data, &params);
 }
 
 char *test_immediate_rm(binary_stream_t *data)
@@ -51,7 +84,7 @@ char *test_immediate_rm(binary_stream_t *data)
     }
 
     char *res = malloc(50);
-    char *rm_value = get_rm(data, params.w, params.mod, params.rm);
+    char *rm_value = get_rm(data, &params);
     switch (params.reg)
     {
         case 0b000:
@@ -97,7 +130,7 @@ char *shift_left(binary_stream_t *data)
     }
 
     char *instruction;
-    char *rm_value = get_rm(data, params.w, params.mod, params.rm);
+    char *rm_value = get_rm(data, &params);
     switch (params.reg)
     {
         case 0b000:
@@ -140,25 +173,30 @@ char *shift_left(binary_stream_t *data)
 
 char *and_immediate_acc(binary_stream_t *data)
 {
-    return format_immediate_from_acc("and", data);
+    params_t params;
+    return format_immediate_from_acc("and", data, &params);
 }
 
 char *and_rm_reg(binary_stream_t *data)
 {
-    return format_dw_rm_to_reg("and", data);
+    params_t params;
+    return format_dw_rm_to_reg("and", data, &params);
 }
 
 char *or_immediate_acc(binary_stream_t *data)
 {
-    return format_immediate_from_acc("or", data);
+    params_t params;
+    return format_immediate_from_acc("or", data, &params);
 }
 
 char *or_rm_reg(binary_stream_t *data)
 {
-    return format_dw_rm_to_reg("or", data);
+    params_t params;
+    return format_dw_rm_to_reg("or", data, &params);
 }
 
 char *test_immediate_acc(binary_stream_t *data)
 {
-    return format_immediate_from_acc("test", data);
+    params_t params;
+    return format_immediate_from_acc("test", data, &params);
 }

@@ -34,23 +34,28 @@ char *get_reg(char w, char val);
 char *get_short_reg(char val);
 char *get_word_reg(char val);
 
-char *get_rm(binary_stream_t *data, char w, char mod, char val);
+char *get_rm(binary_stream_t *data, params_t *params);
 
-char *format_dw_rm_to_reg(char *val, binary_stream_t *data);
-char *format_sized_dw_rm_to_reg(char *val, binary_stream_t *data);
+char *format_dw_rm_to_reg(char *val, binary_stream_t *data, params_t *params);
+char *format_sized_dw_rm_to_reg(
+    char *val, binary_stream_t *data, params_t *params);
 
-char *format_w_rm_to_reg(char *val, binary_stream_t *data);
-char *format_w_rm_to_reg_d(char *val, binary_stream_t *data, int direction);
+char *format_w_rm_to_reg(char *val, binary_stream_t *data, params_t *params);
+char *format_w_rm_to_reg_d(char *val, binary_stream_t *data, params_t *params);
 
-char *format_rm_to_reg(char *val, binary_stream_t *data);
-char *format_immediate_from_acc(char *val, binary_stream_t *data);
-char *format_w_immediate_to_rm(char *val, binary_stream_t *data);
+char *format_rm_to_reg(char *val, binary_stream_t *data, params_t *params);
+char *format_immediate_from_acc(
+    char *val, binary_stream_t *data, params_t *params);
+char *format_w_immediate_to_rm(
+    char *val, binary_stream_t *data, params_t *params);
 
-char *format_byte_displacement(char *val, binary_stream_t *data);
-char *format_word_displacement(char *val, binary_stream_t *data);
-char *format_reg(char *val, binary_stream_t *data);
-char *format_reg_to_acc(char *val, binary_stream_t *data);
+char *format_byte_displacement(
+    char *val, binary_stream_t *data, params_t *params);
+char *format_word_displacement(
+    char *val, binary_stream_t *data, params_t *params);
+char *format_reg(char *val, binary_stream_t *data, params_t *params);
+char *format_reg_to_acc(char *val, binary_stream_t *data, params_t *params);
 
-char *format_w_mem_to_acc(char *val, binary_stream_t *data);
+char *format_w_mem_to_acc(char *val, binary_stream_t *data, params_t *params);
 
 #endif // !INSTRUCTIONS_UTILS_H

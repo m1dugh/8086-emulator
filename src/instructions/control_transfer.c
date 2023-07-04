@@ -5,71 +5,86 @@
 
 char *jnb(binary_stream_t *data)
 {
-    return format_byte_displacement("jnb", data);
+    params_t params;
+    return format_byte_displacement("jnb", data, &params);
 }
+
 char *js(binary_stream_t *data)
 {
-    return format_byte_displacement("js", data);
+    params_t params;
+    return format_byte_displacement("js", data, &params);
 }
 
 char *jb(binary_stream_t *data)
 {
-    return format_byte_displacement("jb", data);
+    params_t params;
+    return format_byte_displacement("jb", data, &params);
 }
 
 char *jne(binary_stream_t *data)
 {
-    return format_byte_displacement("jne", data);
+    params_t params;
+    return format_byte_displacement("jne", data, &params);
 }
 
 char *jnl_instruction(binary_stream_t *data)
 {
-    return format_byte_displacement("jnl", data);
+    params_t params;
+    return format_byte_displacement("jnl", data, &params);
 }
 
 char *jnle(binary_stream_t *data)
 {
-    return format_byte_displacement("jnle", data);
+    params_t params;
+    return format_byte_displacement("jnle", data, &params);
 }
 
 char *jnbe(binary_stream_t *data)
 {
-    return format_byte_displacement("jnbe", data);
+    params_t params;
+    return format_byte_displacement("jnbe", data, &params);
 }
 
 char *jbe(binary_stream_t *data)
 {
-    return format_byte_displacement("jbe", data);
+    params_t params;
+    return format_byte_displacement("jbe", data, &params);
 }
 
 char *je(binary_stream_t *data)
 {
-    return format_byte_displacement("je", data);
+    params_t params;
+    return format_byte_displacement("je", data, &params);
 }
 
 char *jl(binary_stream_t *data)
 {
-    return format_byte_displacement("jl", data);
+    params_t params;
+    return format_byte_displacement("jl", data, &params);
 }
 
 char *jle(binary_stream_t *data)
 {
-    return format_byte_displacement("jle", data);
+    params_t params;
+    return format_byte_displacement("jle", data, &params);
 }
 
 char *call_direct_seg(binary_stream_t *data)
 {
-    return format_word_displacement("call", data);
+    params_t params;
+    return format_word_displacement("call", data, &params);
 }
 
 char *jmp_direct_seg(binary_stream_t *data)
 {
-    return format_word_displacement("jmp", data);
+    params_t params;
+    return format_word_displacement("jmp", data, &params);
 }
 
 char *jmp_direct_seg_short(binary_stream_t *data)
 {
-    return format_byte_displacement("jmp short", data);
+    params_t params;
+    return format_byte_displacement("jmp short", data, &params);
 }
 
 char *interrupt()
@@ -107,13 +122,16 @@ char *ret()
 
 char *loop(binary_stream_t *data)
 {
-    return format_byte_displacement("loop", data);
+    params_t params;
+    return format_byte_displacement("loop", data, &params);
 }
 char *loopz(binary_stream_t *data)
 {
-    return format_byte_displacement("loopz", data);
+    params_t params;
+    return format_byte_displacement("loopz", data, &params);
 }
 char *loopnz(binary_stream_t *data)
 {
-    return format_byte_displacement("loopnz", data);
+    params_t params;
+    return format_byte_displacement("loopnz", data, &params);
 }

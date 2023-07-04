@@ -5,17 +5,20 @@
 
 char *add_rm_with_reg(binary_stream_t *data)
 {
-    return format_dw_rm_to_reg("add", data);
+    params_t params;
+    return format_dw_rm_to_reg("add", data, &params);
 }
 
 char *add_immediate_to_acc(binary_stream_t *data)
 {
-    return format_immediate_from_acc("add", data);
+    params_t params;
+    return format_immediate_from_acc("add", data, &params);
 }
 
 char *cmp_rm_reg(binary_stream_t *data)
 {
-    return format_sized_dw_rm_to_reg("cmp", data);
+    params_t params;
+    return format_sized_dw_rm_to_reg("cmp", data, &params);
 }
 
 char *cmp_immediate_rm(binary_stream_t *data)
@@ -26,7 +29,7 @@ char *cmp_immediate_rm(binary_stream_t *data)
         return NULL;
     }
 
-    char *rm_value = get_rm(data, params.w, params.mod, params.rm);
+    char *rm_value = get_rm(data, &params);
     unsigned short extracted = extract_data_sw(data, &params);
     char *instruction;
     int signed_val = 1;
@@ -92,7 +95,7 @@ char *inc_rm(binary_stream_t *data)
     {
         return NULL;
     }
-    char *rm_value = get_rm(data, params.w, params.mod, params.rm);
+    char *rm_value = get_rm(data, &params);
     char *res = malloc(50);
     switch (params.reg)
     {
@@ -129,22 +132,26 @@ char *inc_rm(binary_stream_t *data)
 
 char *inc_reg(binary_stream_t *data)
 {
-    return format_reg("inc", data);
+    params_t params;
+    return format_reg("inc", data, &params);
 }
 
 char *dec_reg(binary_stream_t *data)
 {
-    return format_reg("dec", data);
+    params_t params;
+    return format_reg("dec", data, &params);
 }
 
 char *ssb_rm_with_reg(binary_stream_t *data)
 {
-    return format_dw_rm_to_reg("ssb", data);
+    params_t params;
+    return format_dw_rm_to_reg("ssb", data, &params);
 }
 
 char *sub_rm_with_reg(binary_stream_t *data)
 {
-    return format_dw_rm_to_reg("sub", data);
+    params_t params;
+    return format_dw_rm_to_reg("sub", data, &params);
 }
 
 char *cbw()
@@ -163,15 +170,18 @@ char *cwd()
 
 char *sub_immediate_to_acc(binary_stream_t *data)
 {
-    return format_immediate_from_acc("sub", data);
+    params_t params;
+    return format_immediate_from_acc("sub", data, &params);
 }
 
 char *cmp_immediate_acc(binary_stream_t *data)
 {
-    return format_immediate_from_acc("cmp", data);
+    params_t params;
+    return format_immediate_from_acc("cmp", data, &params);
 }
 
 char *adc_rm_with_reg(binary_stream_t *data)
 {
-    return format_dw_rm_to_reg("adc", data);
+    params_t params;
+    return format_dw_rm_to_reg("adc", data, &params);
 }
