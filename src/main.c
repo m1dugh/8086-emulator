@@ -7,8 +7,10 @@
 #include "instructions/logic.h"
 #include "instructions/processor_control.h"
 #include "instructions/string_manipulation.h"
+#include "models.h"
 #include "utils/binary_stream.h"
 #include "utils/format.h"
+#include "utils/trie.h"
 
 struct exec_header
 {
@@ -97,6 +99,9 @@ int read_header(FILE *stream, struct exec_header *header)
     current_index += 2;
     header->a_text = to_long(buffer + current_index);
     current_index += 4;
+
+    header->a_data = to_long(buffer + current_index);
+    current_index += 4;
     // TODO: implement full header.
 
     free(buffer);
@@ -104,21 +109,21 @@ int read_header(FILE *stream, struct exec_header *header)
     return 0;
 }
 
-char *find_4_len_instruction(
+instruction_t *find_4_len_instruction(
     unsigned char instruction, binary_stream_t *stream)
 {
-    switch (instruction)
+    /*switch (instruction)
     {
         case 0b1011:
             return mov_immediate_to_reg(stream);
-    }
+    }*/
     return NULL;
 }
 
-char *find_5_len_instruction(
+instruction_t *find_5_len_instruction(
     unsigned char instruction, binary_stream_t *stream)
 {
-    switch (instruction)
+    /*switch (instruction)
     {
         case 0b01000:
             return inc_reg(stream);
@@ -130,16 +135,16 @@ char *find_5_len_instruction(
             return pop_reg(stream);
         case 0b10010:
             return xchg_reg(stream);
-    }
+    }*/
     return NULL;
 }
 
-char *find_6_len_instruction(
+instruction_t *find_6_len_instruction(
     unsigned char instruction, binary_stream_t *stream)
 {
     switch (instruction)
     {
-        case 0b000000:
+        /*case 0b000000:
             return add_rm_with_reg(stream);
         case 0b000010:
             return or_rm_reg(stream);
@@ -150,25 +155,25 @@ char *find_6_len_instruction(
         case 0b001000:
             return and_rm_reg(stream);
         case 0b001010:
-            return sub_rm_with_reg(stream);
+            return sub_rm_with_reg(stream);*/
         case 0b001100:
             return xor_rm_reg(stream);
-        case 0b001110:
-            return cmp_rm_reg(stream);
-        case 0b100000:
-            return cmp_immediate_rm(stream);
-        case 0b100010:
-            return mov_rm_to_reg(stream);
-        case 0b110100:
-            return shift_left(stream);
+            /*case 0b001110:
+                return cmp_rm_reg(stream);
+            case 0b100000:
+                return cmp_immediate_rm(stream);
+            case 0b100010:
+                return mov_rm_to_reg(stream);
+            case 0b110100:
+                return shift_left(stream);*/
     }
     return NULL;
 }
 
-char *find_7_len_instruction(
+instruction_t *find_7_len_instruction(
     unsigned char instruction, binary_stream_t *stream)
 {
-    switch (instruction)
+    /*switch (instruction)
     {
         case 0b0000010:
             return add_immediate_to_acc(stream);
@@ -198,14 +203,15 @@ char *find_7_len_instruction(
             return test_immediate_rm(stream);
         case 0b1111111:
             return inc_rm(stream);
-    }
-    return get_string_instruction(instruction, stream);
+    }*/
+    // return get_string_instruction(instruction, stream);
+    return NULL;
 }
 
-char *find_8_len_instruction(
+instruction_t *find_8_len_instruction(
     unsigned char instruction, binary_stream_t *stream)
 {
-    switch (instruction)
+    /*switch (instruction)
     {
         case 0b01110010:
             return jb(stream);
@@ -265,15 +271,15 @@ char *find_8_len_instruction(
             return cld();
         case 0b11111101:
             return std_instruction();
-    }
+    }*/
     return NULL;
 }
 
-char *next_instruction(binary_stream_t *stream)
+instruction_t *next_instruction(binary_stream_t *stream)
 {
     bs_flush_buffer(stream);
     char instruction;
-    char *res;
+    instruction_t *res;
 
     if (bs_next_reset(stream, 4, &instruction) != 0)
         return NULL;
@@ -303,6 +309,16 @@ char *next_instruction(binary_stream_t *stream)
     return NULL;
 }
 
+void display_instructions(
+    instruction_t *data, unsigned long address, emulator_t *emulator)
+{
+    char *proc_display = processor_display(emulator->processor);
+    printf("%s ", proc_display);
+    free(proc_display);
+    printf_instruction(
+        address, data->instruction, data->instruction_len, data->display);
+}
+
 int main(int argc, char **argv)
 {
     if (argc != 2)
@@ -321,30 +337,29 @@ int main(int argc, char **argv)
         errx(-1, "Could not read header.");
     }
 
-    printf("text length: %04lx\ntext start address: %04x\ntext end address: "
-           "%04lx\n",
-        header.a_text, header.a_hdrlen,
-        ((long)header.a_hdrlen) + header.a_text);
-
     binary_stream_t *stream = bs_new(f, header.a_text);
+    emulator_t *emulator = emulator_new(header.a_data);
+
+    printf("%s IP \n", PROCESSOR_HEADER);
 
     while (!bs_finished(stream))
     {
-        char *res = next_instruction(stream);
-        if (printf_instruction(stream->current_address,
-                stream->instruction_buffer, stream->instruction_buffer_len,
-                res)
-                != 0
-            && !bs_finished(stream))
+        instruction_t *res = next_instruction(stream);
+        if (res == NULL && !bs_finished(stream))
         {
             fflush(stdout);
-            errx(-1, "Instruction not found");
+            // errx(-1, "Instruction not found");
+            break;
         }
-        free(res);
+        trie_set(emulator->instructions, stream->current_address, res);
     }
+
+    trie_for_each(emulator->instructions,
+        (trie_function_t)display_instructions, emulator);
 
     printf("===== END OF .TEXT SECTION =====\n");
 
+    emulator_free(emulator);
     bs_free(stream);
 
     fclose(f);

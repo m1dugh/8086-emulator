@@ -21,7 +21,7 @@ typedef struct
     long len;      /* The max number of bytes to pull from the _stream */
     char _buffer;
     char _buffer_index;
-    char *instruction_buffer;
+    unsigned char *instruction_buffer;
     size_t _instruction_buffer_cap;
     size_t instruction_buffer_len;
     short current_address;

@@ -1,5 +1,8 @@
+#include <err.h>
 #include <malloc.h>
+#include <stdio.h>
 #include "models.h"
+#include "utils/trie.h"
 #include "utils/vector.h"
 
 #define PROC_REG_SWITCH(key, reg_name) \
@@ -10,6 +13,25 @@
 processor_t *processor_new()
 {
     processor_t *res = calloc(1, sizeof(processor_t));
+    res->sp = MAX_ADDRESS;
+    return res;
+}
+
+// 45 corresponds to the number of bytes to print
+// 8 registers printed on 4 bytes each and flags register
+// space separated and an additional null byte
+#define PROCESSOR_DISPLAY_LEN 45
+
+char *processor_display(processor_t *processor)
+{
+    char *res = calloc(PROCESSOR_DISPLAY_LEN, sizeof(char));
+    snprintf(res, PROCESSOR_DISPLAY_LEN,
+        "%04x %04x %04x %04x %04x %04x %04x %04x %c%c%c%c", processor->ax,
+        processor->bx, processor->cx, processor->dx, processor->sp,
+        processor->bp, processor->si, processor->di, '?',
+        processor->flags.s ? 'S' : '-', processor->flags.z ? 'Z' : '-',
+        processor->flags.c ? 'C' : '-');
+
     return res;
 }
 
@@ -87,4 +109,67 @@ void stack_push(stack_t *stack, void *data)
 void *stack_pop(stack_t *stack)
 {
     return vector_pop(stack);
+}
+
+instruction_t *instruction_new(char *display, unsigned char *instruction,
+    size_t instruction_len, struct params_t params, instruction_cb_t callback)
+{
+    instruction_t *res = malloc(sizeof(instruction_t));
+    if (res == NULL)
+        return NULL;
+
+    res->display = display;
+    res->callback = callback;
+    res->instruction_len = instruction_len;
+    res->params = params;
+    res->instruction = instruction;
+
+    return res;
+}
+
+void instruction_free(instruction_t *instruction)
+{
+    free(instruction->display);
+    free(instruction->instruction);
+    free(instruction);
+}
+
+emulator_t *emulator_new(size_t data_size)
+{
+    emulator_t *res = malloc(sizeof(emulator_t));
+    if (res == NULL)
+        errx(-1, "malloc error: could not allocate emulator struct");
+
+    if ((res->processor = processor_new()) == NULL)
+        errx(-1, "malloc error: could not allocate processor struct");
+
+    if ((res->stack = stack_new()) == NULL)
+        errx(-1, "malloc error: could not allocate stack struct");
+
+    if ((res->instructions = trie_new()) == NULL)
+        errx(-1,
+            "malloc error: could not allocate trie struct for instructions");
+
+    res->data_size = data_size;
+    if ((res->data = calloc(data_size, sizeof(unsigned char))) == NULL)
+        errx(-1, "malloc error: could not allocate trie struct for memory");
+
+    return res;
+}
+
+void instruction_free_cb(
+    instruction_t *instruction, unsigned long _address, void *_additional)
+{
+    instruction_free(instruction);
+}
+
+void emulator_free(emulator_t *emulator)
+{
+    processor_free(emulator->processor);
+    trie_for_each(
+        emulator->instructions, (trie_function_t)instruction_free_cb, NULL);
+    trie_free(emulator->instructions);
+    free(emulator->data);
+    stack_free(emulator->stack);
+    free(emulator);
 }

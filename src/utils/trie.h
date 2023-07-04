@@ -21,4 +21,9 @@ void trie_free(trie_t *);
 void *trie_get(trie_t *, unsigned long address);
 void trie_set(trie_t *, unsigned long address, void *data);
 
+typedef void (*trie_function_t)(
+    void *data, unsigned long address, void *additionals);
+
+void trie_for_each(trie_t *, trie_function_t function, void *additionals);
+
 #endif /* !UTILS_TRIE_H */

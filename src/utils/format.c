@@ -24,11 +24,11 @@ void print_hex(char c)
     printf("%x", (c & 0xf));
 }
 
-int printf_instruction(
-    unsigned short address, char *buffer, size_t buffer_len, char *instruction)
+int printf_instruction(unsigned short address, unsigned char *buffer,
+    size_t buffer_len, char *instruction)
 {
     size_t offset = 0;
-    printf("%04x: ", address);
+    printf("%04x:", address);
     for (size_t i = 0; i < buffer_len; i++)
     {
         print_hex(buffer[i]);

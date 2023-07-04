@@ -1,7 +1,12 @@
 #ifndef EMULATOR_MODELS_H
 #define EMULATOR_MODELS_H
+
 #include <stdlib.h>
+#include "utils/trie.h"
 #include "utils/vector.h"
+
+#define MAX_ADDRESS 0xffff
+#define PROCESSOR_HEADER " AX   BX   CX   DX   SP   BP   SI   DI  FLAGS"
 
 typedef struct
 {
@@ -131,6 +136,8 @@ int processor_set_value(processor_t *, char key, unsigned short value);
 int processor_set_segment(processor_t *, char key, unsigned short value);
 void processor_free(processor_t *);
 
+char *processor_display(processor_t *processor);
+
 typedef vector_t stack_t;
 
 stack_t *stack_new();
@@ -151,16 +158,29 @@ struct params_t
 
 typedef struct
 {
-    char *display;
-    struct params_t params;
-} instruction_t;
+    processor_t *processor;
+    trie_t *instructions;
+    unsigned char *data;
+    size_t data_size;
+    stack_t *stack;
+} emulator_t;
+
+emulator_t *emulator_new(size_t data_size);
+void emulator_free(emulator_t *);
+
+typedef void (*instruction_cb_t)(emulator_t *emulator, struct params_t params);
 
 typedef struct
 {
-    size_t size;
-    unsigned short *value;
-} memory_seg_t;
+    char *display;
+    unsigned char *instruction;
+    size_t instruction_len;
+    struct params_t params;
+    instruction_cb_t callback;
+} instruction_t;
 
-memory_seg_t *memory_new();
+instruction_t *instruction_new(char *display, unsigned char *instruction,
+    size_t instruction_len, struct params_t params, instruction_cb_t callback);
+void instruction_free(instruction_t *);
 
 #endif // !EMULATOR_MODELS_H

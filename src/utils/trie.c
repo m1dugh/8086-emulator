@@ -28,10 +28,6 @@ void trie_free(trie_t *tree)
         trie_free(vector_get(tree->children, i));
     }
     vector_free(tree->children);
-    if (tree->data != NULL)
-    {
-        free(tree->data);
-    }
 
     free(tree);
 }
@@ -45,27 +41,26 @@ int find_insert_index(trie_t *tree, unsigned char prefix, size_t *index)
 {
     size_t start = 0;
     size_t end = vector_len(tree->children);
-    size_t middle = 0;
     while (start < end)
     {
-        middle = (end - start) / 2;
+        size_t middle = (end + start) / 2;
         trie_t *child = vector_get(tree->children, middle);
-        unsigned char child_prefix = get_prefix(child);
-        if (child_prefix == prefix)
+        unsigned char middle_prefix = get_prefix(child);
+        if (middle_prefix == prefix)
         {
             *index = middle;
             return 0;
         }
-        else if (child_prefix < prefix)
-        {
-            start = middle + 1;
-        }
-        else
+        else if (prefix < middle_prefix)
         {
             end = middle;
         }
+        else
+        {
+            start = middle + 1;
+        }
     }
-    *index = middle;
+    *index = start;
     return -1;
 }
 
@@ -89,11 +84,13 @@ trie_t *find_create_child(trie_t *tree, unsigned char prefix)
 trie_t *find_create_path(trie_t *root, unsigned long address)
 {
     trie_t *current = root;
+    unsigned long mask = 0xFF << ((ADDRESS_SIZE - 1) * 8);
     for (size_t i = 0; i < ADDRESS_SIZE; i++)
     {
-        unsigned char prefix = address & 0xFF;
+        unsigned char prefix
+            = (address & mask) >> ((ADDRESS_SIZE - 1 - i) * 8);
         current = find_create_child(current, prefix);
-        address >>= 8;
+        mask >>= 8;
     }
     return current;
 }
@@ -108,4 +105,28 @@ void trie_set(trie_t *tree, unsigned long address, void *data)
 {
     trie_t *child = find_create_path(tree, address);
     child->data = data;
+}
+
+void trie_for_each_rec(trie_t *tree, unsigned long parent_key,
+    trie_function_t cb, void *additionals)
+{
+    unsigned long key
+        = (parent_key << 8) + ((unsigned char)tree->prefix & 0xFF);
+    if (tree->data != NULL)
+    {
+        cb(tree->data, key, additionals);
+    }
+    for (size_t i = 0; i < vector_len(tree->children); i++)
+    {
+        trie_for_each_rec(vector_get(tree->children, i), key, cb, additionals);
+    }
+}
+
+void trie_for_each(trie_t *tree, trie_function_t function, void *additionals)
+{
+    for (size_t i = 0; i < vector_len(tree->children); i++)
+    {
+        trie_for_each_rec(
+            vector_get(tree->children, i), 0, function, additionals);
+    }
 }

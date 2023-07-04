@@ -1,8 +1,9 @@
 #include <malloc.h>
+#include <string.h>
 #include "logic.h"
 #include "utils.h"
 
-char *xor_rm_reg(binary_stream_t *data)
+instruction_t *xor_rm_reg(binary_stream_t *data)
 {
     struct params_t params;
     if (extract_dw_mod_reg_rm(data, &params) != 0)
@@ -23,7 +24,13 @@ char *xor_rm_reg(binary_stream_t *data)
         snprintf(instruction, 50, "xor %s, %s", rm_value, reg);
     }
     free(rm_value);
-    return instruction;
+    unsigned char *instruction_buffer_copy
+        = calloc(data->instruction_buffer_len, sizeof(unsigned char));
+    memcpy(instruction_buffer_copy, data->instruction_buffer,
+        data->instruction_buffer_len);
+    instruction_t *res = instruction_new(instruction, instruction_buffer_copy,
+        data->instruction_buffer_len, params, NULL);
+    return res;
 }
 
 char *test_rm_reg(binary_stream_t *data)

@@ -1,6 +1,7 @@
 #ifndef INSTRUCTIONS_LOGIC_H
 #define INSTRUCTIONS_LOGIC_H
 
+#include "../models.h"
 #include "../utils/binary_stream.h"
 
 // NOT
@@ -22,7 +23,7 @@ char *or_immediate_rm(binary_stream_t *data);
 char *or_immediate_acc(binary_stream_t *data);
 
 // XOR
-char *xor_rm_reg(binary_stream_t *data);
+instruction_t *xor_rm_reg(binary_stream_t *data);
 char *xor_immediate_rm(binary_stream_t *data);
 char *xor_immediate_acc(binary_stream_t *data);
 

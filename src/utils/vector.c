@@ -6,7 +6,7 @@
 int grow(vector_t *vector)
 {
     size_t new_cap = vector->cap * 2;
-    vector->values = realloc(vector->values, new_cap);
+    vector->values = realloc(vector->values, new_cap * sizeof(void *));
     if (vector->values == NULL)
     {
         return -1;
