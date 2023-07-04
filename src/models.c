@@ -8,7 +8,7 @@
 
 processor_t *processor_new()
 {
-    processor_t *res = calloc(sizeof(processor_t), 0);
+    processor_t *res = calloc(1, sizeof(processor_t));
     return res;
 }
 

@@ -1,5 +1,6 @@
 #ifndef EMULATOR_MODELS_H
 #define EMULATOR_MODELS_H
+#include <stdlib.h>
 
 typedef struct
 {
@@ -128,5 +129,13 @@ int processor_set_byte_value(processor_t *, char key, unsigned char value);
 int processor_set_value(processor_t *, char key, unsigned short value);
 int processor_set_segment(processor_t *, char key, unsigned short value);
 void processor_free(processor_t *);
+
+typedef struct
+{
+    size_t size;
+    unsigned short *value;
+} memory_seg_t;
+
+memory_seg_t *memory_new();
 
 #endif // !EMULATOR_MODELS_H
