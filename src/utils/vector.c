@@ -60,6 +60,15 @@ int vector_set(vector_t *vector, size_t index, void *data)
     return 0;
 }
 
+void *vector_get(vector_t *vector, size_t index)
+{
+    if (index >= vector->len)
+    {
+        return NULL;
+    }
+    return vector->values[index];
+}
+
 void vector_append(vector_t *vector, void *data)
 {
     grow_if_needed(vector);
@@ -81,4 +90,29 @@ void vector_insert(vector_t *vector, size_t index, void *data)
 size_t vector_len(vector_t *vector)
 {
     return vector->len;
+}
+
+void *vector_pop(vector_t *vector)
+{
+    if (vector->len <= 0)
+    {
+        return NULL;
+    }
+    vector->len--;
+    return vector->values[vector->len];
+}
+
+void *vector_remove(vector_t *vector, size_t index)
+{
+    if (index >= vector->len)
+        return NULL;
+
+    void *res = vector->values[index];
+
+    for (size_t i = index; i < vector->len - 1; i++)
+    {
+        vector->values[i] = vector->values[i + 1];
+    }
+    vector->len--;
+    return res;
 }

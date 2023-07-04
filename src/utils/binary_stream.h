@@ -3,17 +3,17 @@
 
 #include <stdio.h>
 
-struct stack
+struct bs_stack
 {
-    struct stack *last;
+    struct bs_stack *last;
     size_t cursor_pos;
     char byte_position;
 };
 
-struct stack *stack_push(
-    struct stack *stack, size_t cursor, char byte_position);
-struct stack *stack_pop(
-    struct stack *stack, size_t *cursor, char *byte_position);
+struct bs_stack *bs_stack_push(
+    struct bs_stack *stack, size_t cursor, char byte_position);
+struct bs_stack *bs_stack_pop(
+    struct bs_stack *stack, size_t *cursor, char *byte_position);
 
 typedef struct
 {
@@ -25,7 +25,7 @@ typedef struct
     size_t _instruction_buffer_cap;
     size_t instruction_buffer_len;
     short current_address;
-    struct stack *_stack;
+    struct bs_stack *_stack;
 } binary_stream_t;
 
 binary_stream_t *bs_new(FILE *stream, long len);

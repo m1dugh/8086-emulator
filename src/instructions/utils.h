@@ -1,6 +1,7 @@
 #ifndef INSTRUCTIONS_UTILS_H
 #define INSTRUCTIONS_UTILS_H
 
+#include "../models.h"
 #include "../utils/binary_stream.h"
 
 #define GET_DATA(val, data, size)             \
@@ -13,17 +14,6 @@
 #define GET_RM_VALUE(reg, data) GET_DATA(mod, data, 3)
 
 #define GET_BIT(val, data) GET_DATA(val, data, 1)
-
-struct params_t
-{
-    char d;
-    char w;
-    char mod;
-    char reg;
-    char rm;
-    char data_high;
-    char data_low;
-};
 
 int extract_w(binary_stream_t *data, struct params_t *params);
 int extract_d(binary_stream_t *data, struct params_t *params);

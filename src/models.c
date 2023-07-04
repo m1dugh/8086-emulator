@@ -1,5 +1,6 @@
 #include <malloc.h>
 #include "models.h"
+#include "utils/vector.h"
 
 #define PROC_REG_SWITCH(key, reg_name) \
     case key:                          \
@@ -66,4 +67,24 @@ void processor_free(processor_t *proc)
     if (proc == NULL)
         return;
     free(proc);
+}
+
+stack_t *stack_new()
+{
+    return vector_new();
+}
+
+void stack_free(stack_t *stack)
+{
+    vector_free(stack);
+}
+
+void stack_push(stack_t *stack, void *data)
+{
+    vector_append(stack, data);
+}
+
+void *stack_pop(stack_t *stack)
+{
+    return vector_pop(stack);
 }

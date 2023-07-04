@@ -1,6 +1,7 @@
 #ifndef EMULATOR_MODELS_H
 #define EMULATOR_MODELS_H
 #include <stdlib.h>
+#include "utils/vector.h"
 
 typedef struct
 {
@@ -129,6 +130,30 @@ int processor_set_byte_value(processor_t *, char key, unsigned char value);
 int processor_set_value(processor_t *, char key, unsigned short value);
 int processor_set_segment(processor_t *, char key, unsigned short value);
 void processor_free(processor_t *);
+
+typedef vector_t stack_t;
+
+stack_t *stack_new();
+void stack_free(stack_t *);
+void stack_push(stack_t *, void *);
+void *stack_pop(stack_t *);
+
+struct params_t
+{
+    char d;
+    char w;
+    char mod;
+    char reg;
+    char rm;
+    char data_high;
+    char data_low;
+};
+
+typedef struct
+{
+    char *display;
+    struct params_t params;
+} instruction_t;
 
 typedef struct
 {

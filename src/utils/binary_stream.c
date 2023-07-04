@@ -105,10 +105,10 @@ int bs_finished(binary_stream_t *stream)
     return stream->current_address + 1 >= stream->len;
 }
 
-struct stack *stack_push(
-    struct stack *stack, size_t cursor, char byte_position)
+struct bs_stack *bs_stack_push(
+    struct bs_stack *stack, size_t cursor, char byte_position)
 {
-    struct stack *res = malloc(sizeof(struct stack));
+    struct bs_stack *res = malloc(sizeof(struct bs_stack));
     if (res == NULL)
         return NULL;
     res->byte_position = byte_position;
@@ -116,8 +116,8 @@ struct stack *stack_push(
     res->last = stack;
     return res;
 }
-struct stack *stack_pop(
-    struct stack *stack, size_t *cursor, char *byte_position)
+struct bs_stack *bs_stack_pop(
+    struct bs_stack *stack, size_t *cursor, char *byte_position)
 {
     if (stack == NULL)
         return NULL;
@@ -125,7 +125,7 @@ struct stack *stack_pop(
     *cursor = stack->cursor_pos;
     *byte_position = stack->byte_position;
 
-    struct stack *res = stack->last;
+    struct bs_stack *res = stack->last;
     free(stack);
     return res;
 }
@@ -133,7 +133,8 @@ struct stack *stack_pop(
 void bs_save(binary_stream_t *stream)
 {
     size_t cursor = ftell(stream->_stream);
-    stream->_stack = stack_push(stream->_stack, cursor, stream->_buffer_index);
+    stream->_stack
+        = bs_stack_push(stream->_stack, cursor, stream->_buffer_index);
 }
 int bs_rollback(binary_stream_t *stream)
 {
@@ -142,7 +143,7 @@ int bs_rollback(binary_stream_t *stream)
 
     size_t cursor;
     stream->_stack
-        = stack_pop(stream->_stack, &cursor, &stream->_buffer_index);
+        = bs_stack_pop(stream->_stack, &cursor, &stream->_buffer_index);
 
     fseek(stream->_stream, cursor, SEEK_SET);
     stream->instruction_buffer_len = 0;
@@ -156,7 +157,7 @@ int bs_unsave(binary_stream_t *stream)
         return -1;
     size_t cursor;
     stream->_stack
-        = stack_pop(stream->_stack, &cursor, &stream->_buffer_index);
+        = bs_stack_pop(stream->_stack, &cursor, &stream->_buffer_index);
 
     return 0;
 }
