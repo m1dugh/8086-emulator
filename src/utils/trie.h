@@ -21,6 +21,9 @@ void trie_free(trie_t *);
 void *trie_get(trie_t *, unsigned long address);
 void trie_set(trie_t *, unsigned long address, void *data);
 
+unsigned long trie_last_address(trie_t *);
+unsigned long trie_first_address(trie_t *);
+
 typedef void (*trie_function_t)(
     void *data, unsigned long address, void *additionals);
 

@@ -1,6 +1,7 @@
 #include <err.h>
 #include <malloc.h>
 #include <stdio.h>
+#include "env.h"
 #include "instructions/arithmetic.h"
 #include "instructions/data_transfer.h"
 #include "instructions/instructions.h"
@@ -105,7 +106,6 @@ int read_header(FILE *stream, struct exec_header *header)
     // TODO: implement full header.
 
     free(buffer);
-    fseek(stream, header->a_hdrlen, SEEK_SET);
     return 0;
 }
 
@@ -161,10 +161,10 @@ instruction_t *find_6_len_instruction(
             /*case 0b001110:
                 return cmp_rm_reg(stream);
             case 0b100000:
-                return cmp_immediate_rm(stream);
-            case 0b100010:
-                return mov_rm_to_reg(stream);
-            case 0b110100:
+                return cmp_immediate_rm(stream);*/
+            /*case 0b100010:
+                return mov_rm_to_reg(stream);*/
+            /*case 0b110100:
                 return shift_left(stream);*/
     }
     return NULL;
@@ -319,6 +319,40 @@ void display_instructions(
         address, data->instruction, data->instruction_len, data->display);
 }
 
+/// returns a list of pointers to the env variables
+vector_t *load_environment(emulator_t *emulator)
+{
+}
+
+void load_text(struct exec_header header, FILE *f, emulator_t *emulator)
+{
+    fseek(f, header.a_hdrlen, SEEK_SET);
+    binary_stream_t *stream = bs_new(f, header.a_text);
+    while (!bs_finished(stream))
+    {
+        instruction_t *res = next_instruction(stream);
+        if (res == NULL && !bs_finished(stream))
+        {
+            fflush(stdout);
+            // errx(-1, "Instruction not found");
+            break;
+        }
+        trie_set(emulator->text, stream->current_address, res);
+    }
+
+    bs_free(stream);
+}
+
+void load_data(struct exec_header header, FILE *f, emulator_t *emulator)
+{
+    fseek(f, header.a_hdrlen + header.a_text, SEEK_SET);
+    for (size_t i = 0; i < header.a_data; i++)
+    {
+        unsigned char val = fgetc(f);
+        emulator_push_data(emulator, val);
+    }
+}
+
 int main(int argc, char **argv)
 {
     if (argc != 2)
@@ -337,30 +371,22 @@ int main(int argc, char **argv)
         errx(-1, "Could not read header.");
     }
 
-    binary_stream_t *stream = bs_new(f, header.a_text);
-    emulator_t *emulator = emulator_new(header.a_data);
+    emulator_t *emulator = emulator_new(MEM_SIZE);
+    load_text(header, f, emulator);
+    load_data(header, f, emulator);
+
+    emulator_prepare(emulator);
+
+    mem_seg_display(emulator->data);
 
     printf("%s IP \n", PROCESSOR_HEADER);
 
-    while (!bs_finished(stream))
-    {
-        instruction_t *res = next_instruction(stream);
-        if (res == NULL && !bs_finished(stream))
-        {
-            fflush(stdout);
-            // errx(-1, "Instruction not found");
-            break;
-        }
-        trie_set(emulator->instructions, stream->current_address, res);
-    }
-
-    trie_for_each(emulator->instructions,
-        (trie_function_t)display_instructions, emulator);
+    trie_for_each(
+        emulator->text, (trie_function_t)display_instructions, emulator);
 
     printf("===== END OF .TEXT SECTION =====\n");
 
     emulator_free(emulator);
-    bs_free(stream);
 
     fclose(f);
     return 0;

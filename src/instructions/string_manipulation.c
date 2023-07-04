@@ -29,7 +29,7 @@ char *get_string_instruction(char instruction, binary_stream_t *data)
             return NULL;
     };
 
-    struct params_t params;
+    params_t params;
     if (extract_w(data, &params) != 0)
         return NULL;
 
@@ -40,7 +40,7 @@ char *get_string_instruction(char instruction, binary_stream_t *data)
 
 char *rep_string(binary_stream_t *data)
 {
-    struct params_t params;
+    params_t params;
     if (extract_w(data, &params) != 0)
     {
         return NULL;

@@ -2,11 +2,9 @@
 #define EMULATOR_MODELS_H
 
 #include <stdlib.h>
+#include "env.h"
 #include "utils/trie.h"
 #include "utils/vector.h"
-
-#define MAX_ADDRESS 0xffff
-#define PROCESSOR_HEADER " AX   BX   CX   DX   SP   BP   SI   DI  FLAGS"
 
 typedef struct
 {
@@ -142,10 +140,10 @@ typedef vector_t stack_t;
 
 stack_t *stack_new();
 void stack_free(stack_t *);
-void stack_push(stack_t *, void *);
-void *stack_pop(stack_t *);
+void stack_push(stack_t *, unsigned short value);
+unsigned short stack_pop(stack_t *);
 
-struct params_t
+typedef struct
 {
     char d;
     char w;
@@ -154,33 +152,82 @@ struct params_t
     char rm;
     char data_high;
     char data_low;
-};
+} params_t;
+
+#define DIRECTION_DOWN (unsigned char)1
+#define DIRECTION_UP (unsigned char)0
+
+typedef struct
+{
+    unsigned short base_address;
+    unsigned char direction;
+    vector_t *value;
+    char locked;
+} memory_segment_t;
+
+memory_segment_t *mem_seg_new(
+    unsigned short base_address, unsigned char direction);
+void mem_seg_free(memory_segment_t *mem);
+unsigned short mem_seg_high_addr(memory_segment_t *mem);
+unsigned short mem_seg_low_addr(memory_segment_t *mem);
+unsigned char mem_seg_get_abs(memory_segment_t *mem, unsigned short address);
+unsigned char mem_seg_get(memory_segment_t *mem, unsigned short address);
+unsigned short mem_seg_push(memory_segment_t *mem, unsigned char data);
+
+void mem_seg_display(memory_segment_t *mem);
 
 typedef struct
 {
     processor_t *processor;
-    trie_t *instructions;
-    unsigned char *data;
-    size_t data_size;
-    stack_t *stack;
+    unsigned short top_address;
+    memory_segment_t *environment;
+    memory_segment_t *stack;
+    trie_t *heap;
+    memory_segment_t *bss;
+    memory_segment_t *data;
+    trie_t *text;
+    unsigned char text_locked;
 } emulator_t;
 
-emulator_t *emulator_new(size_t data_size);
+emulator_t *emulator_new(size_t memory_size);
 void emulator_free(emulator_t *);
 
-typedef void (*instruction_cb_t)(emulator_t *emulator, struct params_t params);
+void emulator_prepare(emulator_t *);
+
+unsigned short emulator_push_data(emulator_t *, unsigned char);
+
+unsigned short emulator_push_bss(emulator_t *, unsigned char);
+
+unsigned short emulator_push_environment(emulator_t *, unsigned char);
+
+void emulator_stack_push(emulator_t *, unsigned short value);
+unsigned short emulator_stack_pop(emulator_t *);
+
+unsigned char emulator_get_reg_byte(emulator_t *, char reg);
+void emulator_set_reg_byte(emulator_t *, char reg, unsigned char);
+
+unsigned short emulator_get_reg(emulator_t *, char reg);
+void emulator_set_reg(emulator_t *, char reg, unsigned short);
+
+unsigned char emulator_get_rm_byte(emulator_t *, params_t params);
+void emulator_set_rm_byte(emulator_t *, params_t params, unsigned char);
+
+unsigned short emulator_get_rm(emulator_t *, params_t params);
+void emulator_set_rm(emulator_t *, params_t params, unsigned short);
+
+typedef void (*instruction_cb_t)(emulator_t *emulator, params_t params);
 
 typedef struct
 {
     char *display;
     unsigned char *instruction;
     size_t instruction_len;
-    struct params_t params;
+    params_t params;
     instruction_cb_t callback;
 } instruction_t;
 
 instruction_t *instruction_new(char *display, unsigned char *instruction,
-    size_t instruction_len, struct params_t params, instruction_cb_t callback);
+    size_t instruction_len, params_t params, instruction_cb_t callback);
 void instruction_free(instruction_t *);
 
 #endif // !EMULATOR_MODELS_H

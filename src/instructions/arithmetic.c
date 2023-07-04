@@ -20,7 +20,7 @@ char *cmp_rm_reg(binary_stream_t *data)
 
 char *cmp_immediate_rm(binary_stream_t *data)
 {
-    struct params_t params;
+    params_t params;
     if (extract_dw_mod_reg_rm(data, &params) != 0)
     {
         return NULL;
@@ -87,7 +87,7 @@ char *cmp_immediate_rm(binary_stream_t *data)
 
 char *inc_rm(binary_stream_t *data)
 {
-    struct params_t params;
+    params_t params;
     if (extract_w_mod_reg_rm(data, &params) != 0)
     {
         return NULL;

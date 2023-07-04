@@ -130,3 +130,27 @@ void trie_for_each(trie_t *tree, trie_function_t function, void *additionals)
             vector_get(tree->children, i), 0, function, additionals);
     }
 }
+
+unsigned long trie_last_address(trie_t *tree)
+{
+    unsigned long address = 0;
+    while (
+        tree->children != NULL
+        && (tree = vector_get(tree->children, vector_len(tree->children) - 1))
+               != NULL)
+    {
+        address = (address << 8) | get_prefix(tree);
+    }
+    return address;
+}
+
+unsigned long trie_first_address(trie_t *tree)
+{
+    unsigned long address = 0;
+    while (tree->children != NULL
+           && (tree = vector_get(tree->children, 0)) != NULL)
+    {
+        address = (address << 8) | get_prefix(tree);
+    }
+    return address;
+}

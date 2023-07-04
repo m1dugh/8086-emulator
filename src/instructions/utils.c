@@ -9,32 +9,32 @@ char extract_byte(binary_stream_t *data)
     return res;
 }
 
-int extract_w(binary_stream_t *data, struct params_t *params)
+int extract_w(binary_stream_t *data, params_t *params)
 {
     return bs_next_reset(data, 1, &params->w);
 }
 
-int extract_d(binary_stream_t *data, struct params_t *params)
+int extract_d(binary_stream_t *data, params_t *params)
 {
     return bs_next_reset(data, 1, &params->d);
 }
 
-int extract_reg(binary_stream_t *data, struct params_t *params)
+int extract_reg(binary_stream_t *data, params_t *params)
 {
     return bs_next_reset(data, 3, &params->reg);
 }
 
-int extract_mod(binary_stream_t *data, struct params_t *params)
+int extract_mod(binary_stream_t *data, params_t *params)
 {
     return bs_next_reset(data, 2, &params->mod);
 }
 
-int extract_rm(binary_stream_t *data, struct params_t *params)
+int extract_rm(binary_stream_t *data, params_t *params)
 {
     return bs_next_reset(data, 3, &params->rm);
 }
 
-int extract_mod_reg_rm(binary_stream_t *data, struct params_t *params)
+int extract_mod_reg_rm(binary_stream_t *data, params_t *params)
 {
     if (extract_mod(data, params) != 0)
     {
@@ -54,7 +54,7 @@ int extract_mod_reg_rm(binary_stream_t *data, struct params_t *params)
     return 0;
 }
 
-int extract_w_mod_reg_rm(binary_stream_t *data, struct params_t *params)
+int extract_w_mod_reg_rm(binary_stream_t *data, params_t *params)
 {
     if (extract_w(data, params) != 0)
     {
@@ -64,7 +64,7 @@ int extract_w_mod_reg_rm(binary_stream_t *data, struct params_t *params)
     return extract_mod_reg_rm(data, params);
 }
 
-int extract_dw_mod_reg_rm(binary_stream_t *data, struct params_t *params)
+int extract_dw_mod_reg_rm(binary_stream_t *data, params_t *params)
 {
     if (extract_d(data, params) != 0)
     {
@@ -256,7 +256,7 @@ char *get_rm(binary_stream_t *data, char w, char mod, char rm)
 
 char *format_dw_rm_to_reg(char *val, binary_stream_t *data)
 {
-    struct params_t params;
+    params_t params;
     if (extract_d(data, &params) != 0)
         return NULL;
     return format_w_rm_to_reg_d(val, data, params.d);
@@ -264,7 +264,7 @@ char *format_dw_rm_to_reg(char *val, binary_stream_t *data)
 
 char *format_sized_dw_rm_to_reg(char *val, binary_stream_t *data)
 {
-    struct params_t params;
+    params_t params;
     if (extract_dw_mod_reg_rm(data, &params) != 0)
     {
         return NULL;
@@ -297,7 +297,7 @@ char *format_sized_dw_rm_to_reg(char *val, binary_stream_t *data)
 
 char *format_w_rm_to_reg(char *val, binary_stream_t *data)
 {
-    struct params_t params;
+    params_t params;
     if (extract_w_mod_reg_rm(data, &params) != 0)
     {
         return NULL;
@@ -315,7 +315,7 @@ char *format_w_rm_to_reg(char *val, binary_stream_t *data)
 char *format_w_rm_to_reg_d(char *val, binary_stream_t *data, int direction)
 {
 
-    struct params_t params;
+    params_t params;
     if (extract_w_mod_reg_rm(data, &params) != 0)
     {
         return NULL;
@@ -339,7 +339,7 @@ char *format_w_rm_to_reg_d(char *val, binary_stream_t *data, int direction)
 
 char *format_rm_to_reg(char *val, binary_stream_t *data)
 {
-    struct params_t params;
+    params_t params;
     if (extract_mod_reg_rm(data, &params) != 0)
     {
         return NULL;
@@ -355,7 +355,7 @@ char *format_rm_to_reg(char *val, binary_stream_t *data)
     return instruction;
 }
 
-short extract_data(binary_stream_t *data, struct params_t *params)
+short extract_data(binary_stream_t *data, params_t *params)
 {
     unsigned char low = extract_byte(data);
     unsigned short val = low;
@@ -366,7 +366,7 @@ short extract_data(binary_stream_t *data, struct params_t *params)
     return val;
 }
 
-short extract_data_sw(binary_stream_t *data, struct params_t *params)
+short extract_data_sw(binary_stream_t *data, params_t *params)
 {
     unsigned char low = extract_byte(data);
     unsigned short val;
@@ -440,7 +440,7 @@ char *format_word_displacement(char *val, binary_stream_t *data)
 
 char *format_reg(char *val, binary_stream_t *data)
 {
-    struct params_t params;
+    params_t params;
     if (extract_reg(data, &params) != 0)
     {
         return NULL;
@@ -454,7 +454,7 @@ char *format_reg(char *val, binary_stream_t *data)
 
 char *format_reg_to_acc(char *val, binary_stream_t *data)
 {
-    struct params_t params;
+    params_t params;
     if (extract_reg(data, &params) != 0)
     {
         return NULL;
@@ -468,7 +468,7 @@ char *format_reg_to_acc(char *val, binary_stream_t *data)
 
 char *format_immediate_from_acc(char *val, binary_stream_t *data)
 {
-    struct params_t params;
+    params_t params;
     if (extract_w(data, &params) != 0)
     {
         return NULL;
@@ -483,7 +483,7 @@ char *format_immediate_from_acc(char *val, binary_stream_t *data)
 
 char *format_w_immediate_to_rm(char *val, binary_stream_t *data)
 {
-    struct params_t params;
+    params_t params;
     if (extract_w_mod_reg_rm(data, &params) != 0)
     {
         return NULL;
@@ -508,7 +508,7 @@ char *format_w_immediate_to_rm(char *val, binary_stream_t *data)
 
 char *format_w_mem_to_acc(char *val, binary_stream_t *data)
 {
-    struct params_t params;
+    params_t params;
     if (extract_w(data, &params) != 0)
     {
         return NULL;

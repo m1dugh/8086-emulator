@@ -15,7 +15,7 @@ char *mov_immediate_to_rm(binary_stream_t *data)
 
 char *mov_immediate_to_reg(binary_stream_t *data)
 {
-    struct params_t params;
+    params_t params;
     if (extract_w(data, &params) != 0)
         return NULL;
     if (extract_reg(data, &params) != 0)
@@ -45,7 +45,7 @@ char *push_reg(binary_stream_t *data)
 
 char *pop_rm(binary_stream_t *data)
 {
-    struct params_t params;
+    params_t params;
     if (extract_mod_reg_rm(data, &params) != 0)
     {
         return NULL;
@@ -67,7 +67,7 @@ char *pop_reg(binary_stream_t *data)
 
 char *in_out_port(char *val, binary_stream_t *data, int fixed)
 {
-    struct params_t params;
+    params_t params;
     if (extract_w(data, &params) != 0)
     {
         return NULL;

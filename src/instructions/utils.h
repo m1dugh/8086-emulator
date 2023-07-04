@@ -15,19 +15,19 @@
 
 #define GET_BIT(val, data) GET_DATA(val, data, 1)
 
-int extract_w(binary_stream_t *data, struct params_t *params);
-int extract_d(binary_stream_t *data, struct params_t *params);
-int extract_reg(binary_stream_t *data, struct params_t *params);
-int extract_rm(binary_stream_t *data, struct params_t *params);
-int extract_mod(binary_stream_t *data, struct params_t *params);
+int extract_w(binary_stream_t *data, params_t *params);
+int extract_d(binary_stream_t *data, params_t *params);
+int extract_reg(binary_stream_t *data, params_t *params);
+int extract_rm(binary_stream_t *data, params_t *params);
+int extract_mod(binary_stream_t *data, params_t *params);
 
-int extract_mod_reg_rm(binary_stream_t *data, struct params_t *params);
-int extract_w_mod_reg_rm(binary_stream_t *data, struct params_t *params);
-int extract_dw_mod_reg_rm(binary_stream_t *data, struct params_t *params);
+int extract_mod_reg_rm(binary_stream_t *data, params_t *params);
+int extract_w_mod_reg_rm(binary_stream_t *data, params_t *params);
+int extract_dw_mod_reg_rm(binary_stream_t *data, params_t *params);
 
-short extract_data(binary_stream_t *data, struct params_t *params);
+short extract_data(binary_stream_t *data, params_t *params);
 char extract_byte(binary_stream_t *data);
-short extract_data_sw(binary_stream_t *data, struct params_t *params);
+short extract_data_sw(binary_stream_t *data, params_t *params);
 
 char *get_reg(char w, char val);
 

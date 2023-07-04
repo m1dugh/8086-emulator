@@ -3,9 +3,13 @@
 #include "logic.h"
 #include "utils.h"
 
+void xor_rm_reg_exec(emulator_t *emulator, params_t *params)
+{
+}
+
 instruction_t *xor_rm_reg(binary_stream_t *data)
 {
-    struct params_t params;
+    params_t params;
     if (extract_dw_mod_reg_rm(data, &params) != 0)
     {
         return NULL;
@@ -40,7 +44,7 @@ char *test_rm_reg(binary_stream_t *data)
 
 char *test_immediate_rm(binary_stream_t *data)
 {
-    struct params_t params;
+    params_t params;
     if (extract_w_mod_reg_rm(data, &params) != 0)
     {
         return NULL;
@@ -86,7 +90,7 @@ char *test_immediate_rm(binary_stream_t *data)
 
 char *shift_left(binary_stream_t *data)
 {
-    struct params_t params;
+    params_t params;
     if (extract_dw_mod_reg_rm(data, &params) != 0)
     {
         return NULL;
