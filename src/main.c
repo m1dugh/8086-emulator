@@ -8,7 +8,7 @@
 #include "instructions/logic.h"
 #include "instructions/processor_control.h"
 #include "instructions/string_manipulation.h"
-#include "models.h"
+#include "models/emulator.h"
 #include "utils/binary_stream.h"
 #include "utils/format.h"
 #include "utils/trie.h"

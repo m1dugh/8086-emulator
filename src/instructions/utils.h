@@ -1,7 +1,7 @@
 #ifndef INSTRUCTIONS_UTILS_H
 #define INSTRUCTIONS_UTILS_H
 
-#include "../models.h"
+#include "../models/emulator.h"
 #include "../utils/binary_stream.h"
 
 #define GET_DATA(val, data, size)             \

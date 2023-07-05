@@ -1,7 +1,7 @@
 #ifndef INSTRUCTIONS_LOGIC_H
 #define INSTRUCTIONS_LOGIC_H
 
-#include "../models.h"
+#include "../models/emulator.h"
 #include "../utils/binary_stream.h"
 
 // NOT
