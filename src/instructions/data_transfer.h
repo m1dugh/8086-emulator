@@ -23,7 +23,7 @@ char *push_reg(binary_stream_t *stream);
 char *push_seg_reg(binary_stream_t *stream);
 
 // LEA
-char *lea(binary_stream_t *stream);
+instruction_t *lea(binary_stream_t *stream);
 
 // IN/OUT
 char *in_fixed_port(binary_stream_t *stream);

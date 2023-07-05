@@ -41,6 +41,8 @@ void emulator_set_reg_byte(emulator_t *, char reg, unsigned char);
 unsigned short emulator_get_reg(emulator_t *, char reg);
 void emulator_set_reg(emulator_t *, char reg, unsigned short);
 
+unsigned short emulator_get_effective_addr(emulator_t *, params_t params);
+
 unsigned char emulator_get_mem_byte(
     emulator_t *emulator, unsigned short address);
 void emulator_set_mem_byte(

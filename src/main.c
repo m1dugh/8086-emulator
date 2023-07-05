@@ -213,9 +213,9 @@ instruction_t *find_7_len_instruction(
 instruction_t *find_8_len_instruction(
     unsigned char instruction, binary_stream_t *stream)
 {
-    /*switch (instruction)
+    switch (instruction)
     {
-        case 0b01110010:
+        /*case 0b01110010:
             return jb(stream);
         case 0b01111000:
             return js(stream);
@@ -236,44 +236,45 @@ instruction_t *find_8_len_instruction(
         case 0b01111110:
             return jle(stream);
         case 0b01111111:
-            return jnle(stream);
+            return jnle(stream);*/
         case 0b10001101:
             return lea(stream);
-        case 0b10001111:
-            return pop_rm(stream);
-        case 0b10011000:
-            return cbw();
-        case 0b10011001:
-            return cwd();
-        case 0b11001100:
-            return interrupt();
-        case 0b11001101:
-            return interrupt_with_code(stream);
-        case 0b11100000:
-            return loopnz(stream);
-        case 0b11100001:
-            return loopz(stream);
-        case 0b11100010:
-            return loop(stream);
-        case 0b11101000:
-            return call_direct_seg(stream);
-        case 0b11101001:
-            return jmp_direct_seg(stream);
-        case 0b11101011:
-            return jmp_direct_seg_short(stream);
-        case 0b11110100:
-            return hlt();
-        case 0b11001010:
-        case 0b11000010:
-            return ret_data(stream);
-        case 0b11001011:
-        case 0b11000011:
-            return ret();
-        case 0b11111100:
-            return cld();
-        case 0b11111101:
-            return std_instruction();
-    }*/
+            /*case 0b10001111:
+                return pop_rm(stream);
+            case 0b10011000:
+                return cbw();
+            case 0b10011001:
+                return cwd();
+            case 0b11001100:
+                return interrupt();
+            case 0b11001101:
+                return interrupt_with_code(stream);
+            case 0b11100000:
+                return loopnz(stream);
+            case 0b11100001:
+                return loopz(stream);
+            case 0b11100010:
+                return loop(stream);
+            case 0b11101000:
+                return call_direct_seg(stream);
+            case 0b11101001:
+                return jmp_direct_seg(stream);
+            case 0b11101011:
+                return jmp_direct_seg_short(stream);
+            case 0b11110100:
+                return hlt();
+            case 0b11001010:
+            case 0b11000010:
+                return ret_data(stream);
+            case 0b11001011:
+            case 0b11000011:
+                return ret();
+            case 0b11111100:
+                return cld();
+            case 0b11111101:
+                return std_instruction();
+            */
+    }
     return NULL;
 }
 
@@ -402,8 +403,7 @@ int main(int argc, char **argv)
     vector_free(env);
     vector_free(args);
 
-    mem_seg_display(emulator->environment);
-    mem_seg_display(emulator->args);
+    mem_seg_display(emulator->stack);
 
     printf("%s IP \n", PROCESSOR_HEADER);
 

@@ -15,22 +15,30 @@ DEBUG_TARGET_DIR=$(ROOT_TARGET)/Debug
 DEBUG_TARGET=$(DEBUG_TARGET_DIR)/$(BINARY).debug
 
 SRC_DIR=./src
+
+INSTRUCTION_IMPLEMENTATION=xor mov utils lea
+_INSTRUCTION_IMPL_FULL_PATH=$(addprefix instructions/implementation/, $(INSTRUCTION_IMPLEMENTATION))
+
+INSTRUCTION_IMPL_SECTIONS=data_transfer logic
+_INSTRUCTION_IMPL_SECTIONS_FULL_PATH=$(addprefix instructions/implementation/, $(INSTRUCTION_IMPL_SECTIONS))
+
 SRC=utils/binary_stream.c main.c instructions/arithmetic.c instructions/logic.c \
 	utils/trie.c utils/vector.c \
 	instructions/data_transfer.c instructions/utils.c utils/format.c \
 	instructions/control_transfer.c instructions/processor_control.c \
 	instructions/string_manipulation.c \
-	instructions/implementation/xor.c instructions/implementation/mov.c instructions/implementation/utils.c \
 	models/emulator.c models/instruction.c models/memory_segment.c models/processor.c
+SRC := $(SRC) $(addsuffix .c, $(_INSTRUCTION_IMPL_FULL_PATH))
 
 HEADERS=utils/binary_stream.h instructions/arithmetic.h instructions/logic.h \
 		utils/trie.h utils/vector.h \
 		instructions/data_transfer.h instructions/utils.h utils/format.h \
 		instructions/instructions.h instructions/control_transfer.h \
 		instructions/processor_control.h instructions/string_manipulation.h \
-		instructions/implementation/xor.h instructions/implementation/mov.h instructions/implementation/utils.h \
-		instructions/implementation/logic.h instructions/implementation/data_transfer.h \
 		models/emulator.h models/instruction.h models/memory_segment.h models/processor.h
+
+HEADERS := $(HEADERS) $(addsuffix .h, $(_INSTRUCTION_IMPL_FULL_PATH)) \
+		   $(addsuffix .h, $(_INSTRUCTION_IMPL_SECTIONS_FULL_PATH))
 
 DEPS=$(addprefix $(SRC_DIR)/, $(HEADERS))
 

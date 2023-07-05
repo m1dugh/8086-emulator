@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include "data_transfer.h"
 #include "implementation/data_transfer.h"
+#include "implementation/lea.h"
 #include "implementation/mov.h"
 #include "utils.h"
 
@@ -39,10 +40,11 @@ char *mov_mem_to_acc(binary_stream_t *data)
     return format_w_mem_to_acc("mov", data, &params);
 }
 
-char *lea(binary_stream_t *data)
+instruction_t *lea(binary_stream_t *data)
 {
     params_t params;
-    return format_rm_to_reg("lea", data, &params);
+    char *display = format_rm_to_reg("lea", data, &params);
+    RET_INSTRUCTION(display, data, params, lea_exec);
 }
 
 char *push_reg(binary_stream_t *data)

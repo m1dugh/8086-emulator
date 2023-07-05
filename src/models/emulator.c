@@ -308,13 +308,9 @@ void emulator_set_reg(emulator_t *emulator, char reg, unsigned short value)
     };
 }
 
-unsigned char emulator_get_rm_byte(emulator_t *emulator, params_t params)
+unsigned short emulator_get_effective_addr(
+    emulator_t *emulator, params_t params)
 {
-    if (params.mod == 0b11)
-    {
-        return emulator_get_reg_byte(emulator, params.rm);
-    }
-
     short disp = params.disp;
     unsigned short effective_address;
     processor_t *proc = emulator->processor;
@@ -354,7 +350,18 @@ unsigned char emulator_get_rm_byte(emulator_t *emulator, params_t params)
         default:
             errx(-1, "invalid value for rm: %x", params.rm);
     };
+    return effective_address;
+}
 
+unsigned char emulator_get_rm_byte(emulator_t *emulator, params_t params)
+{
+    if (params.mod == 0b11)
+    {
+        return emulator_get_reg_byte(emulator, params.rm);
+    }
+
+    unsigned short effective_address
+        = emulator_get_effective_addr(emulator, params);
     return emulator_get_mem_byte(emulator, effective_address);
 }
 
@@ -367,46 +374,8 @@ void emulator_set_rm_byte(
         return;
     }
 
-    short disp = params.disp;
-    unsigned short effective_address;
-    processor_t *proc = emulator->processor;
-    switch (params.rm)
-    {
-        case 0b000:
-            effective_address = proc->bx + proc->si + disp;
-            break;
-        case 0b001:
-            effective_address = proc->bx + proc->di + disp;
-            break;
-        case 0b010:
-            effective_address = proc->bp + proc->si + disp;
-            break;
-        case 0b011:
-            effective_address = proc->bp + proc->di + disp;
-            break;
-        case 0b100:
-            effective_address = proc->si + disp;
-            break;
-        case 0b101:
-            effective_address = proc->di + disp;
-            break;
-        case 0b110:
-            if (params.mod == 0b00)
-            {
-                effective_address = (unsigned short)disp;
-            }
-            else
-            {
-                effective_address = proc->bp + disp;
-            }
-            break;
-        case 0b111:
-            effective_address = proc->bx + disp;
-            break;
-        default:
-            errx(-1, "invalid value for rm: %x", params.rm);
-    };
-
+    unsigned short effective_address
+        = emulator_get_effective_addr(emulator, params);
     emulator_set_mem_byte(emulator, effective_address, value);
 }
 
@@ -417,46 +386,8 @@ unsigned short emulator_get_rm(emulator_t *emulator, params_t params)
         return emulator_get_reg(emulator, params.rm);
     }
 
-    short disp = params.disp;
-    unsigned short effective_address;
-    processor_t *proc = emulator->processor;
-    switch (params.rm)
-    {
-        case 0b000:
-            effective_address = proc->bx + proc->si + disp;
-            break;
-        case 0b001:
-            effective_address = proc->bx + proc->di + disp;
-            break;
-        case 0b010:
-            effective_address = proc->bp + proc->si + disp;
-            break;
-        case 0b011:
-            effective_address = proc->bp + proc->di + disp;
-            break;
-        case 0b100:
-            effective_address = proc->si + disp;
-            break;
-        case 0b101:
-            effective_address = proc->di + disp;
-            break;
-        case 0b110:
-            if (params.mod == 0b00)
-            {
-                effective_address = (unsigned short)disp;
-            }
-            else
-            {
-                effective_address = proc->bp + disp;
-            }
-            break;
-        case 0b111:
-            effective_address = proc->bx + disp;
-            break;
-        default:
-            errx(-1, "invalid value for rm: %x", params.rm);
-    };
-
+    unsigned short effective_address
+        = emulator_get_effective_addr(emulator, params);
     return emulator_get_mem_word(emulator, effective_address);
 }
 
@@ -469,45 +400,8 @@ void emulator_set_rm(
         return;
     }
 
-    short disp = params.disp;
-    unsigned short effective_address;
-    processor_t *proc = emulator->processor;
-    switch (params.rm)
-    {
-        case 0b000:
-            effective_address = proc->bx + proc->si + disp;
-            break;
-        case 0b001:
-            effective_address = proc->bx + proc->di + disp;
-            break;
-        case 0b010:
-            effective_address = proc->bp + proc->si + disp;
-            break;
-        case 0b011:
-            effective_address = proc->bp + proc->di + disp;
-            break;
-        case 0b100:
-            effective_address = proc->si + disp;
-            break;
-        case 0b101:
-            effective_address = proc->di + disp;
-            break;
-        case 0b110:
-            if (params.mod == 0b00)
-            {
-                effective_address = (unsigned short)disp;
-            }
-            else
-            {
-                effective_address = proc->bp + disp;
-            }
-            break;
-        case 0b111:
-            effective_address = proc->bx + disp;
-            break;
-        default:
-            errx(-1, "invalid value for rm: %x", params.rm);
-    };
+    unsigned short effective_address
+        = emulator_get_effective_addr(emulator, params);
 
     emulator_set_mem_word(emulator, effective_address, value);
 }
