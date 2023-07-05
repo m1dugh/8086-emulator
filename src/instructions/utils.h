@@ -1,6 +1,7 @@
 #ifndef INSTRUCTIONS_UTILS_H
 #define INSTRUCTIONS_UTILS_H
 
+#include <string.h>
 #include "../models/emulator.h"
 #include "../utils/binary_stream.h"
 
@@ -14,6 +15,14 @@
 #define GET_RM_VALUE(reg, data) GET_DATA(mod, data, 3)
 
 #define GET_BIT(val, data) GET_DATA(val, data, 1)
+
+#define RET_INSTRUCTION(display, data, params, cb)                     \
+    unsigned char *instruction_buffer_copy                             \
+        = calloc(data->instruction_buffer_len, sizeof(unsigned char)); \
+    memcpy(instruction_buffer_copy, data->instruction_buffer,          \
+        data->instruction_buffer_len);                                 \
+    return instruction_new(display, instruction_buffer_copy,           \
+        data->instruction_buffer_len, params, cb);
 
 int extract_w(binary_stream_t *data, params_t *params);
 int extract_d(binary_stream_t *data, params_t *params);

@@ -9,6 +9,7 @@
 #include "instructions/processor_control.h"
 #include "instructions/string_manipulation.h"
 #include "models/emulator.h"
+#include "models/memory_segment.h"
 #include "utils/binary_stream.h"
 #include "utils/format.h"
 #include "utils/trie.h"
@@ -163,8 +164,8 @@ instruction_t *find_6_len_instruction(
                 return cmp_rm_reg(stream);
             case 0b100000:
                 return cmp_immediate_rm(stream);*/
-            /*case 0b100010:
-                return mov_rm_to_reg(stream);*/
+        case 0b100010:
+            return mov_rm_to_reg(stream);
             /*case 0b110100:
                 return shift_left(stream);*/
     }
@@ -328,19 +329,8 @@ vector_t *load_environment(emulator_t *emulator)
 {
     vector_t *res = vector_new();
     for (char **env = environ; *env; env++)
-    {
-        char *s = *env;
-        if (*s)
-        {
-            unsigned short addr = emulator_push_environment(emulator, *s++);
-            vector_append(res, TO_VOID_PTR(addr));
-            for (; *s; s++)
-            {
-                emulator_push_environment(emulator, *s);
-            }
-            emulator_push_environment(emulator, 0);
-        }
-    }
+        vector_append(
+            res, TO_VOID_PTR(emulator_push_environment(emulator, *env)));
 
     return res;
 }
@@ -349,19 +339,7 @@ vector_t *load_args(emulator_t *emulator, int argc, char **argv)
 {
     vector_t *res = vector_new();
     for (int i = 0; i < argc; i++)
-    {
-        char *s = argv[i];
-        if (*s)
-        {
-            unsigned short addr = emulator_push_args(emulator, *s++);
-            vector_append(res, TO_VOID_PTR(addr));
-            for (; *s; s++)
-            {
-                emulator_push_args(emulator, *s);
-            }
-            emulator_push_args(emulator, 0);
-        }
-    }
+        vector_append(res, TO_VOID_PTR(emulator_push_args(emulator, argv[i])));
 
     return res;
 }
@@ -423,6 +401,9 @@ int main(int argc, char **argv)
     emulator_prepare(emulator, env, args);
     vector_free(env);
     vector_free(args);
+
+    mem_seg_display(emulator->environment);
+    mem_seg_display(emulator->args);
 
     printf("%s IP \n", PROCESSOR_HEADER);
 

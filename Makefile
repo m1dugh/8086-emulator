@@ -20,6 +20,7 @@ SRC=utils/binary_stream.c main.c instructions/arithmetic.c instructions/logic.c 
 	instructions/data_transfer.c instructions/utils.c utils/format.c \
 	instructions/control_transfer.c instructions/processor_control.c \
 	instructions/string_manipulation.c \
+	instructions/implementation/xor.c instructions/implementation/mov.c instructions/implementation/utils.c \
 	models/emulator.c models/instruction.c models/memory_segment.c models/processor.c
 
 HEADERS=utils/binary_stream.h instructions/arithmetic.h instructions/logic.h \
@@ -27,6 +28,8 @@ HEADERS=utils/binary_stream.h instructions/arithmetic.h instructions/logic.h \
 		instructions/data_transfer.h instructions/utils.h utils/format.h \
 		instructions/instructions.h instructions/control_transfer.h \
 		instructions/processor_control.h instructions/string_manipulation.h \
+		instructions/implementation/xor.h instructions/implementation/mov.h instructions/implementation/utils.h \
+		instructions/implementation/logic.h instructions/implementation/data_transfer.h \
 		models/emulator.h models/instruction.h models/memory_segment.h models/processor.h
 
 DEPS=$(addprefix $(SRC_DIR)/, $(HEADERS))

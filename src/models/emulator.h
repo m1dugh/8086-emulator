@@ -29,8 +29,8 @@ unsigned short emulator_push_data(emulator_t *, unsigned char);
 
 unsigned short emulator_push_bss(emulator_t *, unsigned char);
 
-unsigned short emulator_push_environment(emulator_t *, unsigned char);
-unsigned short emulator_push_args(emulator_t *, unsigned char);
+unsigned short emulator_push_environment(emulator_t *, char *str);
+unsigned short emulator_push_args(emulator_t *, char *str);
 
 void emulator_stack_push(emulator_t *, unsigned short value);
 unsigned short emulator_stack_pop(emulator_t *);

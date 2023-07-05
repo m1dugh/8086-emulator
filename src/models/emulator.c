@@ -1,6 +1,7 @@
 #include <err.h>
 #include "emulator.h"
 #include "../env.h"
+#include "memory_segment.h"
 
 unsigned short emulator_next_address(memory_segment_t *mem)
 {
@@ -47,6 +48,7 @@ void emulator_args_ensure_lock(emulator_t *emulator)
     if (!emulator->args->locked)
     {
         emulator->args->locked = 1;
+        emulator->stack->base_address = emulator_next_address(emulator->args);
     }
 }
 
@@ -126,8 +128,8 @@ void emulator_free(emulator_t *emulator)
 
 void emulator_stack_push(emulator_t *emulator, unsigned short value)
 {
-    emulator->processor->sp--;
     vector_append(emulator->stack->value, TO_VOID_PTR(value));
+    emulator->processor->sp--;
 }
 
 unsigned short emulator_stack_pop(emulator_t *emulator)
@@ -142,16 +144,15 @@ unsigned short emulator_push_data(emulator_t *emulator, unsigned char value)
     return mem_seg_push(emulator->data, value);
 }
 
-unsigned short emulator_push_environment(
-    emulator_t *emulator, unsigned char value)
+unsigned short emulator_push_environment(emulator_t *emulator, char *str)
 {
-    return mem_seg_push(emulator->environment, value);
+    return mem_seg_push_str(emulator->environment, str);
 }
 
-unsigned short emulator_push_args(emulator_t *emulator, unsigned char value)
+unsigned short emulator_push_args(emulator_t *emulator, char *str)
 {
     emulator_environment_ensure_lock(emulator);
-    return mem_seg_push(emulator->args, value);
+    return mem_seg_push_str(emulator->args, str);
 }
 
 unsigned short emulator_push_bss(emulator_t *emulator, unsigned char value)
@@ -170,6 +171,10 @@ void emulator_prepare(
     emulator->processor->sp = emulator->processor->bp;
 
     emulator_stack_push(emulator, 0);
+
+    // Fixes broken offset for stack pointer
+    emulator->processor->sp++;
+
     for (size_t i = vector_len(environment); i > 0; i--)
     {
         emulator_stack_push(emulator, TO_ADDR(vector_get(environment, i - 1)));
@@ -527,6 +532,11 @@ unsigned char emulator_get_mem_byte(
     {
         res = mem_seg_get_abs(emulator->environment, address);
     }
+    else if (address <= mem_seg_high_addr(emulator->stack)
+             && address >= mem_seg_low_addr(emulator->stack))
+    {
+        res = mem_seg_get_abs(emulator->stack, address);
+    }
     else
     {
         errx(-1, "could not extract data at address 0x%04x", address);
@@ -554,6 +564,12 @@ unsigned short emulator_get_mem_word(
     {
         res = mem_seg_get_abs_word(emulator->environment, address);
     }
+    else if (address <= mem_seg_high_addr(emulator->stack)
+             && address >= mem_seg_low_addr(emulator->stack))
+    {
+        res = mem_seg_get_abs_word(emulator->stack, address);
+    }
+
     else
     {
         errx(-1, "could not extract data at address 0x%04x", address);
@@ -579,6 +595,11 @@ void emulator_set_mem_byte(
     {
         mem_seg_set_abs(emulator->environment, address, value);
     }
+    else if (address <= mem_seg_high_addr(emulator->stack)
+             && address >= mem_seg_low_addr(emulator->stack))
+    {
+        mem_seg_set_abs(emulator->stack, address, value);
+    }
     else
     {
         errx(-1, "could not extract data at address 0x%04x", address);
@@ -602,6 +623,11 @@ void emulator_set_mem_word(
              && address >= mem_seg_low_addr(emulator->environment))
     {
         mem_seg_set_abs_word(emulator->environment, address, value);
+    }
+    else if (address <= mem_seg_high_addr(emulator->stack)
+             && address >= mem_seg_low_addr(emulator->stack))
+    {
+        mem_seg_set_abs_word(emulator->stack, address, value);
     }
     else
     {

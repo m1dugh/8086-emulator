@@ -32,6 +32,7 @@ void mem_seg_set_abs(
 void mem_seg_set(
     memory_segment_t *mem, unsigned short address, unsigned char value);
 unsigned short mem_seg_push(memory_segment_t *mem, unsigned char data);
+unsigned short mem_seg_push_str(memory_segment_t *mem, char *str);
 
 void mem_seg_set_abs_word(
     memory_segment_t *mem, unsigned short address, unsigned short value);

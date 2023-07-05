@@ -1,5 +1,6 @@
 #include <err.h>
 #include <stdio.h>
+#include <string.h>
 #include "memory_segment.h"
 #include "../env.h"
 
@@ -213,6 +214,37 @@ unsigned short mem_seg_push(memory_segment_t *mem, unsigned char data)
     return address;
 }
 
+unsigned short mem_seg_push_str(memory_segment_t *mem, char *str)
+{
+    if (mem->direction == DIRECTION_UP)
+    {
+        if (*str)
+        {
+            unsigned short res = mem_seg_push(mem, *str++);
+            for (; *str; str++)
+            {
+                mem_seg_push(mem, *str);
+            }
+            mem_seg_push(mem, 0);
+            return res;
+        }
+        else
+        {
+            return mem_seg_push(mem, 0);
+        }
+    }
+    else
+    {
+        unsigned short res = mem_seg_push(mem, 0);
+        size_t len = strlen(str);
+        for (size_t i = len; i > 0; i--)
+        {
+            mem_seg_push(mem, str[i - 1]);
+        }
+        return res;
+    }
+}
+
 int mem_seg_empty(memory_segment_t *mem)
 {
     return vector_len(mem->value) == 0;
@@ -229,15 +261,9 @@ void mem_seg_display(memory_segment_t *mem)
     unsigned short low_address = mem_seg_low_addr(mem);
     unsigned short high_address = mem_seg_high_addr(mem);
 
-    if (mem->direction == DIRECTION_UP)
-    {
-        address = low_address;
-    }
-    else
-    {
-        address = high_address;
-    }
+    address = low_address;
 
+    printf("===== START OF MEMORY SEGMENT (0x%04x) =====\n", low_address);
     char buffer[DISPLAY_COLUMN_SIZE + 1];
     buffer[DISPLAY_COLUMN_SIZE] = 0;
     while (address >= low_address && address <= high_address)
@@ -257,10 +283,7 @@ void mem_seg_display(memory_segment_t *mem)
                 {
                     buffer[j] = '.';
                 }
-                if (mem->direction == DIRECTION_UP)
-                    address++;
-                else
-                    address--;
+                address++;
             }
             else
             {
@@ -270,4 +293,5 @@ void mem_seg_display(memory_segment_t *mem)
         }
         printf("\t|%s|\n", buffer);
     }
+    printf("====== END OF MEMORY SEGMENT (0x%04x) ======\n", high_address);
 }
