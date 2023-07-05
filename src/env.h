@@ -11,4 +11,6 @@
 #define TO_BYTE(val) (unsigned char)(unsigned long)val
 #define TO_VOID_PTR(val) (void *)(unsigned long)val
 
+#define BIG_ENDIAN FALSE
+
 #endif // !EMULATOR_ENV_H

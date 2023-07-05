@@ -1,13 +1,15 @@
 #ifndef EMULATOR_MODELS_PROCESSOR_H
 #define EMULATOR_MODELS_PROCESSOR_H
 
+#include "../env.h"
+
 typedef struct
 {
     union
     {
         struct
         {
-#ifdef BIG_ENDIAN
+#if BIG_ENDIAN
             unsigned char ah;
             unsigned char al;
 #else
@@ -23,7 +25,7 @@ typedef struct
     {
         struct
         {
-#ifdef BIG_ENDIAN
+#if BIG_ENDIAN
             unsigned char ch;
             unsigned char cl;
 #else
@@ -39,7 +41,7 @@ typedef struct
     {
         struct
         {
-#ifdef BIG_ENDIAN
+#if BIG_ENDIAN
             unsigned char dh;
             unsigned char dl;
 #else
@@ -55,7 +57,7 @@ typedef struct
     {
         struct
         {
-#ifdef BIG_ENDIAN
+#if BIG_ENDIAN
             unsigned char bh;
             unsigned char bl;
 #else
@@ -77,7 +79,7 @@ typedef struct
         unsigned short value;
         struct
         {
-#ifdef BIG_ENDIAN
+#if BIG_ENDIAN
             // HIGH
             unsigned char : 4;
             unsigned char o : 1;
