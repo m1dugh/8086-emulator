@@ -3,10 +3,11 @@
 #include "arithmetic.h"
 #include "utils.h"
 
-char *add_rm_with_reg(binary_stream_t *data)
+instruction_t *add_rm_with_reg(binary_stream_t *data)
 {
     params_t params;
-    return format_dw_rm_to_reg("add", data, &params);
+    char *display = format_dw_rm_to_reg("add", data, &params);
+    RET_INSTRUCTION(display, data, params, add_rm_reg_exec);
 }
 
 char *add_immediate_to_acc(binary_stream_t *data)

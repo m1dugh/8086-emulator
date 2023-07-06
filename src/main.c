@@ -146,9 +146,9 @@ instruction_t *find_6_len_instruction(
 {
     switch (instruction)
     {
-        /*case 0b000000:
+        case 0b000000:
             return add_rm_with_reg(stream);
-        case 0b000010:
+        /*case 0b000010:
             return or_rm_reg(stream);
         case 0b000100:
             return adc_rm_with_reg(stream);
@@ -330,8 +330,7 @@ vector_t *load_environment(emulator_t *emulator)
 {
     vector_t *res = vector_new();
     for (char **env = environ; *env; env++)
-        vector_append(
-            res, TO_VOID_PTR(emulator_push_environment(emulator, *env)));
+        vector_push(res, TO_VOID_PTR(emulator_push_data_str(emulator, *env)));
 
     return res;
 }
@@ -340,7 +339,8 @@ vector_t *load_args(emulator_t *emulator, int argc, char **argv)
 {
     vector_t *res = vector_new();
     for (int i = 0; i < argc; i++)
-        vector_append(res, TO_VOID_PTR(emulator_push_args(emulator, argv[i])));
+        vector_push(
+            res, TO_VOID_PTR(emulator_push_data_str(emulator, argv[i])));
 
     return res;
 }
@@ -358,7 +358,11 @@ void load_text(struct exec_header header, FILE *f, emulator_t *emulator)
             // errx(-1, "Instruction not found");
             break;
         }
-        trie_set(emulator->text, stream->current_address, res);
+        if (code_seg_set(emulator->code, stream->current_address, res) != 0)
+        {
+            errx(-1, "could not set instruction <%s> at address %04x\n",
+                res->display, stream->current_address);
+        }
     }
 
     bs_free(stream);
@@ -367,7 +371,7 @@ void load_text(struct exec_header header, FILE *f, emulator_t *emulator)
 void load_data(struct exec_header header, FILE *f, emulator_t *emulator)
 {
     fseek(f, header.a_hdrlen + header.a_text, SEEK_SET);
-    for (size_t i = 0; i < header.a_data; i++)
+    for (long i = 0; i < header.a_data; i++)
     {
         unsigned char val = fgetc(f);
         emulator_push_data(emulator, val);
@@ -407,8 +411,8 @@ int main(int argc, char **argv)
 
     printf("%s IP \n", PROCESSOR_HEADER);
 
-    trie_for_each(
-        emulator->text, (trie_function_t)execute_instructions, emulator);
+    code_seg_for_each(
+        emulator->code, (code_seg_cb_t)execute_instructions, emulator);
 
     printf("===== END OF .TEXT SECTION =====\n");
 

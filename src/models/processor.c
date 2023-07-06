@@ -10,7 +10,10 @@
 processor_t *processor_new()
 {
     processor_t *res = calloc(1, sizeof(processor_t));
-    res->sp = MAX_ADDRESS;
+    res->ds = DATA_SEGMENT;
+    res->cs = CODE_SEGMENT;
+    res->ss = STACK_SEGMENT;
+    res->es = EXTRA_SEGMENT;
     return res;
 }
 

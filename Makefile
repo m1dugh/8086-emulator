@@ -16,10 +16,10 @@ DEBUG_TARGET=$(DEBUG_TARGET_DIR)/$(BINARY).debug
 
 SRC_DIR=./src
 
-INSTRUCTION_IMPLEMENTATION=xor mov utils lea
+INSTRUCTION_IMPLEMENTATION=xor mov utils lea add
 _INSTRUCTION_IMPL_FULL_PATH=$(addprefix instructions/implementation/, $(INSTRUCTION_IMPLEMENTATION))
 
-INSTRUCTION_IMPL_SECTIONS=data_transfer logic
+INSTRUCTION_IMPL_SECTIONS=data_transfer logic arithmetic
 _INSTRUCTION_IMPL_SECTIONS_FULL_PATH=$(addprefix instructions/implementation/, $(INSTRUCTION_IMPL_SECTIONS))
 
 SRC=utils/binary_stream.c main.c instructions/arithmetic.c instructions/logic.c \
@@ -31,7 +31,7 @@ SRC=utils/binary_stream.c main.c instructions/arithmetic.c instructions/logic.c 
 SRC := $(SRC) $(addsuffix .c, $(_INSTRUCTION_IMPL_FULL_PATH))
 
 HEADERS=utils/binary_stream.h instructions/arithmetic.h instructions/logic.h \
-		utils/trie.h utils/vector.h \
+		utils/trie.h utils/vector.h env.h \
 		instructions/data_transfer.h instructions/utils.h utils/format.h \
 		instructions/instructions.h instructions/control_transfer.h \
 		instructions/processor_control.h instructions/string_manipulation.h \

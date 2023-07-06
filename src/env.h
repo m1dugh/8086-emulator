@@ -13,4 +13,9 @@
 #define TO_BYTE(val) (unsigned char)(unsigned long)val
 #define TO_VOID_PTR(val) (void *)(unsigned long)val
 
+#define EXTRA_SEGMENT 0x7000
+#define CODE_SEGMENT 0x3000
+#define STACK_SEGMENT 0x4fff
+#define DATA_SEGMENT 0x2000
+
 #endif // !EMULATOR_ENV_H

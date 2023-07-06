@@ -2,9 +2,11 @@
 #define INSTRUCTIONS_ARITHMETIC_H
 
 #include "../utils/binary_stream.h"
+#include "implementation/arithmetic.h"
+#include "utils.h"
 
 // ADD
-char *add_rm_with_reg(binary_stream_t *data);
+instruction_t *add_rm_with_reg(binary_stream_t *data);
 char *add_immediate_to_rm(binary_stream_t *data);
 char *add_immediate_to_acc(binary_stream_t *data);
 

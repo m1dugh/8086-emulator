@@ -3,31 +3,32 @@
 #include <stdlib.h>
 #include "vector.h"
 
+int can_grow(vector_t *vector)
+{
+    return vector->max_size == 0 || vector->cap < vector->max_size;
+}
+
 int grow(vector_t *vector)
 {
+    if (!can_grow(vector))
+        return -1;
     size_t new_cap = vector->cap * 2;
     vector->values = realloc(vector->values, new_cap * sizeof(void *));
     if (vector->values == NULL)
-    {
-        return -1;
-    }
+        errx(-1, "malloc error: Could not grow vector capacity");
     vector->cap = new_cap;
     return 0;
 }
 
-void grow_if_needed(vector_t *vector)
+int grow_if_needed(vector_t *vector)
 {
     if (vector->len >= vector->cap)
-    {
-        int res = grow(vector);
-        if (res != 0)
-        {
-            errx(res, "malloc error: Could not grow vector capacity");
-        }
-    }
+        return grow(vector);
+
+    return 0;
 }
 
-vector_t *vector_new()
+vector_t *vector_new_sized(size_t max_size)
 {
     vector_t *res = malloc(sizeof(vector_t));
     if (res == NULL)
@@ -41,7 +42,13 @@ vector_t *vector_new()
     }
     res->len = 0;
     res->cap = VECTOR_INITIAL_CAPACITY;
+    res->max_size = max_size;
     return res;
+}
+
+vector_t *vector_new()
+{
+    return vector_new_sized(0);
 }
 
 void vector_free(vector_t *vector)
@@ -69,22 +76,28 @@ void *vector_get(vector_t *vector, size_t index)
     return vector->values[index];
 }
 
-void vector_append(vector_t *vector, void *data)
+int vector_push(vector_t *vector, void *data)
 {
-    grow_if_needed(vector);
+    int res;
+    if ((res = grow_if_needed(vector)) != 0)
+        return res;
+
     vector->values[vector->len] = data;
     vector->len++;
+    return 0;
 }
 
-void vector_insert(vector_t *vector, size_t index, void *data)
+int vector_insert(vector_t *vector, size_t index, void *data)
 {
-    grow_if_needed(vector);
+    int res;
+    if ((res = grow_if_needed(vector)) != 0)
+        return res;
+
     for (size_t i = vector->len; i > index; i--)
-    {
         vector->values[i] = vector->values[i - 1];
-    }
     vector->values[index] = data;
     vector->len++;
+    return 0;
 }
 
 size_t vector_len(vector_t *vector)
