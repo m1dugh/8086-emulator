@@ -315,34 +315,12 @@ instruction_t *next_instruction(binary_stream_t *stream)
 void execute_instructions(
     instruction_t *data, unsigned long address, emulator_t *emulator)
 {
-    data->callback(emulator, data->params);
     char *proc_display = processor_display(emulator->processor);
     printf("%s ", proc_display);
     free(proc_display);
     printf_instruction(
         address, data->instruction, data->instruction_len, data->display);
-}
-
-extern char **environ;
-
-/// returns a list of pointers to the env variables
-vector_t *load_environment(emulator_t *emulator)
-{
-    vector_t *res = vector_new();
-    for (char **env = environ; *env; env++)
-        vector_push(res, TO_VOID_PTR(emulator_push_data_str(emulator, *env)));
-
-    return res;
-}
-
-vector_t *load_args(emulator_t *emulator, int argc, char **argv)
-{
-    vector_t *res = vector_new();
-    for (int i = 0; i < argc; i++)
-        vector_push(
-            res, TO_VOID_PTR(emulator_push_data_str(emulator, argv[i])));
-
-    return res;
+    data->callback(emulator, data->params);
 }
 
 void load_text(struct exec_header header, FILE *f, emulator_t *emulator)
@@ -378,6 +356,8 @@ void load_data(struct exec_header header, FILE *f, emulator_t *emulator)
     }
 }
 
+extern char **environ;
+
 int main(int argc, char **argv)
 {
     if (argc != 2)
@@ -397,17 +377,15 @@ int main(int argc, char **argv)
     }
 
     emulator_t *emulator = emulator_new(MEM_SIZE);
-    vector_t *env = load_environment(emulator);
-    vector_t *args = load_args(emulator, argc, argv);
 
     load_text(header, f, emulator);
     load_data(header, f, emulator);
 
-    emulator_prepare(emulator, env, args);
-    vector_free(env);
-    vector_free(args);
+    char *env[] = {0};
+    emulator_prepare(emulator, env, argc - 1, argv + 1);
 
-    mem_seg_display(emulator->stack);
+    emulator_stack_display(emulator);
+    mem_seg_display(emulator->data, "DATA");
 
     printf("%s IP \n", PROCESSOR_HEADER);
 

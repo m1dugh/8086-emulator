@@ -37,7 +37,7 @@ unsigned short mem_seg_push_str(memory_segment_t *mem, char *str);
 void mem_seg_set_word(
     memory_segment_t *mem, unsigned short address, unsigned short value);
 
-void mem_seg_display(memory_segment_t *mem);
+void mem_seg_display(memory_segment_t *mem, char *name);
 int mem_seg_empty(memory_segment_t *mem);
 
 typedef struct
@@ -63,17 +63,5 @@ typedef void (*code_seg_cb_t)(
 
 void code_seg_for_each(
     code_segment_t *instructions, code_seg_cb_t function, void *additionals);
-
-typedef memory_segment_t stack_t;
-
-void stack_push(stack_t *stack, unsigned short data);
-unsigned short stack_pop(stack_t *stack);
-
-unsigned int stack_get_top(stack_t *stack);
-unsigned int stack_get_bottom(stack_t *stack);
-
-/// if ret is < 0, the address is not valid
-/// otherwise, the address is an unsigned short in lower part of the return
-int stack_get_relative_address(stack_t *stack, unsigned int address);
 
 #endif // !EMULATOR_MODELS_MEMORY_SEGMENT_H

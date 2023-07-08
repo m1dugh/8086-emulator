@@ -3,6 +3,11 @@
 
 #include "../env.h"
 
+#define DS_SELECTOR 0
+#define CS_SELECTOR 1
+#define ES_SELECTOR 2
+#define SS_SELECTOR 3
+
 typedef struct
 {
     union
@@ -123,6 +128,8 @@ typedef struct
     unsigned short ds;
 
     unsigned short ip;
+
+    unsigned int segment_selector : 2;
 } processor_t;
 
 processor_t *processor_new();
@@ -130,6 +137,8 @@ int processor_set_byte_value(processor_t *, char key, unsigned char value);
 int processor_set_value(processor_t *, char key, unsigned short value);
 int processor_set_segment(processor_t *, char key, unsigned short value);
 void processor_free(processor_t *);
+
+unsigned short processor_segment_addr(processor_t *processor);
 
 char *processor_display(processor_t *processor);
 

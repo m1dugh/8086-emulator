@@ -114,12 +114,12 @@ int mem_seg_empty(memory_segment_t *mem)
 
 #define DISPLAY_COLUMN_SIZE 16
 
-void mem_seg_display(memory_segment_t *mem)
+void mem_seg_display(memory_segment_t *mem, char *name)
 {
     if (mem_seg_empty(mem))
         return;
 
-    printf("===== START OF MEMORY SEGMENT =====\n");
+    printf("===== START OF %s SEGMENT =====\n", name);
     char buffer[DISPLAY_COLUMN_SIZE + 1];
     buffer[DISPLAY_COLUMN_SIZE] = 0;
     for (size_t i = 0; i < vector_len(mem->value);)
@@ -150,7 +150,7 @@ void mem_seg_display(memory_segment_t *mem)
         }
         printf("\t|%s|\n", buffer);
     }
-    printf("====== END OF MEMORY SEGMENT ======\n");
+    printf("====== END OF %s SEGMENT ======\n", name);
 }
 
 code_segment_t *code_seg_new(unsigned short base_address)
@@ -211,28 +211,6 @@ int code_seg_set(code_segment_t *instructions, unsigned short address,
     return 0;
 }
 
-void stack_push(stack_t *stack, unsigned short data)
-{
-#if BIG_ENDIAN
-    mem_seg_push(stack, (data & 0xff00) >> 8);
-    mem_seg_push(stack, data & 0xff);
-#else
-    mem_seg_push(mem, value & 0xff);
-    mem_seg_push(mem, (value & 0xff00) >> 8);
-#endif
-}
-
-unsigned short stack_pop(stack_t *stack)
-{
-    unsigned char val_1 = TO_BYTE(vector_pop(stack->value));
-    unsigned char val_2 = TO_BYTE(vector_pop(stack->value));
-#if BIG_ENDIAN
-    return val_1 << 8 | val_2;
-#else
-    return val_2 << 8 | val_1;
-#endif
-}
-
 unsigned int mem_seg_get_low_addr(memory_segment_t *mem)
 {
     return mem->base_address << 4;
@@ -243,31 +221,10 @@ unsigned int mem_seg_get_high_addr(memory_segment_t *mem)
     return (mem->base_address << 4) + (unsigned short)vector_len(mem->value);
 }
 
-unsigned int stack_get_top(stack_t *stack)
-{
-    return stack->base_address << 4;
-}
-unsigned int stack_get_bottom(stack_t *stack)
-{
-    return (stack->base_address << 4)
-           - (unsigned short)vector_len(stack->value);
-}
-
 int mem_set_get_relative_address(memory_segment_t *mem, unsigned int address)
 {
     unsigned int high = mem_seg_get_high_addr(mem);
     unsigned int low = mem_seg_get_low_addr(mem);
-    if (address > high || address < low)
-        return -1;
-
-    unsigned short relative_addr = address - low;
-    return ((int)0x0) | relative_addr;
-}
-
-int stack_get_relative_address(stack_t *stack, unsigned int address)
-{
-    unsigned int high = stack_get_top(stack);
-    unsigned int low = stack_get_bottom(stack);
     if (address > high || address < low)
         return -1;
 
