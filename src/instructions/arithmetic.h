@@ -1,6 +1,7 @@
 #ifndef INSTRUCTIONS_ARITHMETIC_H
 #define INSTRUCTIONS_ARITHMETIC_H
 
+#include "../models/instruction.h"
 #include "../utils/binary_stream.h"
 #include "implementation/arithmetic.h"
 #include "utils.h"
@@ -35,7 +36,7 @@ char *neg(binary_stream_t *data);
 
 // CMP
 char *cmp_rm_reg(binary_stream_t *data);
-char *cmp_immediate_rm(binary_stream_t *data);
+instruction_t *cmp_immediate_rm(binary_stream_t *data);
 char *cmp_immediate_acc(binary_stream_t *data);
 
 char *cbw();

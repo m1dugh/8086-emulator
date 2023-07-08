@@ -12,16 +12,34 @@ typedef struct
     char mod;
     char reg;
     char rm;
-    char data_high;
-    char data_low;
     union
     {
         struct
         {
+#if BIG_ENDIAN
+            unsigned char : 8;
+            char low_disp;
+#else
             char low_disp;
             unsigned char : 8;
+#endif
         };
         short disp;
+    };
+
+    union
+    {
+        struct
+        {
+#if BIG_ENDIAN
+            unsigned char : 8;
+            unsigned char data_low;
+#else
+            unsigned char data_low;
+            unsigned char : 8;
+#endif
+        };
+        unsigned short data;
     };
 } params_t;
 

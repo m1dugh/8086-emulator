@@ -1,5 +1,6 @@
 #include <err.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include "emulator.h"
 #include "../env.h"
@@ -84,6 +85,19 @@ void emulator_prepare(
 {
     emulator->processor->bp = 0;
     emulator->processor->sp = 0;
+
+    size_t combined_len = 0;
+    for (char **env = environment; *env; env++)
+    {
+        combined_len += strlen(*env) + 1;
+    }
+    for (int i = 0; i < argc; i++)
+    {
+        combined_len += strlen(argv[i]) + 1;
+    }
+
+    if (combined_len % 2 != 0)
+        emulator->stack[--emulator->processor->sp] = 0;
 
     vector_t *env_ptrs = vector_new();
     for (; *environment; environment++)
@@ -253,53 +267,83 @@ unsigned int emulator_get_physical_addr(emulator_t *emulator, params_t params)
     short disp = params.disp;
     unsigned short effective_address;
     processor_t *proc = emulator->processor;
+    unsigned short overriden_segment;
+    unsigned short default_segment;
+    unsigned char override_segment = 1;
+    switch (emulator->processor->segment_selector)
+    {
+        case SS_SELECTOR:
+            overriden_segment = emulator->processor->ss;
+            break;
+        case DS_SELECTOR:
+            overriden_segment = emulator->processor->ds;
+            break;
+        case ES_SELECTOR:
+            overriden_segment = emulator->processor->es;
+            break;
+        case CS_SELECTOR:
+            overriden_segment = emulator->processor->cs;
+            break;
+        default:
+            override_segment = 0;
+    }
+
     switch (params.rm)
     {
         case 0b000:
             effective_address = proc->bx + proc->si + disp;
-            emulator->processor->segment_selector = DS_SELECTOR;
+            default_segment = emulator->processor->ds;
             break;
         case 0b001:
             effective_address = proc->bx + proc->di + disp;
-            emulator->processor->segment_selector = DS_SELECTOR;
+            default_segment = emulator->processor->ds;
             break;
         case 0b010:
             effective_address = proc->bp + proc->si + disp;
-            emulator->processor->segment_selector = DS_SELECTOR;
+            default_segment = emulator->processor->ds;
             break;
         case 0b011:
             effective_address = proc->bp + proc->di + disp;
-            emulator->processor->segment_selector = SS_SELECTOR;
+            default_segment = emulator->processor->ss;
             break;
         case 0b100:
             effective_address = proc->si + disp;
-            emulator->processor->segment_selector = DS_SELECTOR;
+            default_segment = emulator->processor->ds;
             break;
         case 0b101:
             effective_address = proc->di + disp;
-            emulator->processor->segment_selector = DS_SELECTOR;
+            default_segment = emulator->processor->ds;
             break;
         case 0b110:
             if (params.mod == 0b00)
             {
                 effective_address = (unsigned short)disp;
-                emulator->processor->segment_selector = DS_SELECTOR;
+                default_segment = emulator->processor->ds;
             }
             else
             {
                 effective_address = proc->bp + disp;
-                emulator->processor->segment_selector = SS_SELECTOR;
+                default_segment = emulator->processor->ss;
             }
             break;
         case 0b111:
             effective_address = proc->bx + disp;
-            emulator->processor->segment_selector = DS_SELECTOR;
+            default_segment = emulator->processor->ds;
             break;
         default:
             errx(-1, "invalid value for rm: %x", params.rm);
     };
-    return (processor_segment_addr(emulator->processor) << 4)
-           + effective_address;
+
+    unsigned int physical_addr;
+    if (override_segment)
+    {
+        physical_addr = (overriden_segment << 4) + effective_address;
+    }
+    else
+    {
+        physical_addr = (default_segment << 4) + effective_address;
+    }
+    return physical_addr;
 }
 
 unsigned char emulator_get_rm_byte(emulator_t *emulator, params_t params)
@@ -521,13 +565,12 @@ void emulator_stack_display(emulator_t *emulator)
 int emulator_stack_get_relative_address(
     emulator_t *emulator, unsigned int address)
 {
-    unsigned int top
-        = (emulator->processor->ss << 4) + emulator->processor->bp;
-    unsigned int bottom
-        = (emulator->processor->ss << 4) + emulator->processor->sp;
-    if ((emulator->processor->bp != 0) && (address >= top || address < bottom))
+    if (address > ((unsigned int)(emulator->processor->ss << 4) + MAX_ADDRESS)
+        || address < ((unsigned int)(emulator->processor->ss << 4)))
+    {
         return -1;
-    return (int)(address - emulator->processor->ss) & 0xFFFF;
+    }
+    return address - (emulator->processor->ss << 4);
 }
 
 unsigned char emulator_stack_get_byte(
@@ -539,11 +582,11 @@ unsigned char emulator_stack_get_byte(
 unsigned short emulator_stack_get(emulator_t *emulator, unsigned short address)
 {
 #if BIG_ENDIAN
-    unsigned char high = emulator_stack_get_byte(emulator, address);
-    unsigned char low = emulator_stack_get_byte(emulator, address - 1);
-#else
+    unsigned char high = emulator_stack_get_byte(emulator, address + 1);
     unsigned char low = emulator_stack_get_byte(emulator, address);
-    unsigned char high = emulator_stack_get_byte(emulator, address - 1);
+#else
+    unsigned char low = emulator_stack_get_byte(emulator, address + 1);
+    unsigned char high = emulator_stack_get_byte(emulator, address);
 #endif
     return (high << 8) + low;
 }

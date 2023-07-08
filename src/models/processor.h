@@ -3,10 +3,11 @@
 
 #include "../env.h"
 
-#define DS_SELECTOR 0
-#define CS_SELECTOR 1
-#define ES_SELECTOR 2
-#define SS_SELECTOR 3
+#define DS_SELECTOR 0b000
+#define CS_SELECTOR 0b001
+#define ES_SELECTOR 0b010
+#define SS_SELECTOR 0b011
+#define NO_SELECTOR 0b100
 
 typedef struct
 {
@@ -129,7 +130,7 @@ typedef struct
 
     unsigned short ip;
 
-    unsigned int segment_selector : 2;
+    unsigned int segment_selector : 3;
 } processor_t;
 
 processor_t *processor_new();

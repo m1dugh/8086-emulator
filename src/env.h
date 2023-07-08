@@ -20,4 +20,27 @@
 #define STACK_SEGMENT 0x5000
 #define DATA_SEGMENT 0x2000
 
+#define AX 0b000
+#define CX 0b001
+#define DX 0b010
+#define BX 0b011
+#define SP 0b100
+#define BP 0b101
+#define SI 0b110
+#define DI 0b111
+
+#define AL 0b000
+#define CL 0b001
+#define DL 0b010
+#define BL 0b011
+#define AH 0b100
+#define CH 0b101
+#define DH 0b110
+#define BH 0b111
+
+#define ES 0b00
+#define CS 0b01
+#define SS 0b10
+#define DS 0b11
+
 #endif // !EMULATOR_ENV_H

@@ -10,11 +10,11 @@ void add_rm_reg_exec(emulator_t *emulator, params_t params)
         unsigned short rm_val = emulator_get_rm(emulator, params);
         unsigned int res = reg_val + rm_val;
         proc->flags.a = (reg_val & 0x8) && (rm_val & 0x8);
-        proc->flags.c = (res & 0x10000) > 0;
-        proc->flags.s = ((res & 0x8000) >> (sizeof(unsigned short) - 1)) > 0;
+        proc->flags.c = get_carry(res);
+        proc->flags.s = get_sign(res);
         proc->flags.o = ((reg_val & 0x8000) == (rm_val & 0x8000))
                         && ((reg_val & 0x8000) != (res & 0x8000));
-        proc->flags.z = (res & 0xFFFF) == 0;
+        proc->flags.z = get_zero(res);
         if (params.d)
         {
             emulator_set_reg(emulator, params.reg, res);

@@ -1,6 +1,7 @@
 #include <malloc.h>
 #include <stdio.h>
 #include "arithmetic.h"
+#include "implementation/cmp.h"
 #include "utils.h"
 
 instruction_t *add_rm_with_reg(binary_stream_t *data)
@@ -22,7 +23,7 @@ char *cmp_rm_reg(binary_stream_t *data)
     return format_sized_dw_rm_to_reg("cmp", data, &params);
 }
 
-char *cmp_immediate_rm(binary_stream_t *data)
+instruction_t *cmp_immediate_rm(binary_stream_t *data)
 {
     params_t params;
     if (extract_dw_mod_reg_rm(data, &params) != 0)
@@ -32,8 +33,10 @@ char *cmp_immediate_rm(binary_stream_t *data)
 
     char *rm_value = get_rm(data, &params);
     unsigned short extracted = extract_data_sw(data, &params);
+    params.data = extracted;
     char *instruction;
     int signed_val = 1;
+    instruction_cb_t cb = NULL;
     switch (params.reg)
     {
         case 0b000:
@@ -69,6 +72,7 @@ char *cmp_immediate_rm(binary_stream_t *data)
             {
                 instruction = "cmp byte";
             }
+            cb = cmp_immediate_rm_exec;
             break;
         default:
             return NULL;
@@ -85,8 +89,7 @@ char *cmp_immediate_rm(binary_stream_t *data)
         snprintf(res, 50, "%s %s, %04x", instruction, rm_value, extracted);
     }
     free(rm_value);
-
-    return res;
+    RET_INSTRUCTION(res, data, params, cb);
 }
 
 char *inc_rm(binary_stream_t *data)

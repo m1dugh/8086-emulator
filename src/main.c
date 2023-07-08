@@ -114,11 +114,11 @@ int read_header(FILE *stream, struct exec_header *header)
 instruction_t *find_4_len_instruction(
     unsigned char instruction, binary_stream_t *stream)
 {
-    /*switch (instruction)
+    switch (instruction)
     {
         case 0b1011:
             return mov_immediate_to_reg(stream);
-    }*/
+    }
     return NULL;
 }
 
@@ -161,9 +161,9 @@ instruction_t *find_6_len_instruction(
         case 0b001100:
             return xor_rm_reg(stream);
             /*case 0b001110:
-                return cmp_rm_reg(stream);
-            case 0b100000:
-                return cmp_immediate_rm(stream);*/
+                return cmp_rm_reg(stream);*/
+        case 0b100000:
+            return cmp_immediate_rm(stream);
         case 0b100010:
             return mov_rm_to_reg(stream);
             /*case 0b110100:
@@ -315,12 +315,12 @@ instruction_t *next_instruction(binary_stream_t *stream)
 void execute_instructions(
     instruction_t *data, unsigned long address, emulator_t *emulator)
 {
+    data->callback(emulator, data->params);
     char *proc_display = processor_display(emulator->processor);
     printf("%s ", proc_display);
     free(proc_display);
     printf_instruction(
         address, data->instruction, data->instruction_len, data->display);
-    data->callback(emulator, data->params);
 }
 
 void load_text(struct exec_header header, FILE *f, emulator_t *emulator)
@@ -360,9 +360,9 @@ extern char **environ;
 
 int main(int argc, char **argv)
 {
-    if (argc != 2)
+    if (argc < 2)
     {
-        errx(-1, "Usage: %s <file>", argv[0]);
+        errx(-1, "Usage: %s <file> <arg1> ... <argn>", argv[0]);
     }
 
     FILE *f = fopen(argv[1], "rb");

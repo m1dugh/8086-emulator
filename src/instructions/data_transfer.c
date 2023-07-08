@@ -19,7 +19,7 @@ char *mov_immediate_to_rm(binary_stream_t *data)
     return format_w_immediate_to_rm("mov", data, &params);
 }
 
-char *mov_immediate_to_reg(binary_stream_t *data)
+instruction_t *mov_immediate_to_reg(binary_stream_t *data)
 {
     params_t params;
     if (extract_w(data, &params) != 0)
@@ -27,11 +27,12 @@ char *mov_immediate_to_reg(binary_stream_t *data)
     if (extract_reg(data, &params) != 0)
         return NULL;
     short val = extract_data(data, &params);
+    params.data = val;
     char *reg_value = get_reg(params.w, params.reg);
     char *res = malloc(50);
 
     snprintf(res, 50, "mov %s, %04x", reg_value, val & 0xffff);
-    return res;
+    RET_INSTRUCTION(res, data, params, mov_immediate_to_reg_exec);
 }
 
 char *mov_mem_to_acc(binary_stream_t *data)
