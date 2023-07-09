@@ -1,9 +1,7 @@
 #include <malloc.h>
 #include <stdio.h>
 #include "data_transfer.h"
-#include "implementation/data_transfer.h"
-#include "implementation/lea.h"
-#include "implementation/mov.h"
+#include "implementation/push.h"
 #include "utils.h"
 
 instruction_t *mov_rm_to_reg(binary_stream_t *data)
@@ -48,10 +46,11 @@ instruction_t *lea(binary_stream_t *data)
     RET_INSTRUCTION(display, data, params, lea_exec);
 }
 
-char *push_reg(binary_stream_t *data)
+instruction_t *push_reg(binary_stream_t *data)
 {
     params_t params;
-    return format_reg("push", data, &params);
+    char *display = format_reg("push", data, &params);
+    RET_INSTRUCTION(display, data, params, push_reg_exec);
 }
 
 char *pop_rm(binary_stream_t *data)

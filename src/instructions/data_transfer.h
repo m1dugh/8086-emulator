@@ -3,6 +3,7 @@
 
 #include "../models/emulator.h"
 #include "../utils/binary_stream.h"
+#include "implementation/data_transfer.h"
 
 // MOV
 instruction_t *mov_rm_to_reg(binary_stream_t *data);
@@ -19,7 +20,7 @@ char *pop_reg(binary_stream_t *stream);
 char *pop_seg_reg(binary_stream_t *stream);
 
 // PUSH
-char *push_reg(binary_stream_t *stream);
+instruction_t *push_reg(binary_stream_t *stream);
 char *push_seg_reg(binary_stream_t *stream);
 
 // LEA

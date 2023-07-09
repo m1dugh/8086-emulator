@@ -52,7 +52,8 @@ typedef struct
 code_segment_t *code_seg_new(unsigned short base_address);
 void code_seg_free(code_segment_t *instructions);
 
-void *code_seg_get(code_segment_t *instructions, unsigned short address);
+instruction_t *code_seg_get(
+    code_segment_t *instructions, unsigned short address);
 int code_seg_set(code_segment_t *instructions, unsigned short address,
     instruction_t *instruction);
 

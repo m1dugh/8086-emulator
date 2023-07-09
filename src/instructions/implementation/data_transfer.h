@@ -3,5 +3,6 @@
 
 #include "lea.h"
 #include "mov.h"
+#include "push.h"
 
 #endif // !EMULATOR_INSTRUCTIONS_IMPLEMENTATION_DATA_TRANSFER_H

@@ -195,9 +195,11 @@ void code_seg_for_each(
         instructions->instructions, (trie_function_t)function, additionals);
 }
 
-void *code_seg_get(code_segment_t *instructions, unsigned short address)
+instruction_t *code_seg_get(
+    code_segment_t *instructions, unsigned short address)
 {
-    return trie_get(instructions->instructions, (unsigned long)address);
+    return (instruction_t *)trie_get(
+        instructions->instructions, (unsigned long)address);
 }
 
 int code_seg_set(code_segment_t *instructions, unsigned short address,

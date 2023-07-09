@@ -1,15 +1,17 @@
 #ifndef INSTRUCTIONS_CONTROL_TRANSFER_H
 #define INSTRUCTIONS_CONTROL_TRANSFER_H
 
+#include "../models/emulator.h"
 #include "../utils/binary_stream.h"
+#include "implementation/control_transfer.h"
 
 // JUMP
 char *jmp_direct_seg(binary_stream_t *data);
 char *jmp_direct_seg_short(binary_stream_t *data);
-char *jnb(binary_stream_t *data);
+instruction_t *jnb(binary_stream_t *data);
 char *jbe(binary_stream_t *data);
 char *jnl_instruction(binary_stream_t *data);
-char *jne(binary_stream_t *data);
+instruction_t *jne(binary_stream_t *data);
 char *jnle(binary_stream_t *data);
 char *jnbe(binary_stream_t *data);
 char *je(binary_stream_t *data);
@@ -24,7 +26,7 @@ char *loopz(binary_stream_t *data);
 char *loopnz(binary_stream_t *data);
 
 // CALL
-char *call_direct_seg(binary_stream_t *data);
+instruction_t *call_direct_seg(binary_stream_t *data);
 
 // INT
 char *interrupt();

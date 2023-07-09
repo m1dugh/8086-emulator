@@ -410,6 +410,7 @@ char *format_byte_displacement(
     {
         effective_address += disp;
     }
+    params->data = effective_address;
     char *res = malloc(50);
     snprintf(res, 50, "%s %04x", val, effective_address);
     return res;
@@ -434,6 +435,7 @@ char *format_word_displacement(
     {
         effective_address += disp;
     }
+    params->data = effective_address;
 
     char *res = malloc(50);
     snprintf(res, 50, "%s %04x", val, effective_address);

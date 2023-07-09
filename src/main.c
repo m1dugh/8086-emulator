@@ -125,19 +125,19 @@ instruction_t *find_4_len_instruction(
 instruction_t *find_5_len_instruction(
     unsigned char instruction, binary_stream_t *stream)
 {
-    /*switch (instruction)
+    switch (instruction)
     {
-        case 0b01000:
+        /*case 0b01000:
             return inc_reg(stream);
         case 0b01001:
-            return dec_reg(stream);
+            return dec_reg(stream);*/
         case 0b01010:
             return push_reg(stream);
-        case 0b01011:
-            return pop_reg(stream);
-        case 0b10010:
-            return xchg_reg(stream);
-    }*/
+            /*case 0b01011:
+                return pop_reg(stream);
+            case 0b10010:
+                return xchg_reg(stream);*/
+    }
     return NULL;
 }
 
@@ -175,9 +175,9 @@ instruction_t *find_6_len_instruction(
 instruction_t *find_7_len_instruction(
     unsigned char instruction, binary_stream_t *stream)
 {
-    /*switch (instruction)
+    switch (instruction)
     {
-        case 0b0000010:
+        /*case 0b0000010:
             return add_immediate_to_acc(stream);
         case 0b0000110:
             return or_immediate_acc(stream);
@@ -200,12 +200,12 @@ instruction_t *find_7_len_instruction(
         case 0b1110110:
             return in_var_port(stream);
         case 0b1111001:
-            return rep_string(stream);
+            return rep_string(stream);*/
         case 0b1111011:
             return test_immediate_rm(stream);
-        case 0b1111111:
-            return inc_rm(stream);
-    }*/
+            /*case 0b1111111:
+                return inc_rm(stream);*/
+    }
     // return get_string_instruction(instruction, stream);
     return NULL;
 }
@@ -218,14 +218,14 @@ instruction_t *find_8_len_instruction(
         /*case 0b01110010:
             return jb(stream);
         case 0b01111000:
-            return js(stream);
+            return js(stream);*/
         case 0b01110011:
             return jnb(stream);
-        case 0b01110100:
-            return je(stream);
+        /*case 0b01110100:
+            return je(stream);*/
         case 0b01110101:
             return jne(stream);
-        case 0b01110110:
+        /*case 0b01110110:
             return jbe(stream);
         case 0b01110111:
             return jnbe(stream);
@@ -239,31 +239,31 @@ instruction_t *find_8_len_instruction(
             return jnle(stream);*/
         case 0b10001101:
             return lea(stream);
-            /*case 0b10001111:
-                return pop_rm(stream);
-            case 0b10011000:
-                return cbw();
-            case 0b10011001:
-                return cwd();
-            case 0b11001100:
-                return interrupt();
-            case 0b11001101:
-                return interrupt_with_code(stream);
-            case 0b11100000:
-                return loopnz(stream);
-            case 0b11100001:
-                return loopz(stream);
-            case 0b11100010:
-                return loop(stream);
-            case 0b11101000:
-                return call_direct_seg(stream);
-            case 0b11101001:
-                return jmp_direct_seg(stream);
-            case 0b11101011:
-                return jmp_direct_seg_short(stream);
-            case 0b11110100:
-                return hlt();
-            case 0b11001010:
+        /*case 0b10001111:
+            return pop_rm(stream);
+        case 0b10011000:
+            return cbw();
+        case 0b10011001:
+            return cwd();
+        case 0b11001100:
+            return interrupt();
+        case 0b11001101:
+            return interrupt_with_code(stream);
+        case 0b11100000:
+            return loopnz(stream);
+        case 0b11100001:
+            return loopz(stream);
+        case 0b11100010:
+            return loop(stream);*/
+        case 0b11101000:
+            return call_direct_seg(stream);
+        /*case 0b11101001:
+            return jmp_direct_seg(stream);
+        case 0b11101011:
+            return jmp_direct_seg_short(stream);*/
+        case 0b11110100:
+            return hlt();
+            /*case 0b11001010:
             case 0b11000010:
                 return ret_data(stream);
             case 0b11001011:
@@ -315,12 +315,15 @@ instruction_t *next_instruction(binary_stream_t *stream)
 void execute_instructions(
     instruction_t *data, unsigned long address, emulator_t *emulator)
 {
-    data->callback(emulator, data->params);
+    unsigned short old_ip = emulator->processor->ip;
     char *proc_display = processor_display(emulator->processor);
     printf("%s ", proc_display);
     free(proc_display);
     printf_instruction(
         address, data->instruction, data->instruction_len, data->display);
+    if (old_ip == emulator->processor->ip)
+        emulator->processor->ip += data->instruction_len;
+    data->callback(emulator, data->params);
 }
 
 void load_text(struct exec_header header, FILE *f, emulator_t *emulator)
@@ -333,6 +336,8 @@ void load_text(struct exec_header header, FILE *f, emulator_t *emulator)
         if (res == NULL && !bs_finished(stream))
         {
             fflush(stdout);
+            fprintf(stderr, "Instruction not found at address %04x\n",
+                stream->current_address);
             // errx(-1, "Instruction not found");
             break;
         }
@@ -389,10 +394,19 @@ int main(int argc, char **argv)
 
     printf("%s IP \n", PROCESSOR_HEADER);
 
-    code_seg_for_each(
-        emulator->code, (code_seg_cb_t)execute_instructions, emulator);
-
+    instruction_t *instruction
+        = code_seg_get(emulator->code, emulator->processor->ip);
+    for (; instruction != NULL;
+         instruction = code_seg_get(emulator->code, emulator->processor->ip))
+    {
+        execute_instructions(instruction, emulator->processor->ip, emulator);
+    }
     printf("===== END OF .TEXT SECTION =====\n");
+
+    printf("ip: %04x, instruction: %p, max address: %04lx\n",
+        emulator->processor->ip,
+        code_seg_get(emulator->code, emulator->processor->ip),
+        trie_last_address(emulator->code->instructions));
 
     emulator_free(emulator);
 

@@ -2,6 +2,7 @@
 #include <string.h>
 #include "logic.h"
 #include "implementation/logic.h"
+#include "implementation/test.h"
 #include "utils.h"
 
 instruction_t *xor_rm_reg(binary_stream_t *data)
@@ -34,7 +35,7 @@ char *test_rm_reg(binary_stream_t *data)
     return format_w_rm_to_reg("test", data, &params);
 }
 
-char *test_immediate_rm(binary_stream_t *data)
+instruction_t *test_immediate_rm(binary_stream_t *data)
 {
     params_t params;
     if (extract_w_mod_reg_rm(data, &params) != 0)
@@ -44,6 +45,7 @@ char *test_immediate_rm(binary_stream_t *data)
 
     char *res = malloc(50);
     char *rm_value = get_rm(data, &params);
+    instruction_cb_t cb = NULL;
     switch (params.reg)
     {
         case 0b000:
@@ -53,6 +55,7 @@ char *test_immediate_rm(binary_stream_t *data)
             else
                 snprintf(res, 50, "test byte %s, %04x", rm_value,
                     extract_data(data, &params));
+            cb = test_immediate_rm_exec;
             break;
         case 0b010:
             snprintf(res, 50, "not %s", rm_value);
@@ -77,7 +80,7 @@ char *test_immediate_rm(binary_stream_t *data)
     }
 
     free(rm_value);
-    return res;
+    RET_INSTRUCTION(res, data, params, cb);
 }
 
 char *shift_left(binary_stream_t *data)

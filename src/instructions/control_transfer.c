@@ -1,12 +1,14 @@
 #include <malloc.h>
 #include <stdio.h>
 #include "control_transfer.h"
+#include "implementation/call.h"
 #include "utils.h"
 
-char *jnb(binary_stream_t *data)
+instruction_t *jnb(binary_stream_t *data)
 {
     params_t params;
-    return format_byte_displacement("jnb", data, &params);
+    char *display = format_byte_displacement("jnb", data, &params);
+    RET_INSTRUCTION(display, data, params, jnb_exec);
 }
 
 char *js(binary_stream_t *data)
@@ -21,10 +23,11 @@ char *jb(binary_stream_t *data)
     return format_byte_displacement("jb", data, &params);
 }
 
-char *jne(binary_stream_t *data)
+instruction_t *jne(binary_stream_t *data)
 {
     params_t params;
-    return format_byte_displacement("jne", data, &params);
+    char *display = format_byte_displacement("jne", data, &params);
+    RET_INSTRUCTION(display, data, params, jne_exec);
 }
 
 char *jnl_instruction(binary_stream_t *data)
@@ -69,10 +72,11 @@ char *jle(binary_stream_t *data)
     return format_byte_displacement("jle", data, &params);
 }
 
-char *call_direct_seg(binary_stream_t *data)
+instruction_t *call_direct_seg(binary_stream_t *data)
 {
     params_t params;
-    return format_word_displacement("call", data, &params);
+    char *display = format_word_displacement("call", data, &params);
+    RET_INSTRUCTION(display, data, params, call_direct_seg_exec);
 }
 
 char *jmp_direct_seg(binary_stream_t *data)

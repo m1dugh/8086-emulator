@@ -3,6 +3,7 @@
 
 #include "../models/emulator.h"
 #include "../utils/binary_stream.h"
+#include "implementation/logic.h"
 
 // NOT
 char *invert(binary_stream_t *data);
@@ -29,7 +30,7 @@ char *xor_immediate_acc(binary_stream_t *data);
 
 // TEST
 char *test_rm_reg(binary_stream_t *data);
-char *test_immediate_rm(binary_stream_t *data);
+instruction_t *test_immediate_rm(binary_stream_t *data);
 char *test_immediate_acc(binary_stream_t *data);
 
 #endif // !INSTRUCTIONS_LOGIC_H
