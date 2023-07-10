@@ -100,4 +100,6 @@ void emulator_stack_set(
 instruction_t *emulator_load_instruction(emulator_t *emulator);
 void emulator_load_data(emulator_t *emulator);
 
+void emulator_syscall(emulator_t *emulator, unsigned short opcode);
+
 #endif // !EMULATOR_MODELS_EMULATOR_H

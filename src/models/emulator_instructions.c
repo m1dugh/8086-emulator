@@ -137,10 +137,10 @@ instruction_t *find_8_len_instruction(
         case 0b10011001:
             return cwd();
         case 0b11001100:
-            return interrupt();
+            return interrupt();*/
         case 0b11001101:
             return interrupt_with_code(stream);
-        case 0b11100000:
+        /*case 0b11100000:
             return loopnz(stream);
         case 0b11100001:
             return loopz(stream);

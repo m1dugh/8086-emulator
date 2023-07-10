@@ -4,6 +4,7 @@
 #include "implementation/call.h"
 #include "implementation/cmp.h"
 #include "implementation/dec.h"
+#include "implementation/push.h"
 #include "implementation/sub.h"
 #include "utils.h"
 
@@ -131,6 +132,7 @@ instruction_t *inc_rm(binary_stream_t *data)
             break;
         case 0b110:
             snprintf(res, 50, "push %s", rm_value);
+            cb = push_rm_exec;
             break;
         default:
             return NULL;

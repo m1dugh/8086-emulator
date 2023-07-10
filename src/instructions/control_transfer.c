@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include "control_transfer.h"
 #include "implementation/call.h"
+#include "implementation/interrupts.h"
 #include "implementation/jump.h"
 #include "utils.h"
 
@@ -103,13 +104,14 @@ char *interrupt()
     return res;
 }
 
-char *interrupt_with_code(binary_stream_t *data)
+instruction_t *interrupt_with_code(binary_stream_t *data)
 {
     unsigned char opcode = extract_byte(data);
+    params_t params = {.data_low = opcode};
     char *res = malloc(10);
     snprintf(res, 10, "int %x", opcode);
 
-    return res;
+    RET_INSTRUCTION(res, data, params, interrupt_with_code_exec);
 }
 
 char *ret_data(binary_stream_t *data)

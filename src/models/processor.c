@@ -22,16 +22,18 @@ processor_t *processor_new()
 // 45 corresponds to the number of bytes to print
 // 8 registers printed on 4 bytes each and flags register
 // space separated and an additional null byte
-#define PROCESSOR_DISPLAY_LEN 65
+#define PROCESSOR_DISPLAY_LEN_LONG 65
+#define PROCESSOR_DISPLAY_LEN 45
+#define PROC_DISPLAY_FORMAT_LONG \
+    "%04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %c%c%c%c"
+#define PROC_DISPLAY_FORMAT "%04x %04x %04x %04x %04x %04x %04x %04x %c%c%c%c"
 
 char *processor_display(processor_t *processor)
 {
     char *res = calloc(PROCESSOR_DISPLAY_LEN, sizeof(char));
-    snprintf(res, PROCESSOR_DISPLAY_LEN,
-        "%04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %c%c%c%c",
-        processor->ax, processor->bx, processor->cx, processor->dx,
-        processor->sp, processor->bp, processor->si, processor->di,
-        processor->cs, processor->ss, processor->ds, processor->es, '?',
+    snprintf(res, PROCESSOR_DISPLAY_LEN, PROC_DISPLAY_FORMAT, processor->ax,
+        processor->bx, processor->cx, processor->dx, processor->sp,
+        processor->bp, processor->si, processor->di, '?',
         processor->flags.s ? 'S' : '-', processor->flags.z ? 'Z' : '-',
         processor->flags.c ? 'C' : '-');
 

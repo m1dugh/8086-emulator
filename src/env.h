@@ -8,8 +8,10 @@
 #define MAX_ADDRESS 0xffff
 #define MEM_SIZE MAX_ADDRESS + 1
 #define STACK_SIZE MEM_SIZE
-#define PROCESSOR_HEADER \
+#define PROCESSOR_HEADER_LONG \
     " AX   BX   CX   DX   SP   BP   SI   DI   CS   SS   DS   ES  FLAGS"
+
+#define PROCESSOR_HEADER " AX   BX   CX   DX   SP   BP   SI   DI  FLAGS"
 
 #define TO_ADDR(val) (unsigned short)(unsigned long)val
 #define TO_BYTE(val) (unsigned char)(unsigned long)val

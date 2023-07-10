@@ -131,15 +131,18 @@ void emulator_prepare(
         vector_push(arg_ptrs, TO_VOID_PTR(emulator->processor->sp));
     }
     emulator_stack_push(emulator, 0);
-    emulator_stack_push(emulator, (unsigned short)argc & 0xFFFF);
-
-    /*for(size_t i = 0; i < vector_len(env_ptrs);i++) {
+    for (size_t i = 0; i < vector_len(env_ptrs); i++)
+    {
         emulator_stack_push(emulator, TO_ADDR(vector_get(env_ptrs, i)));
     }
+
     emulator_stack_push(emulator, 0);
-    for(size_t i = 0; i < vector_len(arg_ptrs);i++) {
+    for (size_t i = 0; i < vector_len(arg_ptrs); i++)
+    {
         emulator_stack_push(emulator, TO_ADDR(vector_get(arg_ptrs, i)));
-    }*/
+    }
+    emulator_stack_push(emulator, 0);
+    emulator_stack_push(emulator, (unsigned short)argc & 0xFFFF);
 
     vector_free(env_ptrs);
     vector_free(arg_ptrs);

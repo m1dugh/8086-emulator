@@ -4,5 +4,6 @@
 #include "../../models/emulator.h"
 
 void push_reg_exec(emulator_t *emulator, params_t params);
+void push_rm_exec(emulator_t *emulator, params_t params);
 
 #endif // !EMULATOR_INSTRUCTIONS_IMPLEMENTATION_PUSH_H

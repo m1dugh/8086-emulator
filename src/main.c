@@ -55,9 +55,6 @@ int main(int argc, char **argv)
     char *env[] = {0};
     emulator_prepare(emulator, env, argc - 1, argv + 1);
 
-    emulator_stack_display(emulator);
-    mem_seg_display(emulator->data, "DATA");
-
     printf("%s IP \n", PROCESSOR_HEADER);
 
     instruction_t *instruction = emulator_load_instruction(emulator);
@@ -75,6 +72,9 @@ int main(int argc, char **argv)
             fprintf(stderr, "%02x", emulator->stream->instruction_buffer[i]);
         }
         fprintf(stderr, "\n");
+        emulator_stack_display(emulator);
+        mem_seg_display(emulator->data, "DATA");
+
         res = -1;
         goto exit;
     }
