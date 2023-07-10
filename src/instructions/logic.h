@@ -9,7 +9,7 @@
 char *invert(binary_stream_t *data);
 
 // SHIFT
-char *shift_left(binary_stream_t *data);
+instruction_t *shift_left(binary_stream_t *data);
 char *shift_arith_right(binary_stream_t *data);
 char *shift_logic_right(binary_stream_t *data);
 

@@ -11,4 +11,10 @@ unsigned char get_carry_byte(unsigned short value);
 unsigned char get_sign_byte(unsigned char value);
 unsigned char get_zero_byte(unsigned char value);
 
+unsigned char get_overflow_plus_byte(unsigned char v1, unsigned char v2);
+unsigned char get_overflow_minus_byte(unsigned char v1, unsigned char v2);
+
+unsigned char get_overflow_plus(unsigned short v1, unsigned short v2);
+unsigned char get_overflow_minus(unsigned short v1, unsigned short v2);
+
 #endif // !EMULATOR_INSTRUCTIONS_IMPLEMENTATION_UTILS_H

@@ -83,7 +83,7 @@ instruction_t *test_immediate_rm(binary_stream_t *data)
     RET_INSTRUCTION(res, data, params, cb);
 }
 
-char *shift_left(binary_stream_t *data)
+instruction_t *shift_left(binary_stream_t *data)
 {
     params_t params;
     if (extract_dw_mod_reg_rm(data, &params) != 0)
@@ -93,6 +93,7 @@ char *shift_left(binary_stream_t *data)
 
     char *instruction;
     char *rm_value = get_rm(data, &params);
+    instruction_cb_t cb = NULL;
     switch (params.reg)
     {
         case 0b000:
@@ -109,6 +110,7 @@ char *shift_left(binary_stream_t *data)
             break;
         case 0b100:
             instruction = "shl";
+            cb = shl_exec;
             break;
         case 0b101:
             instruction = "shr";
@@ -129,8 +131,7 @@ char *shift_left(binary_stream_t *data)
         snprintf(res, 50, "%s %s, cl", instruction, rm_value);
     }
     free(rm_value);
-
-    return res;
+    RET_INSTRUCTION(res, data, params, cb);
 }
 
 char *and_immediate_acc(binary_stream_t *data)

@@ -16,7 +16,8 @@ DEBUG_TARGET=$(DEBUG_TARGET_DIR)/$(BINARY).debug
 
 SRC_DIR=./src
 
-INSTRUCTION_IMPLEMENTATION=xor mov utils lea add cmp jump test push call processor_control
+INSTRUCTION_IMPLEMENTATION=xor mov utils lea add cmp jump test push call \
+						   processor_control dec shift pop sub
 _INSTRUCTION_IMPL_FULL_PATH=$(addprefix instructions/implementation/, $(INSTRUCTION_IMPLEMENTATION))
 
 INSTRUCTION_IMPL_SECTIONS=data_transfer logic arithmetic control_transfer
@@ -27,7 +28,8 @@ SRC=utils/binary_stream.c main.c instructions/arithmetic.c instructions/logic.c 
 	instructions/data_transfer.c instructions/utils.c utils/format.c \
 	instructions/control_transfer.c instructions/processor_control.c \
 	instructions/string_manipulation.c \
-	models/emulator.c models/instruction.c models/memory_segment.c models/processor.c
+	models/emulator.c models/emulator_instructions.c models/instruction.c \
+	models/memory_segment.c models/processor.c
 SRC := $(SRC) $(addsuffix .c, $(_INSTRUCTION_IMPL_FULL_PATH))
 
 HEADERS=utils/binary_stream.h instructions/arithmetic.h instructions/logic.h \

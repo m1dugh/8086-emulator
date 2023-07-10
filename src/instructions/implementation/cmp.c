@@ -10,8 +10,7 @@ void cmp_immediate_rm_exec(emulator_t *emulator, params_t params)
         unsigned short val2 = params.data;
         unsigned int res = val1 - val2;
         proc->flags.c = get_carry(res);
-        // TODO: implement unsigned overflow flag
-        // proc->flags.o = ;
+        proc->flags.o = get_overflow_minus(val1, val2);
         proc->flags.s = get_sign(res);
         proc->flags.z = get_zero(res);
         // TODO: implement auxiliary flag
@@ -24,8 +23,7 @@ void cmp_immediate_rm_exec(emulator_t *emulator, params_t params)
         unsigned char val2 = params.data_low;
         unsigned short res = val1 - val2;
         proc->flags.c = get_carry_byte(res);
-        // TODO: implement unsigned overflow flag
-        // proc->flags.o = ;
+        proc->flags.o = get_overflow_minus_byte(val1, val2);
         proc->flags.s = get_sign_byte(res);
         proc->flags.z = get_zero_byte(res);
         // TODO: implement auxiliary flag

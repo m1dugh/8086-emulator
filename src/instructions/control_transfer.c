@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include "control_transfer.h"
 #include "implementation/call.h"
+#include "implementation/jump.h"
 #include "utils.h"
 
 instruction_t *jnb(binary_stream_t *data)
@@ -54,16 +55,18 @@ char *jbe(binary_stream_t *data)
     return format_byte_displacement("jbe", data, &params);
 }
 
-char *je(binary_stream_t *data)
+instruction_t *je(binary_stream_t *data)
 {
     params_t params;
-    return format_byte_displacement("je", data, &params);
+    char *display = format_byte_displacement("je", data, &params);
+    RET_INSTRUCTION(display, data, params, je_exec);
 }
 
-char *jl(binary_stream_t *data)
+instruction_t *jl(binary_stream_t *data)
 {
     params_t params;
-    return format_byte_displacement("jl", data, &params);
+    char *display = format_byte_displacement("jl", data, &params);
+    RET_INSTRUCTION(display, data, params, jl_exec);
 }
 
 char *jle(binary_stream_t *data)
@@ -79,16 +82,18 @@ instruction_t *call_direct_seg(binary_stream_t *data)
     RET_INSTRUCTION(display, data, params, call_direct_seg_exec);
 }
 
-char *jmp_direct_seg(binary_stream_t *data)
+instruction_t *jmp_direct_seg(binary_stream_t *data)
 {
     params_t params;
-    return format_word_displacement("jmp", data, &params);
+    char *display = format_word_displacement("jmp", data, &params);
+    RET_INSTRUCTION(display, data, params, jmp_exec);
 }
 
-char *jmp_direct_seg_short(binary_stream_t *data)
+instruction_t *jmp_direct_seg_short(binary_stream_t *data)
 {
     params_t params;
-    return format_byte_displacement("jmp short", data, &params);
+    char *display = format_byte_displacement("jmp short", data, &params);
+    RET_INSTRUCTION(display, data, params, jmp_exec);
 }
 
 char *interrupt()

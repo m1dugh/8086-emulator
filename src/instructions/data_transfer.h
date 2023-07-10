@@ -16,7 +16,7 @@ char *mov_seg_reg_to_rm(binary_stream_t *data);
 
 // POP
 char *pop_rm(binary_stream_t *stream);
-char *pop_reg(binary_stream_t *stream);
+instruction_t *pop_reg(binary_stream_t *stream);
 char *pop_seg_reg(binary_stream_t *stream);
 
 // PUSH

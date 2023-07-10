@@ -7,11 +7,13 @@
 #include "memory_segment.h"
 #include "processor.h"
 
-emulator_t *emulator_new()
+emulator_t *emulator_new(FILE *file)
 {
     emulator_t *res = malloc(sizeof(emulator_t));
     if (res == NULL)
         errx(-1, "malloc error: could not allocate emulator struct");
+
+    res->file = file;
 
     if ((res->processor = processor_new()) == NULL)
         errx(-1, "malloc error: could not allocate processor struct");
@@ -39,6 +41,7 @@ void emulator_free(emulator_t *emulator)
     code_seg_free(emulator->code);
     mem_seg_free(emulator->data);
     mem_seg_free(emulator->extra);
+    bs_free(emulator->stream);
     free(emulator);
 }
 
@@ -607,4 +610,93 @@ void emulator_stack_set(
     emulator_stack_set_byte(emulator, address, value & 0xFF);
     emulator_stack_set_byte(emulator, address - 1, (value & 0xFF00) >> 8);
 #endif
+}
+
+long to_long(char *buffer)
+{
+    long res = buffer[3];
+    for (int i = 2; i >= 0; i--)
+        res = (res << 8) + buffer[i];
+
+    return res;
+}
+
+short to_short(char *buffer)
+{
+    short res = buffer[1];
+    res = (res << 8) + buffer[0];
+    return res;
+}
+
+int emulator_load_header(emulator_t *emulator)
+{
+    FILE *stream = emulator->file;
+    struct exec_header *header = &emulator->header;
+    char c;
+    if ((c = fgetc(stream)) == -1)
+    {
+        return -1;
+    }
+    header->a_magic[0] = (unsigned char)c;
+    if ((c = fgetc(stream)) == -1)
+    {
+        return -1;
+    }
+    header->a_magic[1] = (unsigned char)c;
+
+    if ((c = fgetc(stream)) == -1)
+    {
+        return -1;
+    }
+    header->a_flags = (unsigned char)c;
+
+    if ((c = fgetc(stream)) == -1)
+    {
+        return -1;
+    }
+    header->a_cpu = (unsigned char)c;
+
+    if ((c = fgetc(stream)) == -1)
+    {
+        return -1;
+    }
+    header->a_hdrlen = (unsigned char)c;
+
+    unsigned char effective_len = header->a_hdrlen - 5;
+    char *buffer = (char *)malloc(effective_len);
+    for (unsigned char i = 0; i < effective_len; i++)
+    {
+        if ((c = fgetc(stream)) == -1)
+        {
+            return -1;
+        }
+        buffer[i] = c;
+    }
+
+    size_t current_index = 0;
+    header->a_unused = (unsigned char)buffer[current_index++];
+    header->a_version = to_short(buffer + current_index);
+    current_index += 2;
+    header->a_text = to_long(buffer + current_index);
+    current_index += 4;
+
+    header->a_data = to_long(buffer + current_index);
+    current_index += 4;
+    // TODO: implement full header.
+
+    free(buffer);
+
+    emulator->stream = bs_new(emulator->file, emulator->header.a_text);
+    return 0;
+}
+
+void emulator_load_data(emulator_t *emulator)
+{
+    fseek(emulator->file, emulator->header.a_hdrlen + emulator->header.a_text,
+        SEEK_SET);
+    for (long i = 0; i < emulator->header.a_data; i++)
+    {
+        unsigned char val = fgetc(emulator->file);
+        emulator_push_data(emulator, val);
+    }
 }

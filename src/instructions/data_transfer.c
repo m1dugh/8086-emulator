@@ -70,10 +70,11 @@ char *pop_rm(binary_stream_t *data)
     return res;
 }
 
-char *pop_reg(binary_stream_t *data)
+instruction_t *pop_reg(binary_stream_t *data)
 {
     params_t params;
-    return format_reg("pop", data, &params);
+    char *display = format_reg("pop", data, &params);
+    RET_INSTRUCTION(display, data, params, pop_reg_exec);
 }
 
 char *in_out_port(char *val, binary_stream_t *data, int fixed)

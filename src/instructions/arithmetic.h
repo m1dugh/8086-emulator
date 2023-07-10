@@ -4,6 +4,7 @@
 #include "../models/instruction.h"
 #include "../utils/binary_stream.h"
 #include "implementation/arithmetic.h"
+#include "implementation/call.h"
 #include "utils.h"
 
 // ADD
@@ -24,12 +25,12 @@ char *sub_immediate_to_acc(binary_stream_t *data);
 char *ssb_rm_with_reg(binary_stream_t *data);
 
 // INC
-char *inc_rm(binary_stream_t *data);
+instruction_t *inc_rm(binary_stream_t *data);
 char *inc_reg(binary_stream_t *data);
 
 // DEC
 char *dec_rm(binary_stream_t *data);
-char *dec_reg(binary_stream_t *data);
+instruction_t *dec_reg(binary_stream_t *data);
 
 // NEG
 char *neg(binary_stream_t *data);

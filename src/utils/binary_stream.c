@@ -161,3 +161,10 @@ int bs_unsave(binary_stream_t *stream)
 
     return 0;
 }
+
+int bs_goto(binary_stream_t *stream, size_t position, size_t offset)
+{
+    stream->current_address = position;
+    stream->instruction_buffer_len = 0;
+    return fseek(stream->_stream, position + offset, SEEK_SET);
+}

@@ -1,23 +1,50 @@
 #ifndef EMULATOR_MODELS_EMULATOR_H
 #define EMULATOR_MODELS_EMULATOR_H
 
+#include "../utils/binary_stream.h"
 #include "../utils/trie.h"
 #include "instruction.h"
 #include "memory_segment.h"
 #include "processor.h"
 
+struct exec_header
+{
+    unsigned char a_magic[2]; /* magic number */
+    unsigned char a_flags;    /* flags */
+    unsigned char a_cpu;      /* cpu id */
+    unsigned char a_hdrlen;   /* length of header */
+    unsigned char a_unused;   /* reserved */
+    unsigned short a_version; /* version stamp (not used) */
+    long a_text;              /* The length of the text segment */
+    long a_data;              /* The length of the data segment */
+    long a_bss;               /* The length of the bss segment */
+    long a_entry;             /* The entry point */
+    long a_total;             /* The total memory allocated */
+    long a_syms;              /* size of symbol table */
+
+    /* LONG VERSION */
+    long a_trsize; /* text relocation size */
+    long a_drsize; /* data relocation size */
+    long a_tbase;  /* text relocation base */
+    long a_dbase;  /* data relocation base */
+};
+
 typedef struct emulator_t
 {
+    binary_stream_t *stream;
     processor_t *processor;
     memory_segment_t *extra;
     unsigned char stack[STACK_SIZE];
     code_segment_t *code;
     memory_segment_t *data;
+    struct exec_header header;
+    FILE *file;
 } emulator_t;
 
-emulator_t *emulator_new();
+emulator_t *emulator_new(FILE *file);
 void emulator_free(emulator_t *);
 
+int emulator_load_header(emulator_t *emulator);
 void emulator_prepare(emulator_t *, char **environment, int argc, char **argv);
 
 unsigned short emulator_push_data(emulator_t *, unsigned char);
@@ -69,5 +96,8 @@ void emulator_stack_set_byte(
     emulator_t *emulator, unsigned short address, unsigned char value);
 void emulator_stack_set(
     emulator_t *emulator, unsigned short address, unsigned short value);
+
+instruction_t *emulator_load_instruction(emulator_t *emulator);
+void emulator_load_data(emulator_t *emulator);
 
 #endif // !EMULATOR_MODELS_EMULATOR_H

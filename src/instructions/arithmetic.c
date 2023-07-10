@@ -1,7 +1,10 @@
 #include <malloc.h>
 #include <stdio.h>
 #include "arithmetic.h"
+#include "implementation/call.h"
 #include "implementation/cmp.h"
+#include "implementation/dec.h"
+#include "implementation/sub.h"
 #include "utils.h"
 
 instruction_t *add_rm_with_reg(binary_stream_t *data)
@@ -58,6 +61,7 @@ instruction_t *cmp_immediate_rm(binary_stream_t *data)
             break;
         case 0b101:
             instruction = "sub";
+            cb = sub_immediate_rm_exec;
             break;
         case 0b110:
             instruction = "xor";
@@ -92,7 +96,7 @@ instruction_t *cmp_immediate_rm(binary_stream_t *data)
     RET_INSTRUCTION(res, data, params, cb);
 }
 
-char *inc_rm(binary_stream_t *data)
+instruction_t *inc_rm(binary_stream_t *data)
 {
     params_t params;
     if (extract_w_mod_reg_rm(data, &params) != 0)
@@ -101,6 +105,7 @@ char *inc_rm(binary_stream_t *data)
     }
     char *rm_value = get_rm(data, &params);
     char *res = malloc(50);
+    instruction_cb_t cb = NULL;
     switch (params.reg)
     {
         case 0b000:
@@ -111,6 +116,7 @@ char *inc_rm(binary_stream_t *data)
             break;
         case 0b010:
             snprintf(res, 50, "call %s", rm_value);
+            cb = call_indirect_seg_exec;
             break;
         case 0b011:
             // TODO: indirect intersegment
@@ -131,7 +137,8 @@ char *inc_rm(binary_stream_t *data)
     };
 
     free(rm_value);
-    return res;
+
+    RET_INSTRUCTION(res, data, params, cb);
 }
 
 char *inc_reg(binary_stream_t *data)
@@ -140,10 +147,11 @@ char *inc_reg(binary_stream_t *data)
     return format_reg("inc", data, &params);
 }
 
-char *dec_reg(binary_stream_t *data)
+instruction_t *dec_reg(binary_stream_t *data)
 {
     params_t params;
-    return format_reg("dec", data, &params);
+    char *display = format_reg("dec", data, &params);
+    RET_INSTRUCTION(display, data, params, dec_reg_exec);
 }
 
 char *ssb_rm_with_reg(binary_stream_t *data)

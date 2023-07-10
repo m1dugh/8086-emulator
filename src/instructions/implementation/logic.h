@@ -1,6 +1,7 @@
 #ifndef EMULATOR_INSTRUCTIONS_IMPLEMENTATION_LOGIC_H
 #define EMULATOR_INSTRUCTIONS_IMPLEMENTATION_LOGIC_H
 
+#include "shift.h"
 #include "test.h"
 #include "xor.h"
 

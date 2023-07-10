@@ -43,4 +43,6 @@ size_t bs_read_bytes(binary_stream_t *stream);
 
 int bs_finished(binary_stream_t *stream);
 
+int bs_goto(binary_stream_t *stream, size_t position, size_t offset);
+
 #endif /* UTILS_BS_H */

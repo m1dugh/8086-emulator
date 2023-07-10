@@ -3,5 +3,7 @@
 
 #include "add.h"
 #include "cmp.h"
+#include "dec.h"
+#include "sub.h"
 
 #endif // !EMULATOR_INSTRUCTIONS_IMPLEMENTATION_ARITHMETIC_H
