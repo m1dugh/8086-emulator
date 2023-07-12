@@ -12,26 +12,17 @@
 void execute_instructions(
     instruction_t *data, unsigned long address, emulator_t *emulator)
 {
-    unsigned short old_ip = emulator->processor->ip;
-    char *proc_display = processor_display(emulator->processor);
-    printf("%s ", proc_display);
-    free(proc_display);
-    printf_instruction(
-        address, data->instruction, data->instruction_len, data->display);
-
-    if (old_ip == emulator->processor->ip)
-        emulator->processor->ip += data->instruction_len;
-    data->callback(emulator, data->params);
-}
-
-void load_data(struct exec_header header, FILE *f, emulator_t *emulator)
-{
-    fseek(f, header.a_hdrlen + header.a_text, SEEK_SET);
-    for (long i = 0; i < header.a_data; i++)
+    if (emulator->verbose)
     {
-        unsigned char val = fgetc(f);
-        emulator_push_data(emulator, val);
+        char *proc_display = processor_display(emulator->processor);
+        printf("%s ", proc_display);
+        free(proc_display);
+        printf_instruction(
+            address, data->instruction, data->instruction_len, data->display);
     }
+
+    emulator->processor->ip += data->instruction_len;
+    data->callback(emulator, data->params);
 }
 
 extern char **environ;
@@ -52,12 +43,14 @@ int main(int argc, char **argv)
     emulator_t *emulator = emulator_new(f);
     emulator_load_header(emulator);
     emulator_load_data(emulator);
-    char *env[] = {0};
+    char *env_str = "PATH=/usr:/usr/bin";
+    char *env[] = {env_str, NULL};
     emulator_prepare(emulator, env, argc - 1, argv + 1);
 
     printf("%s IP \n", PROCESSOR_HEADER);
 
     instruction_t *instruction = emulator_load_instruction(emulator);
+    mem_seg_display(emulator->data, "DATA");
     for (; instruction != NULL;
          instruction = emulator_load_instruction(emulator))
     {
@@ -73,7 +66,6 @@ int main(int argc, char **argv)
         }
         fprintf(stderr, "\n");
         emulator_stack_display(emulator);
-        mem_seg_display(emulator->data, "DATA");
 
         res = -1;
         goto exit;

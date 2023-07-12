@@ -13,6 +13,7 @@ emulator_t *emulator_new(FILE *file)
     if (res == NULL)
         errx(-1, "malloc error: could not allocate emulator struct");
 
+    res->verbose = 1;
     res->file = file;
 
     if ((res->processor = processor_new()) == NULL)
@@ -48,22 +49,22 @@ void emulator_free(emulator_t *emulator)
 void emulator_stack_push(emulator_t *emulator, unsigned short value)
 {
 #if BIG_ENDIAN
-    emulator->stack[--emulator->processor->sp] = (value & 0xFF00) >> 8;
     emulator->stack[--emulator->processor->sp] = value & 0xFF;
+    emulator->stack[--emulator->processor->sp] = (value & 0xFF00) >> 8;
 #else
-    emulator->stack[--emulator->processor->sp] = value & 0xFF;
     emulator->stack[--emulator->processor->sp] = (value & 0xFF00) >> 8;
+    emulator->stack[--emulator->processor->sp] = value & 0xFF;
 #endif
 }
 
 unsigned short emulator_stack_pop(emulator_t *emulator)
 {
 #if BIG_ENDIAN
-    unsigned char low = emulator->stack[emulator->processor->sp++];
     unsigned char high = emulator->stack[emulator->processor->sp++];
+    unsigned char low = emulator->stack[emulator->processor->sp++];
 #else
-    unsigned char high = emulator->stack[emulator->processor->sp++];
     unsigned char low = emulator->stack[emulator->processor->sp++];
+    unsigned char high = emulator->stack[emulator->processor->sp++];
 #endif
     return (high << 8) + low;
 }
@@ -114,8 +115,6 @@ void emulator_prepare(
         vector_push(env_ptrs, TO_VOID_PTR(emulator->processor->sp));
     }
 
-    emulator_stack_push(emulator, 0);
-
     vector_t *arg_ptrs = vector_new();
     for (int i = argc; i > 0; i--)
     {
@@ -141,7 +140,7 @@ void emulator_prepare(
     {
         emulator_stack_push(emulator, TO_ADDR(vector_get(arg_ptrs, i)));
     }
-    emulator_stack_push(emulator, 0);
+
     emulator_stack_push(emulator, (unsigned short)argc & 0xFFFF);
 
     vector_free(env_ptrs);
@@ -276,6 +275,7 @@ unsigned int emulator_get_physical_addr(emulator_t *emulator, params_t params)
     unsigned short overriden_segment;
     unsigned short default_segment;
     unsigned char override_segment = 1;
+
     switch (emulator->processor->segment_selector)
     {
         case SS_SELECTOR:
@@ -324,6 +324,7 @@ unsigned int emulator_get_physical_addr(emulator_t *emulator, params_t params)
             if (params.mod == 0b00)
             {
                 effective_address = (unsigned short)disp;
+                override_segment = 0;
                 default_segment = emulator->processor->ds;
             }
             else
@@ -572,7 +573,8 @@ int emulator_stack_get_relative_address(
     emulator_t *emulator, unsigned int address)
 {
     if (address > ((unsigned int)(emulator->processor->ss << 4) + MAX_ADDRESS)
-        || address < ((unsigned int)(emulator->processor->ss << 4)))
+        || address < ((unsigned int)(emulator->processor->ss << 4)
+                      + emulator->processor->sp))
     {
         return -1;
     }
@@ -582,17 +584,20 @@ int emulator_stack_get_relative_address(
 unsigned char emulator_stack_get_byte(
     emulator_t *emulator, unsigned short address)
 {
+    if (address < emulator->processor->sp)
+        errx(-1, "could not access stack at address %04x, as sp=%04x", address,
+            emulator->processor->sp);
     return emulator->stack[address];
 }
 
 unsigned short emulator_stack_get(emulator_t *emulator, unsigned short address)
 {
 #if BIG_ENDIAN
-    unsigned char high = emulator_stack_get_byte(emulator, address + 1);
-    unsigned char low = emulator_stack_get_byte(emulator, address);
-#else
     unsigned char low = emulator_stack_get_byte(emulator, address + 1);
     unsigned char high = emulator_stack_get_byte(emulator, address);
+#else
+    unsigned char high = emulator_stack_get_byte(emulator, address + 1);
+    unsigned char low = emulator_stack_get_byte(emulator, address);
 #endif
     return (high << 8) + low;
 }
@@ -608,26 +613,25 @@ void emulator_stack_set(
 {
 #if BIG_ENDIAN
     emulator_stack_set_byte(emulator, address, (value & 0xFF00) >> 8);
-    emulator_stack_set_byte(emulator, address - 1, value & 0xFF);
+    emulator_stack_set_byte(emulator, address + 1, value & 0xFF);
 #else
     emulator_stack_set_byte(emulator, address, value & 0xFF);
-    emulator_stack_set_byte(emulator, address - 1, (value & 0xFF00) >> 8);
+    emulator_stack_set_byte(emulator, address + 1, (value & 0xFF00) >> 8);
 #endif
 }
 
-long to_long(char *buffer)
+unsigned long to_long(unsigned char *buffer)
 {
-    long res = buffer[3];
-    for (int i = 2; i >= 0; i--)
-        res = (res << 8) + buffer[i];
-
+    unsigned long res = 0;
+    for (unsigned char i = 4; i > 0; i--)
+        res = (res << 8) | buffer[i - 1];
     return res;
 }
 
-short to_short(char *buffer)
+unsigned short to_short(unsigned char *buffer)
 {
-    short res = buffer[1];
-    res = (res << 8) + buffer[0];
+    unsigned short res = buffer[1];
+    res = (res << 8) | buffer[0];
     return res;
 }
 
@@ -666,14 +670,14 @@ int emulator_load_header(emulator_t *emulator)
     header->a_hdrlen = (unsigned char)c;
 
     unsigned char effective_len = header->a_hdrlen - 5;
-    char *buffer = (char *)malloc(effective_len);
+    unsigned char *buffer = (unsigned char *)malloc(effective_len);
     for (unsigned char i = 0; i < effective_len; i++)
     {
         if ((c = fgetc(stream)) == -1)
         {
             return -1;
         }
-        buffer[i] = c;
+        buffer[i] = (unsigned char)c;
     }
 
     size_t current_index = 0;
@@ -685,6 +689,15 @@ int emulator_load_header(emulator_t *emulator)
 
     header->a_data = to_long(buffer + current_index);
     current_index += 4;
+    header->a_bss = to_long(buffer + current_index);
+    current_index += 4;
+    header->a_entry = to_long(buffer + current_index);
+    current_index += 4;
+    header->a_total = to_long(buffer + current_index);
+    current_index += 4;
+    header->a_syms = to_long(buffer + current_index);
+    current_index += 4;
+
     // TODO: implement full header.
 
     free(buffer);
@@ -695,11 +708,19 @@ int emulator_load_header(emulator_t *emulator)
 
 void emulator_load_data(emulator_t *emulator)
 {
-    fseek(emulator->file, emulator->header.a_hdrlen + emulator->header.a_text,
-        SEEK_SET);
-    for (long i = 0; i < emulator->header.a_data; i++)
+    struct exec_header header = emulator->header;
+    printf("hdr len: %d, text len: %lx, data size: %lx, sum: %lx\n",
+        header.a_hdrlen, header.a_text, header.a_data,
+        header.a_text + header.a_hdrlen);
+    fseek(emulator->file, header.a_hdrlen + header.a_text, SEEK_SET);
+    for (unsigned long i = 0; i < header.a_data; i++)
     {
         unsigned char val = fgetc(emulator->file);
         emulator_push_data(emulator, val);
     }
+}
+
+void *emulator_data_addr(emulator_t *emulator, unsigned short address)
+{
+    return &emulator->data->value->values[address];
 }

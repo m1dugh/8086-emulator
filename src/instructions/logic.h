@@ -19,7 +19,7 @@ char *and_immediate_rm(binary_stream_t *data);
 char *and_immediate_acc(binary_stream_t *data);
 
 // OR
-char *or_rm_reg(binary_stream_t *data);
+instruction_t *or_rm_reg(binary_stream_t *data);
 char *or_immediate_rm(binary_stream_t *data);
 char *or_immediate_acc(binary_stream_t *data);
 

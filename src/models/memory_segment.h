@@ -14,7 +14,7 @@ typedef struct
     unsigned short base_address;
 
     /// The vector containing all the data
-    vector_t *value;
+    byte_vector_t *value;
 } memory_segment_t;
 
 memory_segment_t *mem_seg_new(unsigned short base_address);

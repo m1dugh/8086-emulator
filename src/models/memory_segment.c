@@ -10,7 +10,7 @@ memory_segment_t *mem_seg_new(unsigned short base_address)
     memory_segment_t *res = malloc(sizeof(memory_segment_t));
     if (res == NULL)
         errx(-1, "malloc error: could not allocate memory for memory_segment");
-    if ((res->value = vector_new_sized(MEM_SIZE)) == NULL)
+    if ((res->value = byte_vector_new_sized(MEM_SIZE)) == NULL)
         errx(-1, "malloc error: could not allocate memory for vector for "
                  "memory_segment");
 
@@ -20,13 +20,13 @@ memory_segment_t *mem_seg_new(unsigned short base_address)
 
 void mem_seg_free(memory_segment_t *mem)
 {
-    vector_free(mem->value);
+    byte_vector_free(mem->value);
     free(mem);
 }
 
 unsigned int mem_seg_high_addr(memory_segment_t *mem)
 {
-    unsigned short len = (unsigned short)vector_len(mem->value);
+    unsigned short len = (unsigned short)byte_vector_len(mem->value);
     return (mem->base_address << 4) + len;
 }
 
@@ -37,11 +37,11 @@ unsigned int mem_seg_low_addr(memory_segment_t *mem)
 
 unsigned char mem_seg_get(memory_segment_t *mem, unsigned short address)
 {
-    if (address >= vector_len(mem->value))
+    if (address >= byte_vector_len(mem->value))
         errx(-1, "memory_segment: cannot access element at address 0x%02x",
             address);
 
-    return TO_BYTE(vector_get(mem->value, (unsigned long)address));
+    return byte_vector_get(mem->value, (unsigned long)address);
 }
 
 unsigned short mem_seg_get_word(memory_segment_t *mem, unsigned short address)
@@ -59,17 +59,17 @@ unsigned short mem_seg_get_word(memory_segment_t *mem, unsigned short address)
 void mem_seg_set(
     memory_segment_t *mem, unsigned short address, unsigned char value)
 {
-    if (address >= vector_len(mem->value))
+    if (address >= byte_vector_len(mem->value))
         errx(-1, "memory_segment: cannot access element at address 0x%02x",
             address);
 
-    vector_set(mem->value, (unsigned long)address, TO_VOID_PTR(value));
+    byte_vector_set(mem->value, (unsigned long)address, value);
 }
 
 void mem_seg_set_word(
     memory_segment_t *mem, unsigned short address, unsigned short value)
 {
-    if (address >= vector_len(mem->value))
+    if (address >= byte_vector_len(mem->value))
         errx(-1, "memory_segment: cannot access element at address 0x%02x",
             address);
 
@@ -84,8 +84,8 @@ void mem_seg_set_word(
 
 unsigned short mem_seg_push(memory_segment_t *mem, unsigned char data)
 {
-    unsigned short address = vector_len(mem->value);
-    vector_push(mem->value, TO_VOID_PTR(data));
+    unsigned short address = byte_vector_len(mem->value);
+    byte_vector_push(mem->value, data);
     return address;
 }
 
@@ -109,7 +109,7 @@ unsigned short mem_seg_push_str(memory_segment_t *mem, char *str)
 
 int mem_seg_empty(memory_segment_t *mem)
 {
-    return vector_len(mem->value) == 0;
+    return byte_vector_len(mem->value) == 0;
 }
 
 #define DISPLAY_COLUMN_SIZE 16
@@ -122,13 +122,13 @@ void mem_seg_display(memory_segment_t *mem, char *name)
     printf("===== START OF %s SEGMENT =====\n", name);
     char buffer[DISPLAY_COLUMN_SIZE + 1];
     buffer[DISPLAY_COLUMN_SIZE] = 0;
-    for (size_t i = 0; i < vector_len(mem->value);)
+    for (size_t i = 0; i < byte_vector_len(mem->value);)
     {
         unsigned short address = i;
         printf("%04x:", address);
         for (size_t j = 0; j < DISPLAY_COLUMN_SIZE; j++, i++)
         {
-            if (address < vector_len(mem->value))
+            if (address < byte_vector_len(mem->value))
             {
                 unsigned char value = mem_seg_get(mem, address);
                 printf(" %02x", value);
@@ -220,7 +220,8 @@ unsigned int mem_seg_get_low_addr(memory_segment_t *mem)
 
 unsigned int mem_seg_get_high_addr(memory_segment_t *mem)
 {
-    return (mem->base_address << 4) + (unsigned short)vector_len(mem->value);
+    return (mem->base_address << 4)
+           + (unsigned short)byte_vector_len(mem->value);
 }
 
 int mem_set_get_relative_address(memory_segment_t *mem, unsigned int address)

@@ -10,7 +10,7 @@ instruction_t *jmp_direct_seg(binary_stream_t *data);
 instruction_t *jmp_direct_seg_short(binary_stream_t *data);
 instruction_t *jnb(binary_stream_t *data);
 char *jbe(binary_stream_t *data);
-char *jnl_instruction(binary_stream_t *data);
+instruction_t *jnl_instruction(binary_stream_t *data);
 instruction_t *jne(binary_stream_t *data);
 char *jnle(binary_stream_t *data);
 char *jnbe(binary_stream_t *data);
@@ -34,6 +34,6 @@ instruction_t *interrupt_with_code(binary_stream_t *data);
 
 // RET
 char *ret_data(binary_stream_t *data);
-char *ret();
+instruction_t *ret_seg(binary_stream_t *data);
 
 #endif /* !INSTRUCTIONS_CONTROL_TRANSFER_H */

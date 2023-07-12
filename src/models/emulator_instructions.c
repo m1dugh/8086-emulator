@@ -1,4 +1,7 @@
+#include <err.h>
 #include "../instructions/instructions.h"
+#include "../minix/env.h"
+#include "../minix/syscalls.h"
 #include "emulator.h"
 #include "memory_segment.h"
 
@@ -39,9 +42,9 @@ instruction_t *find_6_len_instruction(
     {
         case 0b000000:
             return add_rm_with_reg(stream);
-        /*case 0b000010:
+        case 0b000010:
             return or_rm_reg(stream);
-        case 0b000100:
+        /*case 0b000100:
             return adc_rm_with_reg(stream);
         case 0b000110:
             return ssb_rm_with_reg(stream);
@@ -122,9 +125,9 @@ instruction_t *find_8_len_instruction(
             return jnbe(stream);*/
         case 0b01111100:
             return jl(stream);
-        /*case 0b01111101:
+        case 0b01111101:
             return jnl_instruction(stream);
-        case 0b01111110:
+        /*case 0b01111110:
             return jle(stream);
         case 0b01111111:
             return jnle(stream);*/
@@ -154,13 +157,13 @@ instruction_t *find_8_len_instruction(
             return jmp_direct_seg_short(stream);
         case 0b11110100:
             return hlt();
-            /*case 0b11001010:
-            case 0b11000010:
-                return ret_data(stream);
-            case 0b11001011:
-            case 0b11000011:
-                return ret();
-            case 0b11111100:
+        /*case 0b11001010:
+        case 0b11000010:
+            return ret_data(stream);*/
+        // case 0b11001011:
+        case 0b11000011:
+            return ret_seg(stream);
+            /*case 0b11111100:
                 return cld();
             case 0b11111101:
                 return std_instruction();
@@ -217,4 +220,24 @@ instruction_t *emulator_load_instruction(emulator_t *emulator)
         return NULL;
     code_seg_set(emulator->code, address, instruction);
     return instruction;
+}
+
+void emulator_syscall(emulator_t *emulator)
+{
+    unsigned short opcode
+        = emulator_stack_get(emulator, emulator->processor->bx + 2);
+
+    unsigned short res;
+    switch (opcode)
+    {
+        case SYSCALL_EXIT:
+            res = syscall_exit(emulator);
+            break;
+        case SYSCALL_WRITE:
+            res = syscall_write(emulator);
+            break;
+        default:
+            errx(-1, "Syscall not found: %04x", opcode);
+    }
+    emulator->processor->ax = 0;
 }

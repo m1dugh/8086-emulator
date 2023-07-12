@@ -17,19 +17,20 @@ DEBUG_TARGET=$(DEBUG_TARGET_DIR)/$(BINARY).debug
 SRC_DIR=./src
 
 INSTRUCTION_IMPLEMENTATION=xor mov utils lea add cmp jump test push call \
-						   processor_control dec shift pop sub interrupts
+						   processor_control dec shift pop sub interrupts \
+						   or
 _INSTRUCTION_IMPL_FULL_PATH=$(addprefix instructions/implementation/, $(INSTRUCTION_IMPLEMENTATION))
 
 INSTRUCTION_IMPL_SECTIONS=data_transfer logic arithmetic control_transfer
 _INSTRUCTION_IMPL_SECTIONS_FULL_PATH=$(addprefix instructions/implementation/, $(INSTRUCTION_IMPL_SECTIONS))
 
 SRC=utils/binary_stream.c main.c instructions/arithmetic.c instructions/logic.c \
-	utils/trie.c utils/vector.c \
+	utils/trie.c utils/vector.c utils/byte_vector.c \
 	instructions/data_transfer.c instructions/utils.c utils/format.c \
 	instructions/control_transfer.c instructions/processor_control.c \
 	instructions/string_manipulation.c \
 	models/emulator.c models/emulator_instructions.c models/instruction.c \
-	models/memory_segment.c models/processor.c
+	models/memory_segment.c models/processor.c minix/syscalls.c
 SRC := $(SRC) $(addsuffix .c, $(_INSTRUCTION_IMPL_FULL_PATH))
 
 HEADERS=utils/binary_stream.h instructions/arithmetic.h instructions/logic.h \
@@ -37,7 +38,8 @@ HEADERS=utils/binary_stream.h instructions/arithmetic.h instructions/logic.h \
 		instructions/data_transfer.h instructions/utils.h utils/format.h \
 		instructions/instructions.h instructions/control_transfer.h \
 		instructions/processor_control.h instructions/string_manipulation.h \
-		models/emulator.h models/instruction.h models/memory_segment.h models/processor.h
+		models/emulator.h models/instruction.h models/memory_segment.h models/processor.h \
+		minix/syscalls.h minix/env.h
 
 HEADERS := $(HEADERS) $(addsuffix .h, $(_INSTRUCTION_IMPL_FULL_PATH)) \
 		   $(addsuffix .h, $(_INSTRUCTION_IMPL_SECTIONS_FULL_PATH))

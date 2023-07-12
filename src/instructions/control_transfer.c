@@ -32,10 +32,11 @@ instruction_t *jne(binary_stream_t *data)
     RET_INSTRUCTION(display, data, params, jne_exec);
 }
 
-char *jnl_instruction(binary_stream_t *data)
+instruction_t *jnl_instruction(binary_stream_t *data)
 {
     params_t params;
-    return format_byte_displacement("jnl", data, &params);
+    char *display = format_byte_displacement("jnl", data, &params);
+    RET_INSTRUCTION(display, data, params, jnl_exec);
 }
 
 char *jnle(binary_stream_t *data)
@@ -124,11 +125,13 @@ char *ret_data(binary_stream_t *data)
     snprintf(res, 20, "ret %x", val);
     return res;
 }
-char *ret()
+
+instruction_t *ret_seg(binary_stream_t *data)
 {
     char *res = malloc(4);
     snprintf(res, 4, "ret");
-    return res;
+    params_t params = {.data = 0};
+    RET_INSTRUCTION(res, data, params, ret_seg_exec);
 }
 
 char *loop(binary_stream_t *data)

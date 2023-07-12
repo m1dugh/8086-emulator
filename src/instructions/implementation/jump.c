@@ -30,3 +30,9 @@ void je_exec(emulator_t *emulator, params_t params)
 {
     jump_exec(emulator, params, emulator->processor->flags.z);
 }
+
+void jnl_exec(emulator_t *emulator, params_t params)
+{
+    jump_exec(emulator, params,
+        emulator->processor->flags.s == emulator->processor->flags.o);
+}

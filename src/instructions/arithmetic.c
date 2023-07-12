@@ -1,6 +1,7 @@
 #include <malloc.h>
 #include <stdio.h>
 #include "arithmetic.h"
+#include "implementation/add.h"
 #include "implementation/call.h"
 #include "implementation/cmp.h"
 #include "implementation/dec.h"
@@ -45,6 +46,7 @@ instruction_t *cmp_immediate_rm(binary_stream_t *data)
     {
         case 0b000:
             instruction = "add";
+            cb = add_immediate_rm_exec;
             break;
         case 0b001:
             instruction = "or";

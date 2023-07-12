@@ -15,12 +15,12 @@ struct exec_header
     unsigned char a_hdrlen;   /* length of header */
     unsigned char a_unused;   /* reserved */
     unsigned short a_version; /* version stamp (not used) */
-    long a_text;              /* The length of the text segment */
-    long a_data;              /* The length of the data segment */
-    long a_bss;               /* The length of the bss segment */
-    long a_entry;             /* The entry point */
-    long a_total;             /* The total memory allocated */
-    long a_syms;              /* size of symbol table */
+    unsigned long a_text;     /* The length of the text segment */
+    unsigned long a_data;     /* The length of the data segment */
+    unsigned long a_bss;      /* The length of the bss segment */
+    unsigned long a_entry;    /* The entry point */
+    unsigned long a_total;    /* The total memory allocated */
+    unsigned long a_syms;     /* size of symbol table */
 
     /* LONG VERSION */
     long a_trsize; /* text relocation size */
@@ -39,6 +39,7 @@ typedef struct emulator_t
     memory_segment_t *data;
     struct exec_header header;
     FILE *file;
+    unsigned char verbose;
 } emulator_t;
 
 emulator_t *emulator_new(FILE *file);
@@ -100,6 +101,7 @@ void emulator_stack_set(
 instruction_t *emulator_load_instruction(emulator_t *emulator);
 void emulator_load_data(emulator_t *emulator);
 
-void emulator_syscall(emulator_t *emulator, unsigned short opcode);
+void emulator_syscall(emulator_t *emulator);
+void *emulator_data_addr(emulator_t *emulator, unsigned short address);
 
 #endif // !EMULATOR_MODELS_EMULATOR_H

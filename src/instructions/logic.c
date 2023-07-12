@@ -152,10 +152,11 @@ char *or_immediate_acc(binary_stream_t *data)
     return format_immediate_from_acc("or", data, &params);
 }
 
-char *or_rm_reg(binary_stream_t *data)
+instruction_t *or_rm_reg(binary_stream_t *data)
 {
     params_t params;
-    return format_dw_rm_to_reg("or", data, &params);
+    char *display = format_dw_rm_to_reg("or", data, &params);
+    RET_INSTRUCTION(display, data, params, or_rm_reg_exec);
 }
 
 char *test_immediate_acc(binary_stream_t *data)
