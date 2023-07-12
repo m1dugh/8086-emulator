@@ -709,9 +709,6 @@ int emulator_load_header(emulator_t *emulator)
 void emulator_load_data(emulator_t *emulator)
 {
     struct exec_header header = emulator->header;
-    printf("hdr len: %d, text len: %lx, data size: %lx, sum: %lx\n",
-        header.a_hdrlen, header.a_text, header.a_data,
-        header.a_text + header.a_hdrlen);
     fseek(emulator->file, header.a_hdrlen + header.a_text, SEEK_SET);
     for (unsigned long i = 0; i < header.a_data; i++)
     {

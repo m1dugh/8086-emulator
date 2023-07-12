@@ -113,6 +113,7 @@ instruction_t *inc_rm(binary_stream_t *data)
     {
         case 0b000:
             snprintf(res, 50, "inc %s", rm_value);
+            cb = inc_rm_exec;
             break;
         case 0b001:
             snprintf(res, 50, "dec %s", rm_value);

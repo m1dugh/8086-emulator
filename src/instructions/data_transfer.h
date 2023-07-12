@@ -7,7 +7,7 @@
 
 // MOV
 instruction_t *mov_rm_to_reg(binary_stream_t *data);
-char *mov_immediate_to_rm(binary_stream_t *data);
+instruction_t *mov_immediate_to_rm(binary_stream_t *data);
 instruction_t *mov_immediate_to_reg(binary_stream_t *data);
 char *mov_mem_to_acc(binary_stream_t *data);
 char *mov_acc_to_mem(binary_stream_t *data);

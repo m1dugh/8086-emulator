@@ -53,3 +53,16 @@ void mov_immediate_to_reg_exec(emulator_t *emulator, params_t params)
     }
     emulator->processor->segment_selector = NO_SELECTOR;
 }
+
+void mov_immediate_rm_exec(emulator_t *emulator, params_t params)
+{
+    if (params.w)
+    {
+        emulator_set_rm(emulator, params, (unsigned short)params.data);
+    }
+    else
+    {
+        emulator_set_rm_byte(emulator, params, (unsigned char)params.data_low);
+    }
+    emulator->processor->segment_selector = NO_SELECTOR;
+}

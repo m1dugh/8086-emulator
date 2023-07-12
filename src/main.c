@@ -9,7 +9,7 @@
 #include "utils/trie.h"
 #include "utils/vector.h"
 
-void execute_instructions(
+int execute_instructions(
     instruction_t *data, unsigned long address, emulator_t *emulator)
 {
     if (emulator->verbose)
@@ -20,9 +20,16 @@ void execute_instructions(
         printf_instruction(
             address, data->instruction, data->instruction_len, data->display);
     }
+    if (data->callback == NULL)
+    {
+        fprintf(
+            stderr, "Missing exec function for instruction %s", data->display);
+        return -1;
+    }
 
     emulator->processor->ip += data->instruction_len;
     data->callback(emulator, data->params);
+    return 0;
 }
 
 extern char **environ;
@@ -49,27 +56,35 @@ int main(int argc, char **argv)
 
     printf("%s IP \n", PROCESSOR_HEADER);
 
+    if (emulator->verbose)
+        mem_seg_display(emulator->data, "DATA");
+
     instruction_t *instruction = emulator_load_instruction(emulator);
-    mem_seg_display(emulator->data, "DATA");
-    for (; instruction != NULL;
+
+    for (; instruction != NULL && res == 0;
          instruction = emulator_load_instruction(emulator))
     {
-        execute_instructions(instruction, emulator->processor->ip, emulator);
+        res = execute_instructions(
+            instruction, emulator->processor->ip, emulator);
+    }
+
+    if (res != 0)
+    {
+        goto exit;
     }
 
     if (!bs_finished(emulator->stream))
     {
-        fprintf(stderr, "Instruction not found: ");
+        fprintf(stderr, "Unknown instruction: ");
         for (size_t i = 0; i < emulator->stream->instruction_buffer_len; i++)
         {
             fprintf(stderr, "%02x", emulator->stream->instruction_buffer[i]);
         }
         fprintf(stderr, "\n");
-        emulator_stack_display(emulator);
-
         res = -1;
         goto exit;
     }
+
     printf("===== END OF .TEXT SECTION =====\n");
 
 exit:

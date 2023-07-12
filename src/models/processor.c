@@ -33,9 +33,9 @@ char *processor_display(processor_t *processor)
     char *res = calloc(PROCESSOR_DISPLAY_LEN, sizeof(char));
     snprintf(res, PROCESSOR_DISPLAY_LEN, PROC_DISPLAY_FORMAT, processor->ax,
         processor->bx, processor->cx, processor->dx, processor->sp,
-        processor->bp, processor->si, processor->di, '?',
-        processor->flags.s ? 'S' : '-', processor->flags.z ? 'Z' : '-',
-        processor->flags.c ? 'C' : '-');
+        processor->bp, processor->si, processor->di,
+        processor->flags.o ? 'O' : '-', processor->flags.s ? 'S' : '-',
+        processor->flags.z ? 'Z' : '-', processor->flags.c ? 'C' : '-');
 
     return res;
 }

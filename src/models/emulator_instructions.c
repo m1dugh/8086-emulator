@@ -86,10 +86,10 @@ instruction_t *find_7_len_instruction(
         case 0b1010000:
             return mov_mem_to_acc(stream);
         case 0b1010100:
-            return test_immediate_acc(stream);
+            return test_immediate_acc(stream);*/
         case 0b1100011:
             return mov_immediate_to_rm(stream);
-        case 0b1110010:
+        /*case 0b1110010:
             return in_fixed_port(stream);
         case 0b1110110:
             return in_var_port(stream);

@@ -1,6 +1,7 @@
 #include <malloc.h>
 #include <stdio.h>
 #include "data_transfer.h"
+#include "implementation/mov.h"
 #include "implementation/push.h"
 #include "utils.h"
 
@@ -11,10 +12,11 @@ instruction_t *mov_rm_to_reg(binary_stream_t *data)
     RET_INSTRUCTION(display, data, params, mov_rm_reg_exec);
 }
 
-char *mov_immediate_to_rm(binary_stream_t *data)
+instruction_t *mov_immediate_to_rm(binary_stream_t *data)
 {
     params_t params;
-    return format_w_immediate_to_rm("mov", data, &params);
+    char *display = format_w_immediate_to_rm("mov", data, &params);
+    RET_INSTRUCTION(display, data, params, mov_immediate_rm_exec);
 }
 
 instruction_t *mov_immediate_to_reg(binary_stream_t *data)
