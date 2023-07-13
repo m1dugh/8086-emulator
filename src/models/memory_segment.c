@@ -38,8 +38,10 @@ unsigned int mem_seg_low_addr(memory_segment_t *mem)
 unsigned char mem_seg_get(memory_segment_t *mem, unsigned short address)
 {
     if (address >= byte_vector_len(mem->value))
-        errx(-1, "memory_segment: cannot access element at address 0x%02x",
+    {
+        errx(-1, "memory_segment: cannot access element at address %04x",
             address);
+    }
 
     return byte_vector_get(mem->value, (unsigned long)address);
 }
@@ -48,11 +50,7 @@ unsigned short mem_seg_get_word(memory_segment_t *mem, unsigned short address)
 {
     unsigned char first_val = mem_seg_get(mem, address);
     unsigned char second_val = mem_seg_get(mem, address + 1);
-#if BIG_ENDIAN
-    unsigned short res = (first_val << 8) | second_val;
-#else
     unsigned short res = (second_val << 8) | first_val;
-#endif
     return res;
 }
 
@@ -60,8 +58,10 @@ void mem_seg_set(
     memory_segment_t *mem, unsigned short address, unsigned char value)
 {
     if (address >= byte_vector_len(mem->value))
-        errx(-1, "memory_segment: cannot access element at address 0x%02x",
-            address);
+    {
+        errx(
+            -1, "memory_segment: cannot set element at address %04x", address);
+    }
 
     byte_vector_set(mem->value, (unsigned long)address, value);
 }
@@ -69,17 +69,8 @@ void mem_seg_set(
 void mem_seg_set_word(
     memory_segment_t *mem, unsigned short address, unsigned short value)
 {
-    if (address >= byte_vector_len(mem->value))
-        errx(-1, "memory_segment: cannot access element at address 0x%02x",
-            address);
-
-#if BIG_ENDIAN
-    mem_seg_set(mem, address, (value & 0xff00) >> 8);
-    mem_seg_set(mem, address + 1, value & 0xff);
-#else
     mem_seg_set(mem, address, value & 0xff);
     mem_seg_set(mem, address + 1, (value & 0xff00) >> 8);
-#endif
 }
 
 unsigned short mem_seg_push(memory_segment_t *mem, unsigned char data)

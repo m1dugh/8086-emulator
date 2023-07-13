@@ -1,11 +1,14 @@
 #ifndef EMULATOR_MODELS_EMULATOR_H
 #define EMULATOR_MODELS_EMULATOR_H
 
+#include <stdlib.h>
 #include "../utils/binary_stream.h"
 #include "../utils/trie.h"
 #include "instruction.h"
 #include "memory_segment.h"
 #include "processor.h"
+
+#define ADDITIONAL_SIZE 129
 
 struct exec_header
 {
@@ -40,6 +43,10 @@ typedef struct emulator_t
     struct exec_header header;
     FILE *file;
     unsigned char verbose;
+    /// An additional string to display at the end of the instruction in
+    /// verbose mode This buffer is preallocated with length ADDITIONAL_SIZE
+    char *_additionals;
+    unsigned char _has_additionals;
 } emulator_t;
 
 emulator_t *emulator_new(FILE *file);
@@ -103,5 +110,12 @@ void emulator_load_data(emulator_t *emulator);
 
 void emulator_syscall(emulator_t *emulator);
 void *emulator_data_addr(emulator_t *emulator, unsigned short address);
+void *emulator_stack_addr(emulator_t *emulator, unsigned short address);
+
+void emulator_stack_set_dword(
+    emulator_t *emulator, unsigned short address, unsigned int value);
+
+// TODO: remove this function and use proper segment selectors
+int emulator_addr_in_data(emulator_t *emulator, unsigned short address);
 
 #endif // !EMULATOR_MODELS_EMULATOR_H

@@ -40,7 +40,7 @@ char *cmp_rm_reg(binary_stream_t *data);
 instruction_t *cmp_immediate_rm(binary_stream_t *data);
 char *cmp_immediate_acc(binary_stream_t *data);
 
-char *cbw();
+instruction_t *cbw(binary_stream_t *data);
 char *cwd();
 
 #endif // !INSTRUCTIONS_ARITHMETIC_H

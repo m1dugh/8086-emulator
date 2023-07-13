@@ -1,6 +1,7 @@
 #ifndef EMULATOR_MODELS_PROCESSOR_H
 #define EMULATOR_MODELS_PROCESSOR_H
 
+#include <stdlib.h>
 #include "../env.h"
 
 #define DS_SELECTOR 0b000
@@ -15,13 +16,8 @@ typedef struct
     {
         struct
         {
-#if BIG_ENDIAN
             unsigned char ah;
             unsigned char al;
-#else
-            unsigned char al;
-            unsigned char ah;
-#endif
         };
 
         unsigned short ax;
@@ -31,13 +27,8 @@ typedef struct
     {
         struct
         {
-#if BIG_ENDIAN
             unsigned char ch;
             unsigned char cl;
-#else
-            unsigned char cl;
-            unsigned char ch;
-#endif
         };
 
         unsigned short cx;
@@ -47,13 +38,8 @@ typedef struct
     {
         struct
         {
-#if BIG_ENDIAN
             unsigned char dh;
             unsigned char dl;
-#else
-            unsigned char dl;
-            unsigned char dh;
-#endif
         };
 
         unsigned short dx;
@@ -63,13 +49,8 @@ typedef struct
     {
         struct
         {
-#if BIG_ENDIAN
             unsigned char bh;
             unsigned char bl;
-#else
-            unsigned char bl;
-            unsigned char bh;
-#endif
         };
 
         unsigned short bx;
@@ -85,24 +66,6 @@ typedef struct
         unsigned short value;
         struct
         {
-#if BIG_ENDIAN
-            // HIGH
-            unsigned char : 4;
-            unsigned char o : 1;
-            unsigned char d : 1;
-            unsigned char i : 1;
-            unsigned char t : 1;
-
-            // LOW
-            unsigned char s : 1;
-            unsigned char z : 1;
-            unsigned char : 1;
-            unsigned char a : 1;
-            unsigned char : 1;
-            unsigned char p : 1;
-            unsigned char : 1;
-            unsigned char c : 1;
-#else
             // LOW
             unsigned char s : 1;
             unsigned char z : 1;
@@ -119,7 +82,6 @@ typedef struct
             unsigned char d : 1;
             unsigned char i : 1;
             unsigned char t : 1;
-#endif
         };
     } flags;
 

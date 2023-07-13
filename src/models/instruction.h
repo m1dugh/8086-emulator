@@ -16,13 +16,8 @@ typedef struct
     {
         struct
         {
-#if BIG_ENDIAN
-            unsigned char : 8;
-            char low_disp;
-#else
             char low_disp;
             unsigned char : 8;
-#endif
         };
         short disp;
     };
@@ -31,13 +26,8 @@ typedef struct
     {
         struct
         {
-#if BIG_ENDIAN
-            unsigned char : 8;
-            unsigned char data_low;
-#else
             unsigned char data_low;
             unsigned char : 8;
-#endif
         };
         unsigned short data;
     };

@@ -32,6 +32,10 @@ emulator_t *emulator_new(FILE *file)
     if ((res->extra = mem_seg_new(proc->es)) == NULL)
         errx(-1, "malloc error: could not allocate memory_segment struct for "
                  "memory");
+    if ((res->_additionals = malloc(sizeof(char) * ADDITIONAL_SIZE)) == NULL)
+        errx(-1, "malloc error: could not allocate additional buffer for "
+                 "additionals ");
+    res->_has_additionals = 0;
 
     return res;
 }
@@ -43,29 +47,20 @@ void emulator_free(emulator_t *emulator)
     mem_seg_free(emulator->data);
     mem_seg_free(emulator->extra);
     bs_free(emulator->stream);
+    free(emulator->_additionals);
     free(emulator);
 }
 
 void emulator_stack_push(emulator_t *emulator, unsigned short value)
 {
-#if BIG_ENDIAN
-    emulator->stack[--emulator->processor->sp] = value & 0xFF;
-    emulator->stack[--emulator->processor->sp] = (value & 0xFF00) >> 8;
-#else
     emulator->stack[--emulator->processor->sp] = (value & 0xFF00) >> 8;
     emulator->stack[--emulator->processor->sp] = value & 0xFF;
-#endif
 }
 
 unsigned short emulator_stack_pop(emulator_t *emulator)
 {
-#if BIG_ENDIAN
-    unsigned char high = emulator->stack[emulator->processor->sp++];
-    unsigned char low = emulator->stack[emulator->processor->sp++];
-#else
     unsigned char low = emulator->stack[emulator->processor->sp++];
     unsigned char high = emulator->stack[emulator->processor->sp++];
-#endif
     return (high << 8) + low;
 }
 
@@ -587,19 +582,25 @@ unsigned char emulator_stack_get_byte(
     if (address < emulator->processor->sp)
         errx(-1, "could not access stack at address %04x, as sp=%04x", address,
             emulator->processor->sp);
-    return emulator->stack[address];
+    unsigned char res = emulator->stack[address];
+    if (!emulator->_has_additionals)
+    {
+        snprintf(emulator->_additionals, ADDITIONAL_SIZE, "; byte [%04x] %x",
+            address, res);
+    }
+    return res;
 }
 
 unsigned short emulator_stack_get(emulator_t *emulator, unsigned short address)
 {
-#if BIG_ENDIAN
-    unsigned char low = emulator_stack_get_byte(emulator, address + 1);
-    unsigned char high = emulator_stack_get_byte(emulator, address);
-#else
     unsigned char high = emulator_stack_get_byte(emulator, address + 1);
     unsigned char low = emulator_stack_get_byte(emulator, address);
-#endif
-    return (high << 8) + low;
+    unsigned short res = (high << 8) + low;
+
+    emulator->_has_additionals = 1;
+    snprintf(
+        emulator->_additionals, ADDITIONAL_SIZE, "; [%04x] %x", address, res);
+    return res;
 }
 
 void emulator_stack_set_byte(
@@ -611,13 +612,8 @@ void emulator_stack_set_byte(
 void emulator_stack_set(
     emulator_t *emulator, unsigned short address, unsigned short value)
 {
-#if BIG_ENDIAN
-    emulator_stack_set_byte(emulator, address, (value & 0xFF00) >> 8);
-    emulator_stack_set_byte(emulator, address + 1, value & 0xFF);
-#else
     emulator_stack_set_byte(emulator, address, value & 0xFF);
     emulator_stack_set_byte(emulator, address + 1, (value & 0xFF00) >> 8);
-#endif
 }
 
 unsigned long to_long(unsigned char *buffer)
@@ -717,7 +713,24 @@ void emulator_load_data(emulator_t *emulator)
     }
 }
 
+void emulator_stack_set_dword(
+    emulator_t *emulator, unsigned short address, unsigned int value)
+{
+    emulator_stack_set(emulator, address + 2, (value & 0xffff0000) >> 16);
+    emulator_stack_set(emulator, address, (value & 0xffff));
+}
+
 void *emulator_data_addr(emulator_t *emulator, unsigned short address)
 {
     return &emulator->data->value->values[address];
+}
+
+void *emulator_stack_addr(emulator_t *emulator, unsigned short address)
+{
+    return &emulator->stack[address];
+}
+
+int emulator_addr_in_data(emulator_t *emulator, unsigned short address)
+{
+    return address < byte_vector_len(emulator->data->value);
 }

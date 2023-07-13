@@ -17,8 +17,6 @@ int execute_instructions(
         char *proc_display = processor_display(emulator->processor);
         printf("%s ", proc_display);
         free(proc_display);
-        printf_instruction(
-            address, data->instruction, data->instruction_len, data->display);
     }
     if (data->callback == NULL)
     {
@@ -29,6 +27,16 @@ int execute_instructions(
 
     emulator->processor->ip += data->instruction_len;
     data->callback(emulator, data->params);
+
+    if (emulator->verbose)
+    {
+        char *additionals
+            = emulator->_has_additionals ? emulator->_additionals : NULL;
+        printf_instruction(address, data->instruction, data->instruction_len,
+            data->display, additionals);
+        emulator->_has_additionals = 0;
+    }
+
     return 0;
 }
 

@@ -2,9 +2,12 @@
 #include <stdio.h>
 #include "arithmetic.h"
 #include "implementation/add.h"
+#include "implementation/and.h"
 #include "implementation/call.h"
 #include "implementation/cmp.h"
+#include "implementation/convert.h"
 #include "implementation/dec.h"
+#include "implementation/or.h"
 #include "implementation/push.h"
 #include "implementation/sub.h"
 #include "utils.h"
@@ -51,6 +54,7 @@ instruction_t *cmp_immediate_rm(binary_stream_t *data)
         case 0b001:
             instruction = "or";
             signed_val = 0;
+            cb = or_immediate_rm_exec;
             break;
         case 0b010:
             instruction = "adc";
@@ -61,6 +65,7 @@ instruction_t *cmp_immediate_rm(binary_stream_t *data)
         case 0b100:
             instruction = "and";
             signed_val = 0;
+            cb = and_immediate_rm_exec;
             break;
         case 0b101:
             instruction = "sub";
@@ -171,11 +176,12 @@ char *sub_rm_with_reg(binary_stream_t *data)
     return format_dw_rm_to_reg("sub", data, &params);
 }
 
-char *cbw()
+instruction_t *cbw(binary_stream_t *data)
 {
     char *res = malloc(4);
     snprintf(res, 4, "cbw");
-    return res;
+    params_t params = {};
+    RET_INSTRUCTION(res, data, params, cbw_exec);
 }
 
 char *cwd()

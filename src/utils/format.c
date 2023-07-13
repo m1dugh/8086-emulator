@@ -25,7 +25,7 @@ void print_hex(char c)
 }
 
 int printf_instruction(unsigned short address, unsigned char *buffer,
-    size_t buffer_len, char *instruction)
+    size_t buffer_len, char *instruction, char *additionals)
 {
     size_t offset = 0;
     printf("%04x:", address);
@@ -42,7 +42,10 @@ int printf_instruction(unsigned short address, unsigned char *buffer,
     {
         printf(" ");
     }
-    printf("%s\n", instruction);
+    printf("%s", instruction);
+    if (additionals != NULL)
+        printf(" %s", additionals);
+    printf("\n");
 
     return 0;
 }

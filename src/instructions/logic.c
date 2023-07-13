@@ -2,6 +2,7 @@
 #include <string.h>
 #include "logic.h"
 #include "implementation/logic.h"
+#include "implementation/neg.h"
 #include "implementation/test.h"
 #include "utils.h"
 
@@ -62,6 +63,7 @@ instruction_t *test_immediate_rm(binary_stream_t *data)
             break;
         case 0b011:
             snprintf(res, 50, "neg %s", rm_value);
+            cb = neg_immediate_rm_exec;
             break;
         case 0b100:
             snprintf(res, 50, "mul %s", rm_value);

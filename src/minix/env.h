@@ -11,4 +11,8 @@
 #define SYSCALL_WAIT 7
 #define SYSCALL_CREATE 8
 
+#define SYSCALL_TIME 13
+
+#define SYSCALL_LSEEK 19
+
 #endif // !EMULATOR_MINIX_ENV_H

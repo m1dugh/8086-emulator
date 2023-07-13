@@ -134,10 +134,10 @@ instruction_t *find_8_len_instruction(
         case 0b10001101:
             return lea(stream);
         /*case 0b10001111:
-            return pop_rm(stream);
+            return pop_rm(stream);*/
         case 0b10011000:
-            return cbw();
-        case 0b10011001:
+            return cbw(stream);
+        /*case 0b10011001:
             return cwd();
         case 0b11001100:
             return interrupt();*/
@@ -236,8 +236,11 @@ void emulator_syscall(emulator_t *emulator)
         case SYSCALL_WRITE:
             res = syscall_write(emulator);
             break;
+        case SYSCALL_TIME:
+            syscall_time(emulator);
+            break;
         default:
-            errx(-1, "Syscall not found: %04x", opcode);
+            errx(-1, "Syscall not found: %d", opcode);
     }
     emulator->processor->ax = 0;
 }
