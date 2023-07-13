@@ -336,15 +336,23 @@ unsigned int emulator_get_physical_addr(emulator_t *emulator, params_t params)
             errx(-1, "invalid value for rm: %x", params.rm);
     };
 
-    unsigned int physical_addr;
-    if (override_segment)
+    unsigned short effective_segment
+        = override_segment ? overriden_segment : default_segment;
+    if (effective_segment == emulator->processor->ss)
     {
-        physical_addr = (overriden_segment << 4) + effective_address;
+        snprintf(emulator->_additionals, ADDITIONAL_SIZE, "; [%04x] %x",
+            effective_address,
+            emulator_stack_get(emulator, effective_address));
+        emulator->_has_additionals = 1;
     }
-    else
+    else if (effective_segment == emulator->processor->ds)
     {
-        physical_addr = (default_segment << 4) + effective_address;
+        snprintf(emulator->_additionals, ADDITIONAL_SIZE, "; data [%04x] %x",
+            effective_address,
+            *(unsigned char *)emulator_data_addr(emulator, effective_address));
+        emulator->_has_additionals = 1;
     }
+    unsigned int physical_addr = (effective_segment << 4) + effective_address;
     return physical_addr;
 }
 

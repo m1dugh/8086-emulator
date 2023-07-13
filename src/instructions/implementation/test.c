@@ -18,7 +18,7 @@ void test_immediate_rm_exec(emulator_t *emulator, params_t params)
     {
         unsigned char val1 = emulator_get_rm_byte(emulator, params);
         unsigned char val2 = params.data_low;
-        unsigned char res = val1 & val2;
+        unsigned char res = (unsigned char)val1 & val2;
         emulator->processor->flags.s = get_sign_byte(res);
         emulator->processor->flags.z = get_zero_byte(res);
         emulator->processor->flags.p = get_parity_byte(res);

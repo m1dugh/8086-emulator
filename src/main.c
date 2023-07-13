@@ -34,8 +34,8 @@ int execute_instructions(
             = emulator->_has_additionals ? emulator->_additionals : NULL;
         printf_instruction(address, data->instruction, data->instruction_len,
             data->display, additionals);
-        emulator->_has_additionals = 0;
     }
+    emulator->_has_additionals = 0;
 
     return 0;
 }

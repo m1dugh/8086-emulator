@@ -50,12 +50,19 @@ instruction_t *test_immediate_rm(binary_stream_t *data)
     switch (params.reg)
     {
         case 0b000:
-            if (params.w || params.mod == 0b11)
+            if (params.w)
+            {
                 snprintf(res, 50, "test %s, %04x", rm_value,
                     extract_data(data, &params));
+                printf(
+                    "data: %x, data low: %x\n", params.data, params.data_low);
+            }
             else
-                snprintf(res, 50, "test byte %s, %04x", rm_value,
-                    extract_data(data, &params));
+            {
+                params.data_low = extract_byte(data);
+                snprintf(
+                    res, 50, "test byte %s, %04x", rm_value, params.data_low);
+            }
             cb = test_immediate_rm_exec;
             break;
         case 0b010:

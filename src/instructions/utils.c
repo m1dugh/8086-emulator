@@ -359,9 +359,14 @@ short extract_data(binary_stream_t *data, params_t *params)
     unsigned short val = low;
     if (params->w)
     {
-        val = (extract_byte(data) << 8) + val;
+        params->data = (extract_byte(data) << 8) + val;
+        return params->data;
     }
-    return val;
+    else
+    {
+        params->data_low = low;
+        return (short)low;
+    }
 }
 
 short extract_data_sw(binary_stream_t *data, params_t *params)

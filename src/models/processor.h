@@ -16,8 +16,8 @@ typedef struct
     {
         struct
         {
-            unsigned char ah;
             unsigned char al;
+            unsigned char ah;
         };
 
         unsigned short ax;
@@ -27,8 +27,8 @@ typedef struct
     {
         struct
         {
-            unsigned char ch;
             unsigned char cl;
+            unsigned char ch;
         };
 
         unsigned short cx;
@@ -38,8 +38,8 @@ typedef struct
     {
         struct
         {
-            unsigned char dh;
             unsigned char dl;
+            unsigned char dh;
         };
 
         unsigned short dx;
@@ -49,8 +49,8 @@ typedef struct
     {
         struct
         {
-            unsigned char bh;
             unsigned char bl;
+            unsigned char bh;
         };
 
         unsigned short bx;
