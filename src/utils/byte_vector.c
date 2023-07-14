@@ -129,3 +129,32 @@ unsigned char byte_vector_remove(byte_vector_t *vector, size_t index)
     vector->len--;
     return res;
 }
+
+int byte_vector_expand(byte_vector_t *vector, size_t new_size)
+{
+    if (new_size <= vector->len)
+    {
+        return 0;
+    }
+    else if (new_size <= vector->cap)
+    {
+        for (; vector->len < new_size; vector->len++)
+        {
+            vector->values[vector->len] = 0;
+        }
+        return 0;
+    }
+    else
+    {
+        int res = 0;
+        while (vector->cap < new_size && res == 0)
+            res = byte_vector_grow(vector);
+        if (res != 0)
+            return res;
+        for (; vector->len < new_size; vector->len++)
+        {
+            vector->values[vector->len] = 0;
+        }
+        return 0;
+    }
+}

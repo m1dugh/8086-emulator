@@ -1,6 +1,11 @@
 #ifndef EMULATOR_MINIX_ENV_H
 #define EMULATOR_MINIX_ENV_H
 
+// ERRORS
+#define ENOMEM 12
+#define EINVAL 22
+
+// SYSCALLS
 #define SYSCALL_NOT_FOUND 0
 #define SYSCALL_EXIT 1
 #define SYSCALL_FORK 2
@@ -12,6 +17,8 @@
 #define SYSCALL_CREATE 8
 
 #define SYSCALL_TIME 13
+
+#define SYSCALL_BRK 17
 
 #define SYSCALL_LSEEK 19
 

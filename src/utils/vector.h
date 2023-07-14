@@ -51,4 +51,9 @@ unsigned char byte_vector_pop(byte_vector_t *vector);
 int byte_vector_insert(byte_vector_t *, size_t, unsigned char);
 unsigned char byte_vector_remove(byte_vector_t *, size_t index);
 
+/// Ensure the size of the vector is at least new_size
+/// returns 0 if completed
+/// returns -1 if failed
+int byte_vector_expand(byte_vector_t *vector, size_t new_size);
+
 #endif /* !UTILS_VECTOR_H */

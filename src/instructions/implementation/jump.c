@@ -39,6 +39,31 @@ void jnl_exec(emulator_t *emulator, params_t params)
 
 void jb_exec(emulator_t *emulator, params_t params)
 {
+    jump_exec(emulator, params, emulator->processor->flags.c);
+}
+
+void jle_exec(emulator_t *emulator, params_t params)
+{
+    processor_t *proc = emulator->processor;
+    jump_exec(
+        emulator, params, proc->flags.z || proc->flags.s != proc->flags.o);
+}
+
+void jnbe_exec(emulator_t *emulator, params_t params)
+{
+    processor_t *proc = emulator->processor;
+    jump_exec(emulator, params, proc->flags.c == 0 && proc->flags.z == 0);
+}
+
+void jbe_exec(emulator_t *emulator, params_t params)
+{
+    processor_t *proc = emulator->processor;
+    jump_exec(emulator, params, proc->flags.c || proc->flags.z);
+}
+
+void jnle_exec(emulator_t *emulator, params_t params)
+{
+    processor_t *proc = emulator->processor;
     jump_exec(emulator, params,
-        emulator->processor->flags.s == emulator->processor->flags.c);
+        proc->flags.z == 0 && proc->flags.s == proc->flags.o);
 }

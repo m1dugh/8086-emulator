@@ -510,6 +510,7 @@ char *format_w_immediate_to_rm(
 
     char *res = malloc(50);
     snprintf(res, 50, format, val, rm_value, extracted);
+    free(rm_value);
     return res;
 }
 

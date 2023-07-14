@@ -7,6 +7,11 @@ unsigned short get_arg(emulator_t *emulator, unsigned short offset)
     return emulator_stack_get(emulator, emulator->processor->bx + offset);
 }
 
+void set_res(emulator_t *emulator, unsigned short offset, unsigned short value)
+{
+    emulator_stack_set(emulator, emulator->processor->bx + offset, value);
+}
+
 short syscall_write(emulator_t *emulator)
 {
     unsigned short fd
@@ -68,5 +73,33 @@ void syscall_ioctl(emulator_t *emulator)
     if (emulator->verbose)
     {
         printf("<ioctl (%d, 0x%04x, 0x%04x)>\n", fd, request, address);
+    }
+    set_res(emulator, 2, -EINVAL);
+}
+
+void syscall_brk(emulator_t *emulator)
+{
+    unsigned short address = get_arg(emulator, 10);
+
+    if (emulator->verbose)
+        printf("<brk (%04x) => ", address);
+
+    if (address < mem_seg_size(emulator->data))
+    {
+        printf("high address: %04x, requested: %04x",
+            mem_seg_high_addr(emulator->data), address);
+        set_res(emulator, 2, -ENOMEM);
+        printf("ENOMEM>\n");
+    }
+    else if (mem_seg_expand(emulator->data, address) != 0)
+    {
+        set_res(emulator, 2, -ENOMEM);
+        printf("ENOMEM>\n");
+    }
+    else
+    {
+        set_res(emulator, 2, 0);
+        set_res(emulator, 18, address);
+        printf("0>\n");
     }
 }

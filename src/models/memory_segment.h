@@ -21,6 +21,12 @@ memory_segment_t *mem_seg_new(unsigned short base_address);
 void mem_seg_free(memory_segment_t *mem);
 unsigned int mem_seg_high_addr(memory_segment_t *mem);
 unsigned int mem_seg_low_addr(memory_segment_t *mem);
+unsigned short mem_seg_size(memory_segment_t *mem);
+
+/// sets the memory segment size to size.
+/// returns 0 if succeeded
+/// returns -1 if failed
+int mem_seg_expand(memory_segment_t *mem, unsigned short size);
 
 unsigned char mem_seg_get(memory_segment_t *mem, unsigned short address);
 unsigned short mem_seg_get_word(memory_segment_t *mem, unsigned short address);

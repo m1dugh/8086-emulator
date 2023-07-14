@@ -9,14 +9,14 @@
 instruction_t *jmp_direct_seg(binary_stream_t *data);
 instruction_t *jmp_direct_seg_short(binary_stream_t *data);
 instruction_t *jnb(binary_stream_t *data);
-char *jbe(binary_stream_t *data);
+instruction_t *jbe(binary_stream_t *data);
 instruction_t *jnl_instruction(binary_stream_t *data);
 instruction_t *jne(binary_stream_t *data);
-char *jnle(binary_stream_t *data);
-char *jnbe(binary_stream_t *data);
+instruction_t *jnle(binary_stream_t *data);
+instruction_t *jnbe(binary_stream_t *data);
 instruction_t *je(binary_stream_t *data);
 instruction_t *jl(binary_stream_t *data);
-char *jle(binary_stream_t *data);
+instruction_t *jle(binary_stream_t *data);
 instruction_t *jb(binary_stream_t *data);
 char *js(binary_stream_t *data);
 

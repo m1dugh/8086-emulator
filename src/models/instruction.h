@@ -16,8 +16,8 @@ typedef struct
     {
         struct
         {
-            unsigned char : 8;
             char low_disp;
+            unsigned char : 8;
         };
         short disp;
     };
@@ -26,8 +26,8 @@ typedef struct
     {
         struct
         {
-            unsigned char : 8;
             unsigned char data_low;
+            unsigned char : 8;
         };
         unsigned short data;
     };

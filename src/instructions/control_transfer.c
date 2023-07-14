@@ -40,22 +40,25 @@ instruction_t *jnl_instruction(binary_stream_t *data)
     RET_INSTRUCTION(display, data, params, jnl_exec);
 }
 
-char *jnle(binary_stream_t *data)
+instruction_t *jnle(binary_stream_t *data)
 {
     params_t params;
-    return format_byte_displacement("jnle", data, &params);
+    char *display = format_byte_displacement("jnle", data, &params);
+    RET_INSTRUCTION(display, data, params, jnle_exec);
 }
 
-char *jnbe(binary_stream_t *data)
+instruction_t *jnbe(binary_stream_t *data)
 {
     params_t params;
-    return format_byte_displacement("jnbe", data, &params);
+    char *display = format_byte_displacement("jnbe", data, &params);
+    RET_INSTRUCTION(display, data, params, jnbe_exec);
 }
 
-char *jbe(binary_stream_t *data)
+instruction_t *jbe(binary_stream_t *data)
 {
     params_t params;
-    return format_byte_displacement("jbe", data, &params);
+    char *display = format_byte_displacement("jbe", data, &params);
+    RET_INSTRUCTION(display, data, params, jbe_exec);
 }
 
 instruction_t *je(binary_stream_t *data)
@@ -72,10 +75,11 @@ instruction_t *jl(binary_stream_t *data)
     RET_INSTRUCTION(display, data, params, jl_exec);
 }
 
-char *jle(binary_stream_t *data)
+instruction_t *jle(binary_stream_t *data)
 {
     params_t params;
-    return format_byte_displacement("jle", data, &params);
+    char *display = format_byte_displacement("jle", data, &params);
+    RET_INSTRUCTION(display, data, params, jle_exec);
 }
 
 instruction_t *call_direct_seg(binary_stream_t *data)

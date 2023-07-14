@@ -1,6 +1,7 @@
 #include <err.h>
 #include <malloc.h>
 #include <stdio.h>
+#include <string.h>
 #include "env.h"
 #include "models/emulator.h"
 #include "models/memory_segment.h"
@@ -42,6 +43,42 @@ int execute_instructions(
 
 extern char **environ;
 
+emulator_t *configure_emulator(int argc, char **argv)
+{
+    int i;
+    unsigned char verbose = 0;
+    unsigned char disassm = 0;
+    FILE *f = NULL;
+    for (i = 1; i < argc; i++)
+    {
+        char *arg = argv[i];
+        if (strcmp(arg, "-m") == 0)
+        {
+            verbose = 1;
+        }
+        else if (strcmp(arg, "-d") == 0)
+        {
+            disassm = 1;
+        }
+        else
+        {
+            f = fopen(arg, "rb");
+            if (f == NULL)
+                errx(-1, "Could not open file %s", arg);
+            break;
+        }
+    }
+    emulator_t *emulator = emulator_new(f);
+
+    char *env_str = "PATH=/usr:/usr/bin";
+    char *env[] = {env_str, NULL};
+    emulator_prepare(emulator, env, argc - i, argv + i);
+    emulator->verbose = verbose;
+    UNUSED(disassm);
+
+    return emulator;
+}
+
 int main(int argc, char **argv)
 {
     int res = 0;
@@ -50,22 +87,12 @@ int main(int argc, char **argv)
         errx(-1, "Usage: %s <file> <arg1> ... <argn>", argv[0]);
     }
 
-    FILE *f = fopen(argv[1], "rb");
-    if (f == NULL)
-    {
-        errx(-1, "Could not open file %s", argv[0]);
-    }
-    emulator_t *emulator = emulator_new(f);
-    emulator_load_header(emulator);
-    emulator_load_data(emulator);
-    char *env_str = "PATH=/usr:/usr/bin";
-    char *env[] = {env_str, NULL};
-    emulator_prepare(emulator, env, argc - 1, argv + 1);
-
-    printf("%s IP \n", PROCESSOR_HEADER);
+    emulator_t *emulator = configure_emulator(argc, argv);
 
     if (emulator->verbose)
-        mem_seg_display(emulator->data, "DATA");
+    {
+        printf("%s IP \n", PROCESSOR_HEADER);
+    }
 
     instruction_t *instruction = emulator_load_instruction(emulator);
 
@@ -93,10 +120,7 @@ int main(int argc, char **argv)
         goto exit;
     }
 
-    printf("===== END OF .TEXT SECTION =====\n");
-
 exit:
     emulator_free(emulator);
-    fclose(f);
     return res;
 }

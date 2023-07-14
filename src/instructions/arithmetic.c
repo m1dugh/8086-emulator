@@ -25,10 +25,11 @@ char *add_immediate_to_acc(binary_stream_t *data)
     return format_immediate_from_acc("add", data, &params);
 }
 
-char *cmp_rm_reg(binary_stream_t *data)
+instruction_t *cmp_rm_reg(binary_stream_t *data)
 {
     params_t params;
-    return format_sized_dw_rm_to_reg("cmp", data, &params);
+    char *display = format_sized_dw_rm_to_reg("cmp", data, &params);
+    RET_INSTRUCTION(display, data, params, cmp_rm_reg_exec);
 }
 
 instruction_t *cmp_immediate_rm(binary_stream_t *data)
@@ -171,10 +172,11 @@ char *ssb_rm_with_reg(binary_stream_t *data)
     return format_dw_rm_to_reg("ssb", data, &params);
 }
 
-char *sub_rm_with_reg(binary_stream_t *data)
+instruction_t *sub_rm_with_reg(binary_stream_t *data)
 {
     params_t params;
-    return format_dw_rm_to_reg("sub", data, &params);
+    char *display = format_dw_rm_to_reg("sub", data, &params);
+    RET_INSTRUCTION(display, data, params, sub_rm_reg_exec);
 }
 
 instruction_t *cbw(binary_stream_t *data)
@@ -198,10 +200,11 @@ char *sub_immediate_to_acc(binary_stream_t *data)
     return format_immediate_from_acc("sub", data, &params);
 }
 
-char *cmp_immediate_acc(binary_stream_t *data)
+instruction_t *cmp_immediate_acc(binary_stream_t *data)
 {
     params_t params;
-    return format_immediate_from_acc("cmp", data, &params);
+    char *display = format_immediate_from_acc("cmp", data, &params);
+    RET_INSTRUCTION(display, data, params, cmp_immediate_acc_exec);
 }
 
 char *adc_rm_with_reg(binary_stream_t *data)

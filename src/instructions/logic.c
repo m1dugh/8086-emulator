@@ -54,8 +54,6 @@ instruction_t *test_immediate_rm(binary_stream_t *data)
             {
                 snprintf(res, 50, "test %s, %04x", rm_value,
                     extract_data(data, &params));
-                printf(
-                    "data: %x, data low: %x\n", params.data, params.data_low);
             }
             else
             {

@@ -225,3 +225,13 @@ int mem_set_get_relative_address(memory_segment_t *mem, unsigned int address)
     unsigned short relative_addr = address - low;
     return ((int)0x0) | relative_addr;
 }
+
+int mem_seg_expand(memory_segment_t *mem, unsigned short size)
+{
+    return byte_vector_expand(mem->value, (unsigned short)size);
+}
+
+unsigned short mem_seg_size(memory_segment_t *mem)
+{
+    return byte_vector_len(mem->value);
+}

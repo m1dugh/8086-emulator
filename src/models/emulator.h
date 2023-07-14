@@ -107,6 +107,7 @@ void emulator_stack_set(
 
 instruction_t *emulator_load_instruction(emulator_t *emulator);
 void emulator_load_data(emulator_t *emulator);
+void emulator_load_bss(emulator_t *emulator);
 
 void emulator_syscall(emulator_t *emulator);
 void *emulator_data_addr(emulator_t *emulator, unsigned short address);

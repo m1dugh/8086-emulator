@@ -49,13 +49,13 @@ instruction_t *find_6_len_instruction(
         case 0b000110:
             return ssb_rm_with_reg(stream);
         case 0b001000:
-            return and_rm_reg(stream);
+            return and_rm_reg(stream);*/
         case 0b001010:
-            return sub_rm_with_reg(stream);*/
+            return sub_rm_with_reg(stream);
         case 0b001100:
             return xor_rm_reg(stream);
-            /*case 0b001110:
-                return cmp_rm_reg(stream);*/
+        case 0b001110:
+            return cmp_rm_reg(stream);
         case 0b100000:
             return cmp_immediate_rm(stream);
         case 0b100010:
@@ -76,10 +76,10 @@ instruction_t *find_7_len_instruction(
         case 0b0000110:
             return or_immediate_acc(stream);
         case 0b0010110:
-            return sub_immediate_to_acc(stream);
+            return sub_immediate_to_acc(stream);*/
         case 0b0011110:
             return cmp_immediate_acc(stream);
-        case 0b1000010:
+        /*case 0b1000010:
             return test_rm_reg(stream);
         case 0b1000011:
             return xchg_rm_with_reg(stream);
@@ -119,18 +119,18 @@ instruction_t *find_8_len_instruction(
             return je(stream);
         case 0b01110101:
             return jne(stream);
-        /*case 0b01110110:
+        case 0b01110110:
             return jbe(stream);
         case 0b01110111:
-            return jnbe(stream);*/
+            return jnbe(stream);
         case 0b01111100:
             return jl(stream);
         case 0b01111101:
             return jnl_instruction(stream);
-        /*case 0b01111110:
+        case 0b01111110:
             return jle(stream);
         case 0b01111111:
-            return jnle(stream);*/
+            return jnle(stream);
         case 0b10001101:
             return lea(stream);
         /*case 0b10001111:
@@ -240,6 +240,9 @@ void emulator_syscall(emulator_t *emulator)
             break;
         case SYSCALL_IOCTL:
             syscall_ioctl(emulator);
+            break;
+        case SYSCALL_BRK:
+            syscall_brk(emulator);
             break;
         default:
             errx(-1, "Syscall not found: %d", opcode);

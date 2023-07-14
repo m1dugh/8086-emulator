@@ -18,7 +18,7 @@ char *adc_immediate_to_rm(binary_stream_t *data);
 char *adc_immediate_to_acc(binary_stream_t *data);
 
 // SUB
-char *sub_rm_with_reg(binary_stream_t *data);
+instruction_t *sub_rm_with_reg(binary_stream_t *data);
 char *sub_immediate_to_acc(binary_stream_t *data);
 
 // SSB
@@ -36,9 +36,9 @@ instruction_t *dec_reg(binary_stream_t *data);
 char *neg(binary_stream_t *data);
 
 // CMP
-char *cmp_rm_reg(binary_stream_t *data);
+instruction_t *cmp_rm_reg(binary_stream_t *data);
 instruction_t *cmp_immediate_rm(binary_stream_t *data);
-char *cmp_immediate_acc(binary_stream_t *data);
+instruction_t *cmp_immediate_acc(binary_stream_t *data);
 
 instruction_t *cbw(binary_stream_t *data);
 char *cwd();
