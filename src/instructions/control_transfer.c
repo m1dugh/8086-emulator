@@ -19,10 +19,11 @@ char *js(binary_stream_t *data)
     return format_byte_displacement("js", data, &params);
 }
 
-char *jb(binary_stream_t *data)
+instruction_t *jb(binary_stream_t *data)
 {
     params_t params;
-    return format_byte_displacement("jb", data, &params);
+    char *display = format_byte_displacement("jb", data, &params);
+    RET_INSTRUCTION(display, data, params, jb_exec);
 }
 
 instruction_t *jne(binary_stream_t *data)

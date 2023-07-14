@@ -15,4 +15,6 @@
 
 #define SYSCALL_LSEEK 19
 
+#define SYSCALL_IOCTL 54
+
 #endif // !EMULATOR_MINIX_ENV_H

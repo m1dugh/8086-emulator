@@ -26,7 +26,7 @@ char *ssb_rm_with_reg(binary_stream_t *data);
 
 // INC
 instruction_t *inc_rm(binary_stream_t *data);
-char *inc_reg(binary_stream_t *data);
+instruction_t *inc_reg(binary_stream_t *data);
 
 // DEC
 char *dec_rm(binary_stream_t *data);

@@ -29,3 +29,17 @@ void inc_rm_exec(emulator_t *emulator, params_t params)
         emulator_set_rm_byte(emulator, params, res);
     }
 }
+
+void inc_reg_exec(emulator_t *emulator, params_t params)
+{
+    processor_t *proc = emulator->processor;
+    unsigned short value = emulator_get_reg(emulator, params.reg);
+    unsigned short res = value + 1;
+    proc->flags.s = get_sign(value);
+    proc->flags.z = get_zero(value);
+    proc->flags.p = get_parity(value);
+    // TODO: implement flags for auxiliary
+    // proc->flags.a = ;
+    proc->flags.o = get_overflow_plus(value, 1);
+    emulator_set_reg(emulator, params.reg, res);
+}

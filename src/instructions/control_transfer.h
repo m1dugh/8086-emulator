@@ -17,7 +17,7 @@ char *jnbe(binary_stream_t *data);
 instruction_t *je(binary_stream_t *data);
 instruction_t *jl(binary_stream_t *data);
 char *jle(binary_stream_t *data);
-char *jb(binary_stream_t *data);
+instruction_t *jb(binary_stream_t *data);
 char *js(binary_stream_t *data);
 
 // LOOP

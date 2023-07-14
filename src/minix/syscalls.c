@@ -2,6 +2,11 @@
 #include <unistd.h>
 #include "syscalls.h"
 
+unsigned short get_arg(emulator_t *emulator, unsigned short offset)
+{
+    return emulator_stack_get(emulator, emulator->processor->bx + offset);
+}
+
 short syscall_write(emulator_t *emulator)
 {
     unsigned short fd
@@ -53,4 +58,15 @@ unsigned int syscall_time(emulator_t *emulator)
     unsigned short bx = emulator->processor->bx;
     emulator_stack_set_dword(emulator, bx + 10, seconds);
     return seconds;
+}
+
+void syscall_ioctl(emulator_t *emulator)
+{
+    unsigned short fd = get_arg(emulator, 4);
+    unsigned short request = get_arg(emulator, 8);
+    unsigned short address = get_arg(emulator, 18);
+    if (emulator->verbose)
+    {
+        printf("<ioctl (%d, 0x%04x, 0x%04x)>\n", fd, request, address);
+    }
 }

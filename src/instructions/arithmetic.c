@@ -151,10 +151,11 @@ instruction_t *inc_rm(binary_stream_t *data)
     RET_INSTRUCTION(res, data, params, cb);
 }
 
-char *inc_reg(binary_stream_t *data)
+instruction_t *inc_reg(binary_stream_t *data)
 {
     params_t params;
-    return format_reg("inc", data, &params);
+    char *display = format_reg("inc", data, &params);
+    RET_INSTRUCTION(display, data, params, inc_reg_exec);
 }
 
 instruction_t *dec_reg(binary_stream_t *data)

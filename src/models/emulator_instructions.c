@@ -21,8 +21,8 @@ instruction_t *find_5_len_instruction(
 {
     switch (instruction)
     {
-        /*case 0b01000:
-            return inc_reg(stream);*/
+        case 0b01000:
+            return inc_reg(stream);
         case 0b01001:
             return dec_reg(stream);
         case 0b01010:
@@ -109,9 +109,9 @@ instruction_t *find_8_len_instruction(
 {
     switch (instruction)
     {
-        /*case 0b01110010:
+        case 0b01110010:
             return jb(stream);
-        case 0b01111000:
+        /*case 0b01111000:
             return js(stream);*/
         case 0b01110011:
             return jnb(stream);
@@ -227,17 +227,19 @@ void emulator_syscall(emulator_t *emulator)
     unsigned short opcode
         = emulator_stack_get(emulator, emulator->processor->bx + 2);
 
-    unsigned short res;
     switch (opcode)
     {
         case SYSCALL_EXIT:
-            res = syscall_exit(emulator);
+            syscall_exit(emulator);
             break;
         case SYSCALL_WRITE:
-            res = syscall_write(emulator);
+            syscall_write(emulator);
             break;
         case SYSCALL_TIME:
             syscall_time(emulator);
+            break;
+        case SYSCALL_IOCTL:
+            syscall_ioctl(emulator);
             break;
         default:
             errx(-1, "Syscall not found: %d", opcode);
