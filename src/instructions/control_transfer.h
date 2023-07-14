@@ -33,7 +33,7 @@ char *interrupt();
 instruction_t *interrupt_with_code(binary_stream_t *data);
 
 // RET
-char *ret_data(binary_stream_t *data);
+instruction_t *ret_seg_data(binary_stream_t *data);
 instruction_t *ret_seg(binary_stream_t *data);
 
 #endif /* !INSTRUCTIONS_CONTROL_TRANSFER_H */

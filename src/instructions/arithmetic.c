@@ -7,6 +7,7 @@
 #include "implementation/cmp.h"
 #include "implementation/convert.h"
 #include "implementation/dec.h"
+#include "implementation/jump.h"
 #include "implementation/or.h"
 #include "implementation/push.h"
 #include "implementation/sub.h"
@@ -123,6 +124,7 @@ instruction_t *inc_rm(binary_stream_t *data)
             break;
         case 0b001:
             snprintf(res, 50, "dec %s", rm_value);
+            cb = dec_rm_exec;
             break;
         case 0b010:
             snprintf(res, 50, "call %s", rm_value);
@@ -134,6 +136,7 @@ instruction_t *inc_rm(binary_stream_t *data)
             break;
         case 0b100:
             snprintf(res, 50, "jmp %s", rm_value);
+            cb = jmp_indirect_seg_exec;
             break;
         case 0b101:
             // TODO: indirect intersegment
@@ -187,17 +190,19 @@ instruction_t *cbw(binary_stream_t *data)
     RET_INSTRUCTION(res, data, params, cbw_exec);
 }
 
-char *cwd()
+instruction_t *cwd(binary_stream_t *data)
 {
     char *res = malloc(4);
     snprintf(res, 4, "cwd");
-    return res;
+    params_t params = {};
+    RET_INSTRUCTION(res, data, params, cwd_exec);
 }
 
-char *sub_immediate_to_acc(binary_stream_t *data)
+instruction_t *sub_immediate_to_acc(binary_stream_t *data)
 {
     params_t params;
-    return format_immediate_from_acc("sub", data, &params);
+    char *display = format_immediate_from_acc("sub", data, &params);
+    RET_INSTRUCTION(display, data, params, sub_immediate_acc_exec);
 }
 
 instruction_t *cmp_immediate_acc(binary_stream_t *data)

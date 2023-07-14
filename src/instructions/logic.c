@@ -1,9 +1,8 @@
 #include <malloc.h>
 #include <string.h>
 #include "logic.h"
+#include "implementation/arithmetic.h"
 #include "implementation/logic.h"
-#include "implementation/neg.h"
-#include "implementation/test.h"
 #include "utils.h"
 
 instruction_t *xor_rm_reg(binary_stream_t *data)
@@ -30,10 +29,11 @@ instruction_t *xor_rm_reg(binary_stream_t *data)
     RET_INSTRUCTION(instruction, data, params, xor_rm_reg_exec);
 }
 
-char *test_rm_reg(binary_stream_t *data)
+instruction_t *test_rm_reg(binary_stream_t *data)
 {
     params_t params;
-    return format_w_rm_to_reg("test", data, &params);
+    char *display = format_w_rm_to_reg("test", data, &params);
+    RET_INSTRUCTION(display, data, params, test_rm_reg_exec);
 }
 
 instruction_t *test_immediate_rm(binary_stream_t *data)
@@ -78,6 +78,7 @@ instruction_t *test_immediate_rm(binary_stream_t *data)
             break;
         case 0b110:
             snprintf(res, 50, "div %s", rm_value);
+            cb = div_exec;
             break;
         case 0b111:
             snprintf(res, 50, "idiv %s", rm_value);
@@ -147,10 +148,11 @@ char *and_immediate_acc(binary_stream_t *data)
     return format_immediate_from_acc("and", data, &params);
 }
 
-char *and_rm_reg(binary_stream_t *data)
+instruction_t *and_rm_reg(binary_stream_t *data)
 {
     params_t params;
-    return format_dw_rm_to_reg("and", data, &params);
+    char *display = format_dw_rm_to_reg("and", data, &params);
+    RET_INSTRUCTION(display, data, params, and_rm_reg_exec);
 }
 
 char *or_immediate_acc(binary_stream_t *data)

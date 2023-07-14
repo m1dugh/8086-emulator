@@ -34,6 +34,6 @@ char *out_var_port(binary_stream_t *data);
 
 // XCHG
 char *xchg_rm_with_reg(binary_stream_t *data);
-char *xchg_reg(binary_stream_t *data);
+instruction_t *xchg_reg(binary_stream_t *data);
 
 #endif // !INSTRUCTIONS_DATA_TRANSFER_H

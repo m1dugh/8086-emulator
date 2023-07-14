@@ -120,15 +120,14 @@ instruction_t *interrupt_with_code(binary_stream_t *data)
     RET_INSTRUCTION(res, data, params, interrupt_with_code_exec);
 }
 
-char *ret_data(binary_stream_t *data)
+instruction_t *ret_seg_data(binary_stream_t *data)
 {
-    unsigned char low = extract_byte(data);
-    unsigned char high = extract_byte(data);
-    unsigned short val = (high << 8) + low;
+    params_t params = {.w = 1};
+    extract_data(data, &params);
 
     char *res = malloc(20);
-    snprintf(res, 20, "ret %x", val);
-    return res;
+    snprintf(res, 20, "ret %x", params.data);
+    RET_INSTRUCTION(res, data, params, ret_seg_immediate_exec);
 }
 
 instruction_t *ret_seg(binary_stream_t *data)

@@ -89,17 +89,20 @@ void syscall_brk(emulator_t *emulator)
         printf("high address: %04x, requested: %04x",
             mem_seg_high_addr(emulator->data), address);
         set_res(emulator, 2, -ENOMEM);
-        printf("ENOMEM>\n");
+        if (emulator->verbose)
+            printf("ENOMEM>\n");
     }
     else if (mem_seg_expand(emulator->data, address) != 0)
     {
         set_res(emulator, 2, -ENOMEM);
-        printf("ENOMEM>\n");
+        if (emulator->verbose)
+            printf("ENOMEM>\n");
     }
     else
     {
         set_res(emulator, 2, 0);
         set_res(emulator, 18, address);
-        printf("0>\n");
+        if (emulator->verbose)
+            printf("0>\n");
     }
 }

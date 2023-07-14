@@ -29,8 +29,8 @@ instruction_t *find_5_len_instruction(
             return push_reg(stream);
         case 0b01011:
             return pop_reg(stream);
-            /*case 0b10010:
-              return xchg_reg(stream);*/
+        case 0b10010:
+            return xchg_reg(stream);
     }
     return NULL;
 }
@@ -47,9 +47,9 @@ instruction_t *find_6_len_instruction(
         /*case 0b000100:
             return adc_rm_with_reg(stream);
         case 0b000110:
-            return ssb_rm_with_reg(stream);
+            return ssb_rm_with_reg(stream);*/
         case 0b001000:
-            return and_rm_reg(stream);*/
+            return and_rm_reg(stream);
         case 0b001010:
             return sub_rm_with_reg(stream);
         case 0b001100:
@@ -74,14 +74,14 @@ instruction_t *find_7_len_instruction(
         /*case 0b0000010:
             return add_immediate_to_acc(stream);
         case 0b0000110:
-            return or_immediate_acc(stream);
+            return or_immediate_acc(stream);*/
         case 0b0010110:
-            return sub_immediate_to_acc(stream);*/
+            return sub_immediate_to_acc(stream);
         case 0b0011110:
             return cmp_immediate_acc(stream);
-        /*case 0b1000010:
+        case 0b1000010:
             return test_rm_reg(stream);
-        case 0b1000011:
+        /*case 0b1000011:
             return xchg_rm_with_reg(stream);
         case 0b1010000:
             return mov_mem_to_acc(stream);
@@ -137,9 +137,9 @@ instruction_t *find_8_len_instruction(
             return pop_rm(stream);*/
         case 0b10011000:
             return cbw(stream);
-        /*case 0b10011001:
-            return cwd();
-        case 0b11001100:
+        case 0b10011001:
+            return cwd(stream);
+        /*case 0b11001100:
             return interrupt();*/
         case 0b11001101:
             return interrupt_with_code(stream);
@@ -157,9 +157,9 @@ instruction_t *find_8_len_instruction(
             return jmp_direct_seg_short(stream);
         case 0b11110100:
             return hlt();
-        /*case 0b11001010:
+        /*case 0b11001010:*/
         case 0b11000010:
-            return ret_data(stream);*/
+            return ret_seg_data(stream);
         // case 0b11001011:
         case 0b11000011:
             return ret_seg(stream);

@@ -1,5 +1,6 @@
 #include <malloc.h>
 #include <stdio.h>
+#include <string.h>
 #include "data_transfer.h"
 #include "implementation/mov.h"
 #include "implementation/push.h"
@@ -125,8 +126,13 @@ char *xchg_rm_with_reg(binary_stream_t *data)
 {
     return format_w_rm_to_reg_d("xchg", data, 0);
 }
-char *xchg_reg(binary_stream_t *data)
+instruction_t *xchg_reg(binary_stream_t *data)
 {
     params_t params;
-    return format_reg_to_acc("xchg", data, &params);
+    char *display = format_reg_to_acc("xchg", data, &params);
+
+    if (params.reg == AX)
+        snprintf(display, strlen(display) + 1, "nop");
+
+    RET_INSTRUCTION(display, data, params, xchg_reg_exec);
 }

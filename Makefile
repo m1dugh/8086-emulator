@@ -18,7 +18,7 @@ SRC_DIR=./src
 
 INSTRUCTION_IMPLEMENTATION=xor mov utils lea add cmp jump test push call \
 						   processor_control dec shift pop sub interrupts \
-						   or inc convert and neg
+						   or inc convert and neg div xchg
 _INSTRUCTION_IMPL_FULL_PATH=$(addprefix instructions/implementation/, $(INSTRUCTION_IMPLEMENTATION))
 
 INSTRUCTION_IMPL_SECTIONS=data_transfer logic arithmetic control_transfer

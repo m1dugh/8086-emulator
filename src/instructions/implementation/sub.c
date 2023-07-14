@@ -86,3 +86,14 @@ void sub_rm_reg_exec(emulator_t *emulator, params_t params)
         proc->flags.c = get_carry_byte(res);
     }
 }
+
+void sub_immediate_acc_exec(emulator_t *emulator, params_t params)
+{
+    params.mod = 0b11;
+    if (params.w)
+        params.rm = AX;
+    else
+        params.rm = AL;
+    params.d = 0;
+    sub_immediate_rm_exec(emulator, params);
+}

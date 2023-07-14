@@ -5,5 +5,6 @@
 #include "mov.h"
 #include "pop.h"
 #include "push.h"
+#include "xchg.h"
 
 #endif // !EMULATOR_INSTRUCTIONS_IMPLEMENTATION_DATA_TRANSFER_H

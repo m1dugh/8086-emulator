@@ -67,3 +67,10 @@ void jnle_exec(emulator_t *emulator, params_t params)
     jump_exec(emulator, params,
         proc->flags.z == 0 && proc->flags.s == proc->flags.o);
 }
+
+void jmp_indirect_seg_exec(emulator_t *emulator, params_t params)
+{
+    unsigned short position = emulator_get_rm(emulator, params);
+    params.data = position;
+    jmp_exec(emulator, params);
+}

@@ -5,6 +5,7 @@
 #include "cmp.h"
 #include "convert.h"
 #include "dec.h"
+#include "div.h"
 #include "inc.h"
 #include "sub.h"
 

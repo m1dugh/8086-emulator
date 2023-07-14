@@ -6,6 +6,7 @@
 void jnb_exec(emulator_t *emulator, params_t params);
 void jne_exec(emulator_t *emulator, params_t params);
 void jmp_exec(emulator_t *emulator, params_t params);
+void jmp_indirect_seg_exec(emulator_t *emulator, params_t params);
 void jl_exec(emulator_t *emulator, params_t params);
 void je_exec(emulator_t *emulator, params_t params);
 void jnl_exec(emulator_t *emulator, params_t params);
