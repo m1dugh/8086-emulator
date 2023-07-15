@@ -125,6 +125,7 @@ instruction_t *shift_left(binary_stream_t *data)
             break;
         case 0b111:
             instruction = "sar";
+            cb = sar_exec;
             break;
         default:
             return NULL;
