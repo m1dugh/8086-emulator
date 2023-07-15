@@ -89,11 +89,11 @@ instruction_t *find_7_len_instruction(
             return test_immediate_acc(stream);*/
         case 0b1100011:
             return mov_immediate_to_rm(stream);
-        /*case 0b1110010:
+        case 0b1110010:
             return in_fixed_port(stream);
         case 0b1110110:
             return in_var_port(stream);
-        case 0b1111001:
+        /*case 0b1111001:
             return rep_string(stream);*/
         case 0b1111011:
             return test_immediate_rm(stream);

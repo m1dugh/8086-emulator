@@ -27,8 +27,8 @@ char *push_seg_reg(binary_stream_t *stream);
 instruction_t *lea(binary_stream_t *stream);
 
 // IN/OUT
-char *in_fixed_port(binary_stream_t *stream);
-char *in_var_port(binary_stream_t *stream);
+instruction_t *in_fixed_port(binary_stream_t *stream);
+instruction_t *in_var_port(binary_stream_t *stream);
 char *out_fixed_port(binary_stream_t *data);
 char *out_var_port(binary_stream_t *data);
 

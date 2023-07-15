@@ -80,15 +80,15 @@ instruction_t *pop_reg(binary_stream_t *data)
     RET_INSTRUCTION(display, data, params, pop_reg_exec);
 }
 
-char *in_out_port(char *val, binary_stream_t *data, int fixed)
+char *in_out_port(
+    char *val, binary_stream_t *data, int fixed, params_t *params)
 {
-    params_t params;
-    if (extract_w(data, &params) != 0)
+    if (extract_w(data, params) != 0)
     {
         return NULL;
     }
 
-    char *reg = get_reg(params.w, 0b000);
+    char *reg = get_reg(params->w, 0b000);
     char *res = malloc(16);
     if (!fixed)
     {
@@ -102,24 +102,30 @@ char *in_out_port(char *val, binary_stream_t *data, int fixed)
     return res;
 }
 
-char *in_fixed_port(binary_stream_t *data)
+instruction_t *in_fixed_port(binary_stream_t *data)
 {
-    return in_out_port("in", data, 1);
+    params_t params = {};
+    char *display = in_out_port("in", data, 1, &params);
+    RET_INSTRUCTION(display, data, params, NULL);
 }
 
-char *in_var_port(binary_stream_t *data)
+instruction_t *in_var_port(binary_stream_t *data)
 {
-    return in_out_port("in", data, 0);
+    params_t params;
+    char *display = in_out_port("in", data, 0, &params);
+    RET_INSTRUCTION(display, data, params, NULL);
 }
 
 char *out_fixed_port(binary_stream_t *data)
 {
-    return in_out_port("out", data, 1);
+    params_t params;
+    return in_out_port("out", data, 1, &params);
 }
 
 char *out_var_port(binary_stream_t *data)
 {
-    return in_out_port("out", data, 0);
+    params_t params;
+    return in_out_port("out", data, 0, &params);
 }
 
 char *xchg_rm_with_reg(binary_stream_t *data)

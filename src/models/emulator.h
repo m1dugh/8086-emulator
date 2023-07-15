@@ -43,6 +43,9 @@ typedef struct emulator_t
     struct exec_header header;
     FILE *file;
     unsigned char verbose;
+    /// Whether the emulator should disassemble only
+    /// or execute too
+    unsigned char execute;
     /// An additional string to display at the end of the instruction in
     /// verbose mode This buffer is preallocated with length ADDITIONAL_SIZE
     char *_additionals;

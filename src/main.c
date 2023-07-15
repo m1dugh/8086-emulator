@@ -13,13 +13,13 @@
 int execute_instructions(
     instruction_t *data, unsigned long address, emulator_t *emulator)
 {
-    if (emulator->verbose)
+    if (emulator->verbose && emulator->execute)
     {
         char *proc_display = processor_display(emulator->processor);
         printf("%s ", proc_display);
         free(proc_display);
     }
-    if (data->callback == NULL)
+    if (emulator->execute && data->callback == NULL)
     {
         fprintf(
             stderr, "Missing exec function for instruction %s", data->display);
@@ -27,9 +27,10 @@ int execute_instructions(
     }
 
     emulator->processor->ip += data->instruction_len;
-    data->callback(emulator, data->params);
+    if (emulator->execute)
+        data->callback(emulator, data->params);
 
-    if (emulator->verbose)
+    if (emulator->verbose || !emulator->execute)
     {
         char *additionals
             = emulator->_has_additionals ? emulator->_additionals : NULL;
@@ -74,6 +75,7 @@ emulator_t *configure_emulator(int argc, char **argv)
     char *env[] = {env_str, NULL};
     emulator_prepare(emulator, env, argc - i, argv + i);
     emulator->verbose = verbose;
+    emulator->execute = !disassm;
     UNUSED(disassm);
 
     return emulator;
